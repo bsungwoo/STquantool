@@ -1,0 +1,40 @@
+Package: STquantool
+Title: ST analysis tool to visualize and quantify multiple datasets
+Version: 1.0.0
+Authors@R: 
+    c(person(given = "Sungwoo",
+             family = "Bae",
+             role = c("aut", "cre"),
+             email = "bsungwoo@snu.ac.kr",
+             comment = c(ORCID = "0000-0002-3484-3749")))
+Description: ST analysis tool based on R shiny platform to visualize and quantify multiple datasets. It first integrates and clusters multiple ST datasets based on reciprocal PCA. Then, it visualizes the results based on Seurat and clusterProfiler packages, finds differentially expressed genes, performs cell type decomposition, and quantify regional cell composition or gene expression
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
+Imports: 
+      shiny (>= 1.7.2),
+      shinyFiles,
+      shinycssloaders,
+      shinybusy,
+      shinymanager,
+      shinyjs,
+      shinythemes,
+      Seurat (>= 4.1.0),
+      dplyr (>= 1.0.7),
+      rhdf5,
+      DT,
+      data.table (>= 1.14.0),
+      BiocManager,
+      EnhancedVolcano (>= 1.12.0),
+      clusterProfiler (>= 4.2.2),
+      org.Mm.eg.db,
+      org.Hs.eg.db,
+      reticulate (>= 1.25),
+      colormap,
+      stringr,
+      moments,
+      magick (>= 2.7.3),
+      rjson,
+      ggpubr,
+      ggridges
