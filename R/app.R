@@ -310,7 +310,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                            condition = "input.cluster_tabset == 'Freq'",
                                            shiny::tabsetPanel(
                                              shiny::tabPanel("Plot", shiny::plotOutput("sc_freqplot") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                             shiny::tabPanel("Table", shiny::dataTableOutput("sc_freqstats") %>% shinycssloaders::withSpinner(color="#0000FF"))
+                                             shiny::tabPanel("Table", DT::dataTableOutput("sc_freqstats") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                            )
                                          )
                                        )
@@ -547,7 +547,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                       shiny::actionButton("sp_feat_upload","Save gene list")
                                                     ),
                                                     shiny::wellPanel(
-                                                      shiny::dataTableOutput("sp_csv_table") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                                      DT::dataTableOutput("sp_csv_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                                     )
                                            )
                                          )
@@ -719,7 +719,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::actionButton(inputId = "sc_marker_upload", label = "Save genes")
                                        ),
                                        shiny::mainPanel(
-                                         shiny::dataTableOutput("sc_marker_table") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                         DT::dataTableOutput("sc_marker_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
@@ -763,7 +763,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::actionButton(inputId = "sc_deg_upload", label = "Save genes")
                                        ),
                                        shiny::mainPanel(
-                                         shiny::dataTableOutput("sc_deg_table") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                         DT::dataTableOutput("sc_deg_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
@@ -787,7 +787,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                        shiny::mainPanel(
                                          shiny::tabsetPanel(
                                            shiny::tabPanel("Plot", shiny::plotOutput("sc_deg_volcano") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                           shiny::tabPanel("Table", shiny::dataTableOutput("sc_deg_filter_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
+                                           shiny::tabPanel("Table", DT::dataTableOutput("sc_deg_filter_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                          )
                                        )
                                      )
@@ -822,7 +822,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                        shiny::mainPanel(
                                          shiny::tabsetPanel(
                                            shiny::tabPanel("Plot", shiny::plotOutput("sc_deg_enrich") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                           shiny::tabPanel("Table", shiny::dataTableOutput("sc_deg_enrich_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
+                                           shiny::tabPanel("Table", DT::dataTableOutput("sc_deg_enrich_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                          )
                                        )
                                      )
@@ -898,7 +898,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::actionButton(inputId = "module_score_start", label = "Generate")
                                        ),
                                        shiny::mainPanel(
-                                         shiny::dataTableOutput("module_score_table") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                         DT::dataTableOutput("module_score_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
@@ -1018,7 +1018,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                        shiny::mainPanel(
                                          shiny::tabsetPanel(
                                            shiny::tabPanel("Plot", shiny::plotOutput("quantitation_plot") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                           shiny::tabPanel("Table", shiny::dataTableOutput("quantitation_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
+                                           shiny::tabPanel("Table", DT::dataTableOutput("quantitation_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                          )
                                        )
                                      )
