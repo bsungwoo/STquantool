@@ -13,92 +13,77 @@ jscode <- "shinyjs.closeWindow = function() { window.close(); }"
 #' Internal UI function
 #' @description UI function for STquantool
 #' @keywords internal
-#' @importFrom shiny actionButton br checkboxInput column conditionalPanel
-#' @importFrom shiny dataTableOutput div downloadButton downloadHandler
-#' @importFrom shiny eventReactive fileInput flowLayout fluidPage fluidRow
-#' @importFrom shiny h1 h2 h3 h4 h5 h6 img isolate
-#' @importFrom shiny mainPanel modalButton modalDialog navbarMenu navbarPage
-#' @importFrom shiny observe observeEvent plotOutput radioButtons reactive
-#' @importFrom shiny reactiveVal reactiveValues removeModal renderDataTable
-#' @importFrom shiny renderImage renderPlot renderPrint renderTable
-#' @importFrom shiny renderText runApp
-#' @importFrom shiny selectInput selectizeInput
-#' @importFrom shiny shinyApp showModal
-#' @importFrom shiny sidebarLayout sidebarPanel sliderInput stopApp
-#' @importFrom shiny tableOutput tabPanel tabsetPanel textInput textOutput titlePanel
-#' @importFrom shiny updateCheckboxInput updateNumericInput updateRadioButtons updateSelectInput
-#' @importFrom shiny updateSelectizeInput updateSliderInput updateTextInput verbatimTextOutput wellPanel
-ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab"),
-                 tabPanel(title = "Info",
-                          h2(style = "font-family:San-serif", "STquantool"),
-                          br(),
-                          h4(style = "font-family:San-serif",
+ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab"),
+                 shiny::tabPanel(title = "Info",
+                          shiny::h2(style = "font-family:San-serif", "STquantool"),
+                          shiny::br(),
+                          shiny::h4(style = "font-family:San-serif",
                              paste0("ST analysis tool to visualize and quantify multiple datasets")),
                           # Image insertion
-                          img(height=400,width=700,src=system.file("www", "Main.png", package="STquantool")),
+                          shiny::img(height=400,width=700,src="Main.png"),
                           shinyjs::useShinyjs(),
                           shinyjs::extendShinyjs(text = jscode, functions = c("closeWindow")),
-                          br(),
-                          actionButton("close", "End session")
+                          shiny::br(),
+                          shiny::actionButton("close", "End session")
                  ),
 
-                 tabPanel(title = "Set directory (Load & Save)",
-                          mainPanel(
-                            fluidRow(
-                              column(7,
-                                     wellPanel(style = "height:350px;",
-                                               h4("Set directory and make output folder"),
+                 shiny::tabPanel(title = "Set directory (Load & Save)",
+                          shiny::mainPanel(
+                            shiny::fluidRow(
+                              shiny::column(7,
+                                     shiny::wellPanel(style = "height:350px;",
+                                               shiny::h4("Set directory and make output folder"),
                                                shinyFiles::shinyDirButton("dir", "Find directory", "Search"),
-                                               verbatimTextOutput("dir", placeholder = TRUE),
-                                               actionButton(inputId = "set_wd", label = "Set working directory"),
-                                               br(),
-                                               br(),
-                                               textInput(inputId = "output_folder_name",
+                                               shiny::verbatimTextOutput("dir", placeholder = TRUE),
+                                               shiny::actionButton(inputId = "set_wd", label = "Set working directory"),
+                                               shiny::br(),
+                                               shiny::br(),
+                                               shiny::textInput(inputId = "output_folder_name",
                                                          label = "Name of the output folder"),
-                                               actionButton(inputId = "output_make", label = "Assign output folder")
+                                               shiny::actionButton(inputId = "output_make", label = "Assign output folder")
                                      )
                               ),
 
-                              column(5,
-                                     wellPanel(style = "height:350px;",
-                                               h4("Upload & Save"),
-                                               radioButtons("save_radio","Data format",
+                              shiny::column(5,
+                                     shiny::wellPanel(style = "height:350px;",
+                                               shiny::h4("Upload & Save"),
+                                               shiny::radioButtons("save_radio","Data format",
                                                             choices = list("Single-cell","Spatial", "Genes: stored", "Genes: abundance"),
                                                             selected = "Single-cell"),
-                                               actionButton("data_save", "Data save"),
+                                               shiny::actionButton("data_save", "Data save"),
                                                shinyFiles::shinyFilesButton("data_load", "Data load", "Search", FALSE),
-                                               br(),br(),
-                                               h4("Convert file to sparse matrix (.rds)"),
-                                               actionButton("convert_file_to_sparse", "Convert")
+                                               shiny::br(),shiny::br(),
+                                               shiny::h4("Convert file to sparse matrix (.rds)"),
+                                               shiny::actionButton("convert_file_to_sparse", "Convert")
 
                                      )
                               )
                             ),
-                            fluidRow(
-                              column(12,
-                                     wellPanel(style = "height:100px;",
-                                               verbatimTextOutput("cmd")
+                            shiny::fluidRow(
+                              shiny::column(12,
+                                     shiny::wellPanel(style = "height:100px;",
+                                               shiny::verbatimTextOutput("cmd")
                                      )
                               )
                             )
                           )
                  ),
-                 tabPanel(title = "QC",
-                          sidebarLayout(
-                            sidebarPanel(
-                              tabsetPanel(id = "qc_tabset",
-                                          tabPanel("Directory",
-                                                   br(),
+                 shiny::tabPanel(title = "QC",
+                          shiny::sidebarLayout(
+                            shiny::sidebarPanel(
+                              shiny::tabsetPanel(id = "qc_tabset",
+                                          shiny::tabPanel("Directory",
+                                                   shiny::br(),
                                                    shinyFiles::shinyDirButton('qc_dir', 'Find directory for QC',
                                                                   'Search'),
-                                                   verbatimTextOutput("qc_dir", placeholder = TRUE),
-                                                   radioButtons("qc_data_type","Data format",
+                                                   shiny::verbatimTextOutput("qc_dir", placeholder = TRUE),
+                                                   shiny::radioButtons("qc_data_type","Data format",
                                                                 choices = list("Single-cell", "Spatial"),
                                                                 selected = "Single-cell"),
-                                                   actionButton(inputId = "dir_qc", label = "Data load")
+                                                   shiny::actionButton(inputId = "dir_qc", label = "Data load")
                                           ),
-                                          tabPanel("Single-cell",
-                                                   wellPanel(
+                                          shiny::tabPanel("Single-cell",
+                                                   shiny::wellPanel(
                                                      sliderInput(inputId = "nCount_RNA",
                                                                  label = "nCount_RNA: threshold",
                                                                  value = 100, min = 0, max = 1000, step=10),
@@ -109,8 +94,8 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                                  label = "nFeature_RNA: threshold",
                                                                  value = 300, min = 0, max = 1000, step=10)
                                                    ),
-                                                   wellPanel(
-                                                     radioButtons("qc_radio","Histogram choices",
+                                                   shiny::wellPanel(
+                                                     shiny::radioButtons("qc_radio","Histogram choices",
                                                                   choices = list("nCount_RNA", "nFeature_RNA", "percent.mt"),
                                                                   selected = "nCount_RNA"),
                                                      sliderInput(inputId = "histo_breaks",
@@ -120,10 +105,10 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                                  label = "Histogram limits",
                                                                  value = 2000, min = 0, max = 3000, step=100)
                                                    ),
-                                                   actionButton(inputId = "qc_start", label = "QC plot")
+                                                   shiny::actionButton(inputId = "qc_start", label = "QC plot")
                                           ),
-                                          tabPanel(title = "Spatial",
-                                                   wellPanel(
+                                          shiny::tabPanel(title = "Spatial",
+                                                   shiny::wellPanel(
                                                      sliderInput(inputId = "sp_nCount_Spatial",
                                                                  label = "nCount_Spatial: threshold",
                                                                  value = 100, min = 0, max = 1000, step=10),
@@ -134,8 +119,8 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                                  label = "nFeature_RNA: threshold",
                                                                  value = 300, min = 0, max = 1000, step=10)
                                                    ),
-                                                   wellPanel(
-                                                     radioButtons("qc_sp_radio","Histogram & Visualization choices",
+                                                   shiny::wellPanel(
+                                                     shiny::radioButtons("qc_sp_radio","Histogram & Visualization choices",
                                                                   choices = list("nCount_Spatial", "nFeature_Spatial", "percent.mt"),
                                                                   selected = "nCount_Spatial"),
                                                      sliderInput(inputId = "histo_sp_breaks",
@@ -148,71 +133,71 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                                  label = "Mapping on tissue: minmax",
                                                                  value = c(0,100), min = 0, max = 100, step=100)
                                                    ),
-                                                   actionButton(inputId = "qc_sp_start", label = "QC plot"),
-                                                   actionButton(inputId = "horizontal_flip_start", label = "Flip image: horizontal"),
-                                                   actionButton(inputId = "vertical_flip_start", label = "Flip image: vertical")
+                                                   shiny::actionButton(inputId = "qc_sp_start", label = "QC plot"),
+                                                   shiny::actionButton(inputId = "horizontal_flip_start", label = "Flip image: horizontal"),
+                                                   shiny::actionButton(inputId = "vertical_flip_start", label = "Flip image: vertical")
                                           )
                               )
                             ),
-                            mainPanel(
-                              conditionalPanel(
+                            shiny::mainPanel(
+                              shiny::conditionalPanel(
                                 condition = "input.qc_tabset=='Directory' & input.qc_data_type=='Single-cell'",
-                                plotOutput("sc_qc_vlnplot") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                shiny::plotOutput("sc_qc_vlnplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                               ),
-                              conditionalPanel(
+                              shiny::conditionalPanel(
                                 condition = "input.qc_tabset=='Directory' & input.qc_data_type=='Spatial'",
-                                plotOutput("sp_qc_vlnplot") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                shiny::plotOutput("sp_qc_vlnplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                               ),
-                              conditionalPanel(
+                              shiny::conditionalPanel(
                                 condition = "input.qc_tabset=='Single-cell' & input.qc_data_type=='Single-cell'",
-                                plotOutput("sc_feat_scatter") %>% shinycssloaders::withSpinner(color="#0000FF"),
-                                plotOutput("sc_hist") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                shiny::plotOutput("sc_feat_scatter") %>% shinycssloaders::withSpinner(color="#0000FF"),
+                                shiny::plotOutput("sc_hist") %>% shinycssloaders::withSpinner(color="#0000FF")
                               ),
-                              conditionalPanel(
+                              shiny::conditionalPanel(
                                 condition = "input.qc_tabset=='Spatial' & input.qc_data_type=='Spatial'",
-                                tabsetPanel(
-                                  tabPanel("Plot", plotOutput("sp_feat_scatter") %>% shinycssloaders::withSpinner(color="#0000FF"),
-                                           plotOutput("sp_hist") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                  tabPanel("Tissue", plotOutput("sp_tissue") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                shiny::tabsetPanel(
+                                  shiny::tabPanel("Plot", shiny::plotOutput("sp_feat_scatter") %>% shinycssloaders::withSpinner(color="#0000FF"),
+                                           shiny::plotOutput("sp_hist") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                  shiny::tabPanel("Tissue", shiny::plotOutput("sp_tissue") %>% shinycssloaders::withSpinner(color="#0000FF")
                                   )
                                 )
                               )
                             )
                           )
                  ),
-                 tabPanel(title = "Preprocessing",
-                          titlePanel("Preprocessing single or multiple datasets"),
-                          mainPanel(
-                            wellPanel(
+                 shiny::tabPanel(title = "Preprocessing",
+                          shiny::titlePanel("Preprocessing single or multiple datasets"),
+                          shiny::mainPanel(
+                            shiny::wellPanel(
                               shinyFiles::shinyDirButton('dir_integ', 'Integration directory',
                                              'Search', multiple=TRUE),
-                              verbatimTextOutput("dir_integ", placeholder = TRUE),
-                              actionButton(inputId = "check_files", label = "Check Files"),
-                              verbatimTextOutput("dir_list", placeholder = TRUE),
-                              radioButtons("preproc_radio","Data format",
+                              shiny::verbatimTextOutput("dir_integ", placeholder = TRUE),
+                              shiny::actionButton(inputId = "check_files", label = "Check Files"),
+                              shiny::verbatimTextOutput("dir_list", placeholder = TRUE),
+                              shiny::radioButtons("preproc_radio","Data format",
                                            choices = list("Single-cell","Spatial"),
                                            selected = "Single-cell"),
-                              selectInput("dir_integ_sel","Select files to include",
+                              shiny::selectInput("dir_integ_sel","Select files to include",
                                           choices = "", multiple=TRUE),
-                              selectInput(inputId = "ref_index",
+                              shiny::selectInput(inputId = "ref_index",
                                           label = "Select files for reference dataset (blank for NULL)",
                                           choices = "", multiple=TRUE),
-                              textInput(inputId = "grp_name",
+                              shiny::textInput(inputId = "grp_name",
                                         label = "Names for each data: separated by comma, no space",
                                         value="")
                             ),
-                            conditionalPanel(
+                            shiny::conditionalPanel(
                               condition = "input.preproc_radio == 'Single-cell'",
-                              wellPanel(
-                                textInput(inputId = "nFeature_RNA_thres",
+                              shiny::wellPanel(
+                                shiny::textInput(inputId = "nFeature_RNA_thres",
                                           label = "Lower thresholds for total number of genes in a cell: separated by comma, no space",
                                           value=""),
-                                textInput(inputId = "percent_mt_thres",
+                                shiny::textInput(inputId = "percent_mt_thres",
                                           label = "Upper thresholds for mitochondrial gene % in a cell: separated by comma, no space",
                                           value="")
                               )
                             ),
-                            wellPanel(
+                            shiny::wellPanel(
                               sliderInput(inputId = "n_var_features",
                                           label = "Number of HVGs",
                                           value = 2000, min = 1000, max = 5000, step=10),
@@ -228,77 +213,77 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                               sliderInput(inputId = "cluster_resolution",
                                           label = "Clustering resolution",
                                           value = 0.3, min = 0, max = 1, step=0.05),
-                              actionButton(inputId = "integ_start", label = "Integration start")
+                              shiny::actionButton(inputId = "integ_start", label = "Integration start")
                             )
                           )
                  ),
-                 navbarMenu(title = "Visualization",
-                            tabPanel(title = "Dimension & Freq. plot",
-                                     titlePanel("Visualize clusters"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         tabsetPanel(id = "cluster_tabset",
-                                                     tabPanel("Dimplot", value = "Dimplot",
-                                                              wellPanel(
-                                                                radioButtons("dimplot_radio","Data format",
+                 shiny::navbarMenu(title = "Visualization",
+                            shiny::tabPanel(title = "Dimension & Freq. plot",
+                                     shiny::titlePanel("Visualize clusters"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::tabsetPanel(id = "cluster_tabset",
+                                                     shiny::tabPanel("Dimplot", value = "Dimplot",
+                                                              shiny::wellPanel(
+                                                                shiny::radioButtons("dimplot_radio","Data format",
                                                                              choices = list("Single-cell","Spatial"),
                                                                              selected = "Single-cell"),
-                                                                selectInput("sc_group_var","Group name",
+                                                                shiny::selectInput("sc_group_var","Group name",
                                                                             c("orig.ident" = "orig.ident",
                                                                               "seurat_clusters" = "seurat_clusters"),
                                                                             selected = "orig.ident"),
-                                                                textInput(inputId = "sc_vis_title",
+                                                                shiny::textInput(inputId = "sc_vis_title",
                                                                           label = "Title of the plot",
                                                                           value="Cluster plot"),
                                                                 sliderInput(inputId = "sc_dot_size",
                                                                             label = "Size of the dot",
                                                                             value = 0, min = 0, max = 2, step=0.05),
-                                                                checkboxInput("sc_vis_label","Label on", value = TRUE),
-                                                                conditionalPanel(
+                                                                shiny::checkboxInput("sc_vis_label","Label on", value = TRUE),
+                                                                shiny::conditionalPanel(
                                                                   condition = "input.sc_vis_label==true",
-                                                                  wellPanel(
+                                                                  shiny::wellPanel(
                                                                     sliderInput(inputId = "sc_label_size",
                                                                                 label = "Size of the label text",
                                                                                 value = 4, min = 0, max = 10, step=1)
                                                                   )
                                                                 ),
-                                                                checkboxInput("sc_cell_high","Cell highlight", value = FALSE),
-                                                                conditionalPanel(
+                                                                shiny::checkboxInput("sc_cell_high","Cell highlight", value = FALSE),
+                                                                shiny::conditionalPanel(
                                                                   condition = "input.sc_cell_high==true",
-                                                                  wellPanel(
-                                                                    textInput(inputId = "sc_cell_high_color",
+                                                                  shiny::wellPanel(
+                                                                    shiny::textInput(inputId = "sc_cell_high_color",
                                                                               label = "Cell highlight color",
                                                                               value= "#DE2D26"),
-                                                                    selectInput("sc_cell_high_cluster","Choose clusters to highlight:","",
+                                                                    shiny::selectInput("sc_cell_high_cluster","Choose clusters to highlight:","",
                                                                                 multiple=TRUE)
                                                                   )
                                                                 ),
-                                                                actionButton(inputId = "sc_vis_clust_start", label = "Plot"),
-                                                                actionButton("sc_clust_save","Save")
+                                                                shiny::actionButton(inputId = "sc_vis_clust_start", label = "Plot"),
+                                                                shiny::actionButton("sc_clust_save","Save")
                                                               )
                                                      ),
-                                                     tabPanel("Frequency", value = "Freq",
-                                                              wellPanel(
-                                                                radioButtons("freqplot_radio","Data format",
+                                                     shiny::tabPanel("Frequency", value = "Freq",
+                                                              shiny::wellPanel(
+                                                                shiny::radioButtons("freqplot_radio","Data format",
                                                                              choices = list("Single-cell","Spatial"),
                                                                              selected = "Single-cell"),
-                                                                selectInput("sc_group_var_freq","Group name (x-axis)",
+                                                                shiny::selectInput("sc_group_var_freq","Group name (x-axis)",
                                                                             c("orig.ident" = "orig.ident",
                                                                               "seurat_clusters" = "seurat_clusters",
                                                                               "cluster" = "cluster"),
                                                                             selected = "orig.ident"),
-                                                                selectInput("sc_cluster_var_freq","Cluster name (y-axis)",
+                                                                shiny::selectInput("sc_cluster_var_freq","Cluster name (y-axis)",
                                                                             c("orig.ident" = "orig.ident",
                                                                               "seurat_clusters" = "seurat_clusters"),
                                                                             selected = "seurat_clusters"),
-                                                                textInput(inputId = "sc_freq_x_title",
+                                                                shiny::textInput(inputId = "sc_freq_x_title",
                                                                           label = "x-axis title",
                                                                           value= "Groups"),
-                                                                textInput(inputId = "sc_freq_y_title",
+                                                                shiny::textInput(inputId = "sc_freq_y_title",
                                                                           label = "y-axis title",
                                                                           value= "Frequency"),
-                                                                checkboxInput("sc_check_x_axis_text", "x-axis text", value=FALSE),
-                                                                conditionalPanel(
+                                                                shiny::checkboxInput("sc_check_x_axis_text", "x-axis text", value=FALSE),
+                                                                shiny::conditionalPanel(
                                                                   condition = "input.sc_check_x_axis_text==true",
                                                                   sliderInput(inputId = "sc_freq_x_angle",
                                                                               label = "Angle of x-axis text",
@@ -307,82 +292,82 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                                               label = "Size of x-axis text",
                                                                               value = 12, min=0, max=30, step=1)
                                                                 ),
-                                                                checkboxInput("sc_freq_label","Visualize freq", value = FALSE),
-                                                                actionButton(inputId = "sc_vis_freq_start", label = "Plot"),
-                                                                actionButton("sc_freq_save","Save")
+                                                                shiny::checkboxInput("sc_freq_label","Visualize freq", value = FALSE),
+                                                                shiny::actionButton(inputId = "sc_vis_freq_start", label = "Plot"),
+                                                                shiny::actionButton("sc_freq_save","Save")
                                                               )
                                                      )
                                          )
                                        ),
-                                       mainPanel(
-                                         conditionalPanel(
+                                       shiny::mainPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.cluster_tabset == 'Dimplot'",
-                                           plotOutput("sc_dimplot") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                           shiny::plotOutput("sc_dimplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                          ),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.cluster_tabset == 'Freq'",
-                                           tabsetPanel(
-                                             tabPanel("Plot", plotOutput("sc_freqplot") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                             tabPanel("Table", dataTableOutput("sc_freqstats") %>% shinycssloaders::withSpinner(color="#0000FF"))
+                                           shiny::tabsetPanel(
+                                             shiny::tabPanel("Plot", shiny::plotOutput("sc_freqplot") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                             shiny::tabPanel("Table", shiny::dataTableOutput("sc_freqstats") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                            )
                                          )
                                        )
                                      )
                             ),
 
-                            tabPanel(title = "Feature plot",
-                                     titlePanel("Visualize gene expression"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         radioButtons("featureplot_radio","Data format",
+                            shiny::tabPanel(title = "Feature plot",
+                                     shiny::titlePanel("Visualize gene expression"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::radioButtons("featureplot_radio","Data format",
                                                       choices = list("Single-cell","Spatial"),
                                                       selected = "Single-cell"),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.sc_check_metadata==true",
-                                           selectInput(inputId = "sc_vis_metadata",
+                                           shiny::selectInput(inputId = "sc_vis_metadata",
                                                        label = "Choose metadata to visualize",
                                                        choices = "", multiple = TRUE)
                                          ),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.sc_check_metadata==false",
-                                           selectInput("sc_check_saved_genes","Show saved gene list",
+                                           shiny::selectInput("sc_check_saved_genes","Show saved gene list",
                                                        choice = c("All","Top 1001~2000","Top 2001~3000"),
                                                        multiple=FALSE, selected="All"),
-                                           selectizeInput(inputId = "sc_vis_feat",
+                                           shiny::selectizeInput(inputId = "sc_vis_feat",
                                                           label = "Choose genes to visualize",
                                                           choices="", multiple = TRUE)
                                          ),
-                                         checkboxInput("sc_check_metadata","Show metadata list", value = FALSE),
+                                         shiny::checkboxInput("sc_check_metadata","Show metadata list", value = FALSE),
                                          sliderInput(inputId = "sc_feat_minmax",
                                                      label = "Min max value",
                                                      value = c(0,3), min = 0, max = 10, step=0.1),
-                                         textInput(inputId = "sc_feat_color",
+                                         shiny::textInput(inputId = "sc_feat_color",
                                                    label = "Color",
                                                    value= "blue"),
                                          numericInput(inputId = "sc_feat_ncol",
                                                       label = "Number of columns",
                                                       value = 2, min = 1, max=10),
-                                         actionButton(inputId = "sc_vis_feat_start", label = "Plot"),
-                                         actionButton("sc_feat_save","Save")
+                                         shiny::actionButton(inputId = "sc_vis_feat_start", label = "Plot"),
+                                         shiny::actionButton("sc_feat_save","Save")
                                        ),
-                                       mainPanel(
-                                         plotOutput("sc_featplot") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                       shiny::mainPanel(
+                                         shiny::plotOutput("sc_featplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
 
-                            tabPanel(title = "Spatial cluster plot",
-                                     titlePanel("Visualize spatial clusters"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         selectInput(inputId = "sp_clust_cluster_name",
+                            shiny::tabPanel(title = "Spatial cluster plot",
+                                     shiny::titlePanel("Visualize spatial clusters"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::selectInput(inputId = "sp_clust_cluster_name",
                                                      label = "Group name",
                                                      choices = c("orig.ident","seurat_clusters"),
                                                      selected = "seurat_clusters"),
-                                         checkboxInput("sp_check_cluster_transparency","Transparency", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("sp_check_cluster_transparency","Transparency", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.sp_check_cluster_transparency==true",
-                                           wellPanel(
+                                           shiny::wellPanel(
                                              sliderInput(inputId = "sp_cluster_alpha",
                                                          label = "Transparency of spots",
                                                          value = c(1,1), min=0, max=1, step=0.1),
@@ -392,17 +377,17 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                            )
                                          ),
 
-                                         checkboxInput("sp_check_cluster_vis","Visualization", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("sp_check_cluster_vis","Visualization", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.sp_check_cluster_vis==true",
-                                           wellPanel(
+                                           shiny::wellPanel(
                                              numericInput(inputId = "sp_cluster_ncol",
                                                           label = "Number of columns",
                                                           value = 4, min = 1, max=20),
-                                             checkboxInput("sp_cluster_label","Label on", value=TRUE),
-                                             conditionalPanel(
+                                             shiny::checkboxInput("sp_cluster_label","Label on", value=TRUE),
+                                             shiny::conditionalPanel(
                                                condition = "input.sp_cluster_label==true",
-                                               wellPanel(
+                                               shiny::wellPanel(
                                                  sliderInput(inputId = "sp_cluster_label_size",
                                                              label = "Size of the label",
                                                              value = 3, min=0, max=10, step = 1)
@@ -418,55 +403,55 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                          label = "Height of image panel",
                                                          value = 300, min=0, max=2000, step=10),
 
-                                             checkboxInput("sp_cluster_crop","Crop the image", value=TRUE)
+                                             shiny::checkboxInput("sp_cluster_crop","Crop the image", value=TRUE)
                                            )
                                          ),
-                                         checkboxInput("sp_check_cluster_subset","Subset the spots", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("sp_check_cluster_subset","Subset the spots", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.sp_check_cluster_subset==true",
-                                           wellPanel(
-                                             selectInput("sp_clust_slide.to.visualize","Choose slide to visualize","",
+                                           shiny::wellPanel(
+                                             shiny::selectInput("sp_clust_slide.to.visualize","Choose slide to visualize","",
                                                          multiple=TRUE),
-                                             selectInput("sp_clust_spot.cluster.highlight","Choose clusters to subset","",
+                                             shiny::selectInput("sp_clust_spot.cluster.highlight","Choose clusters to subset","",
                                                          multiple=TRUE)
                                            )
                                          ),
-                                         actionButton(inputId = "sp_vis_cluster_start", label = "Plot"),
-                                         actionButton("sp_cluster_save","Save")
+                                         shiny::actionButton(inputId = "sp_vis_cluster_start", label = "Plot"),
+                                         shiny::actionButton("sp_cluster_save","Save")
                                        ),
-                                       mainPanel(
-                                         plotOutput("sp_clusterplot") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                       shiny::mainPanel(
+                                         shiny::plotOutput("sp_clusterplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
 
-                            tabPanel(title = "Spatial feature plot",
-                                     titlePanel("Visualize spatial gene expression"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         conditionalPanel(
+                            shiny::tabPanel(title = "Spatial feature plot",
+                                     shiny::titlePanel("Visualize spatial gene expression"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.sp_check_metadata==true",
-                                           selectInput(inputId = "sp_vis_metadata",
+                                           shiny::selectInput(inputId = "sp_vis_metadata",
                                                        label = "Choose metadata to visualize",
                                                        choices = "", multiple=TRUE)
                                          ),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.sp_check_metadata==false",
-                                           selectInput("sp_check_saved_genes","Show saved gene list",
+                                           shiny::selectInput("sp_check_saved_genes","Show saved gene list",
                                                        choice = c("All","Top 1001~2000","Top 2001~3000"),
                                                        multiple=FALSE, selected="All"),
-                                           selectizeInput(inputId = "sp_vis_feat",
+                                           shiny::selectizeInput(inputId = "sp_vis_feat",
                                                           label = "Choose genes to visualize",
                                                           choices = "", multiple=TRUE)
                                          ),
-                                         checkboxInput("sp_check_metadata","Show metadata list", value = FALSE),
+                                         shiny::checkboxInput("sp_check_metadata","Show metadata list", value = FALSE),
                                          sliderInput(inputId = "sp_feat_minmax",
                                                      label = "Min max value",
                                                      value = c(0,3), min = 0, max = 10, step=0.1),
-                                         checkboxInput("sp_check_feat_transparency","Transparency", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("sp_check_feat_transparency","Transparency", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.sp_check_feat_transparency==true",
-                                           wellPanel(
+                                           shiny::wellPanel(
                                              sliderInput(inputId = "sp_feat_alpha",
                                                          label = "Transparency of spots",
                                                          value = c(1,1), min=0, max=1, step=0.1),
@@ -475,27 +460,27 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                          value = 0.6, min=0, max=1, step=0.1)
                                            )
                                          ),
-                                         checkboxInput("sp_check_feat_color","Colorbar", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("sp_check_feat_color","Colorbar", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.sp_check_feat_color==true",
-                                           wellPanel(
-                                             selectInput(inputId = "sp_feat_color",
+                                           shiny::wellPanel(
+                                             shiny::selectInput(inputId = "sp_feat_color",
                                                          label = "Color palette",
                                                          choices = c(rownames(RColorBrewer::brewer.pal.info),
                                                                      names(colormap::colormaps)),
                                                          selected= "RdPu"),
-                                             radioButtons("sp_color_bar_mode","Colorbar mode",
+                                             shiny::radioButtons("sp_color_bar_mode","Colorbar mode",
                                                           choices = list("default","combined"),
                                                           selected = "combined"),
-                                             radioButtons("sp_color_bar_loc","Colorbar location",
+                                             shiny::radioButtons("sp_color_bar_loc","Colorbar location",
                                                           choices = list("top","bottom","left","right"),
                                                           selected = "bottom")
                                            )
                                          ),
-                                         checkboxInput("sp_check_feat_vis","Visualization", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("sp_check_feat_vis","Visualization", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.sp_check_feat_vis==true",
-                                           wellPanel(
+                                           shiny::wellPanel(
                                              numericInput(inputId = "sp_feat_ncol",
                                                           label = "Number of columns",
                                                           value = 4, min = 1, max=20),
@@ -509,44 +494,44 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                              sliderInput(inputId = "sp_feat_img_height",
                                                          label = "Height of image panel",
                                                          value = 550, min=0, max=2000, step=10),
-                                             checkboxInput("sp_feat_crop","Crop the image", value=TRUE)
+                                             shiny::checkboxInput("sp_feat_crop","Crop the image", value=TRUE)
                                            )
                                          ),
-                                         checkboxInput("sp_check_feat_subset","Subset the spots", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("sp_check_feat_subset","Subset the spots", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.sp_check_feat_subset==true",
-                                           wellPanel(
-                                             selectInput("sp_slide.to.visualize","Choose slide to visualize","",
+                                           shiny::wellPanel(
+                                             shiny::selectInput("sp_slide.to.visualize","Choose slide to visualize","",
                                                          multiple=TRUE),
-                                             selectInput("sp_cluster_name","Group name",
+                                             shiny::selectInput("sp_cluster_name","Group name",
                                                          c("orig.ident","seurat_clusters")),
-                                             selectInput("sp_spot.cluster.highlight","Choose clusters to subset","",
+                                             shiny::selectInput("sp_spot.cluster.highlight","Choose clusters to subset","",
                                                          multiple=TRUE)
                                            )
                                          ),
-                                         actionButton(inputId = "sp_vis_feat_start", label = "Plot"),
-                                         actionButton("sp_feat_save","Save")
+                                         shiny::actionButton(inputId = "sp_vis_feat_start", label = "Plot"),
+                                         shiny::actionButton("sp_feat_save","Save")
                                        ),
-                                       mainPanel(
-                                         tabsetPanel(
-                                           tabPanel("Plot", plotOutput("sp_featplot") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                           tabPanel("Save multiple",
-                                                    wellPanel(
-                                                      wellPanel(
-                                                        fileInput("sp_upload_csv", "Upload csv file of gene list",
+                                       shiny::mainPanel(
+                                         shiny::tabsetPanel(
+                                           shiny::tabPanel("Plot", shiny::plotOutput("sp_featplot") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                           shiny::tabPanel("Save multiple",
+                                                    shiny::wellPanel(
+                                                      shiny::wellPanel(
+                                                        shiny::fileInput("sp_upload_csv", "Upload csv file of gene list",
                                                                   accept = c(
                                                                     "text/csv",
                                                                     "text/comma-separated-values,text/plain",
                                                                     ".csv")
                                                         ),
-                                                        checkboxInput("sp_header_check", "Header", TRUE),
-                                                        selectInput("sp_column_select","Select columns of gene list",
+                                                        shiny::checkboxInput("sp_header_check", "Header", TRUE),
+                                                        shiny::selectInput("sp_column_select","Select columns of gene list",
                                                                     "",multiple=FALSE)
                                                       ),
                                                       numericInput(inputId = "sp_feat_by_n",
                                                                    label = "Number of features to save in each plot",
                                                                    value = 2, min = 0, max = 10),
-                                                      textInput("sp_save_name", "Name of the file", value='feats'),
+                                                      shiny::textInput("sp_save_name", "Name of the file", value='feats'),
                                                       sliderInput(inputId = "sp_save_by_n_width",
                                                                   label = "Width in cm",
                                                                   value = 18, min=0, max=50, step=1),
@@ -556,56 +541,56 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                       sliderInput(inputId = "sp_upload_save_dpi",
                                                                   label = "dpi to save image",
                                                                   value = 100, min = 0, max=500, step=10),
-                                                      actionButton("sp_feat_save_by_n", "Save multiple plots by n"),
-                                                      actionButton("sp_feat_upload","Save gene list")
+                                                      shiny::actionButton("sp_feat_save_by_n", "Save multiple plots by n"),
+                                                      shiny::actionButton("sp_feat_upload","Save gene list")
                                                     ),
-                                                    wellPanel(
-                                                      dataTableOutput("sp_csv_table") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                                    shiny::wellPanel(
+                                                      shiny::dataTableOutput("sp_csv_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                                     )
                                            )
                                          )
                                        )
                                      )
                             ),
-                            tabPanel(title = "Violin plot",
-                                     titlePanel("Violin plot visualization"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         radioButtons("vlnplot_radio","Data format",
+                            shiny::tabPanel(title = "Violin plot",
+                                     shiny::titlePanel("Violin plot visualization"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::radioButtons("vlnplot_radio","Data format",
                                                       choices = list("Single-cell","Spatial"),
                                                       selected = "Single-cell"),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.vln_check_metadata==true",
-                                           selectInput(inputId = "vln_vis_metadata",
+                                           shiny::selectInput(inputId = "vln_vis_metadata",
                                                        label = "Choose metadata to visualize",
                                                        choices = "", multiple = TRUE)
                                          ),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.vln_check_metadata==false",
-                                           selectInput("vln_check_saved_genes","Show saved gene list",
+                                           shiny::selectInput("vln_check_saved_genes","Show saved gene list",
                                                        choice = c("All","Top 1001~2000","Top 2001~3000"),
                                                        multiple=FALSE, selected="All"),
-                                           selectizeInput(inputId = "vln_vis_feat",
+                                           shiny::selectizeInput(inputId = "vln_vis_feat",
                                                           label = "Choose genes to visualize",
                                                           choices = "", multiple = TRUE)
                                          ),
-                                         checkboxInput("vln_check_metadata","Show metadata list", value = FALSE),
-                                         selectInput("vln_color_group","Color group",
+                                         shiny::checkboxInput("vln_check_metadata","Show metadata list", value = FALSE),
+                                         shiny::selectInput("vln_color_group","Color group",
                                                      c("orig.ident" = "orig.ident",
                                                        "seurat_clusters" = "seurat_clusters",
                                                        "cluster" = "cluster"),
                                                      selected = "orig.ident"),
-                                         checkboxInput("vln_check_facet","Facet plot", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("vln_check_facet","Facet plot", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.vln_check_facet==true",
-                                           selectInput("vln_facet_group","Facet group",
+                                           shiny::selectInput("vln_facet_group","Facet group",
                                                        c("orig.ident" = "orig.ident",
                                                          "seurat_clusters" = "seurat_clusters"))
                                          ),
-                                         checkboxInput("vln_check_vis","Visualization", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("vln_check_vis","Visualization", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.vln_check_vis==true",
-                                           wellPanel(
+                                           shiny::wellPanel(
                                              sliderInput(inputId = "vln_img_width",
                                                          label = "Width of image panel",
                                                          value = 1000, min=0, max=2000, step=10),
@@ -617,38 +602,38 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                           value = 1, min = 1, max=10)
                                            )
                                          ),
-                                         actionButton(inputId = "vln_start", label = "Plot"),
-                                         actionButton("vln_save","Save")
+                                         shiny::actionButton(inputId = "vln_start", label = "Plot"),
+                                         shiny::actionButton("vln_save","Save")
                                        ),
-                                       mainPanel(
-                                         plotOutput("vlnplot") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                       shiny::mainPanel(
+                                         shiny::plotOutput("vlnplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
-                            tabPanel(title = "Ridge plot",
-                                     titlePanel("Ridge plot visualization"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         radioButtons("ridgeplot_radio","Data format",
+                            shiny::tabPanel(title = "Ridge plot",
+                                     shiny::titlePanel("Ridge plot visualization"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::radioButtons("ridgeplot_radio","Data format",
                                                       choices = list("Single-cell","Spatial"),
                                                       selected = "Single-cell"),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.ridge_check_metadata==true",
-                                           selectInput(inputId = "ridge_vis_metadata",
+                                           shiny::selectInput(inputId = "ridge_vis_metadata",
                                                        label = "Choose metadata to visualize",
                                                        choices = "", multiple = TRUE)
                                          ),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.ridge_check_metadata==false",
-                                           selectInput("ridge_check_saved_genes","Show saved gene list",
+                                           shiny::selectInput("ridge_check_saved_genes","Show saved gene list",
                                                        choice = c("All","Top 1001~2000","Top 2001~3000"),
                                                        multiple=FALSE, selected="All"),
-                                           selectizeInput(inputId = "ridge_vis_feat",
+                                           shiny::selectizeInput(inputId = "ridge_vis_feat",
                                                           label = "Choose genes to visualize",
                                                           choices = "", multiple = TRUE)
                                          ),
-                                         checkboxInput("ridge_check_metadata","Show metadata list", value = FALSE),
-                                         selectInput("ridge_vis_group", label = "Group by",
+                                         shiny::checkboxInput("ridge_check_metadata","Show metadata list", value = FALSE),
+                                         shiny::selectInput("ridge_vis_group", label = "Group by",
                                                      c("orig.ident" = "orig.ident",
                                                        "seurat_clusters" = "seurat_clusters",
                                                        "cluster" = "cluster"),
@@ -659,10 +644,10 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                          sliderInput(inputId = "ridge_alpha",
                                                      label = "Transparency of filled color",
                                                      value = 0, min=0, max=1, step=0.1),
-                                         checkboxInput("ridge_check_vis","Visualization", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("ridge_check_vis","Visualization", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.ridge_check_vis==true",
-                                           wellPanel(
+                                           shiny::wellPanel(
                                              sliderInput(inputId = "ridge_img_width",
                                                          label = "Width of image panel",
                                                          value = 1000, min=0, max=2000, step=10),
@@ -674,34 +659,34 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                           value = 2, min = 1, max=10)
                                            )
                                          ),
-                                         actionButton(inputId = "ridge_feat_start", label = "Plot"),
-                                         actionButton("ridge_save","Save")
+                                         shiny::actionButton(inputId = "ridge_feat_start", label = "Plot"),
+                                         shiny::actionButton("ridge_save","Save")
                                        ),
-                                       mainPanel(
-                                         plotOutput("ridgeplot") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                       shiny::mainPanel(
+                                         shiny::plotOutput("ridgeplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             )
                  ),
 
-                 navbarMenu(title = "Marker & DEG",
-                            tabPanel(title = "Marker",
-                                     titlePanel("Marker genes for clusters"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         radioButtons("marker_radio","Data format",
+                 shiny::navbarMenu(title = "Marker & DEG",
+                            shiny::tabPanel(title = "Marker",
+                                     shiny::titlePanel("Marker genes for clusters"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::radioButtons("marker_radio","Data format",
                                                       choices = list("Single-cell","Spatial"),
                                                       selected = "Single-cell"),
-                                         radioButtons("check_marker_mode","Calculation mode",
+                                         shiny::radioButtons("check_marker_mode","Calculation mode",
                                                       choices = list("Wilcoxon", "NSForest"),
                                                       selected = "Wilcoxon"),
-                                         selectInput("sc_marker_group","Group name",
+                                         shiny::selectInput("sc_marker_group","Group name",
                                                      c("orig.ident" = "orig.ident",
                                                        "seurat_clusters" = "seurat_clusters"),
                                                      selected = "seurat_clusters"),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.check_marker_mode=='NSForest'",
-                                           wellPanel(
+                                           shiny::wellPanel(
                                              sliderInput(inputId = "sc_marker_rfTrees",
                                                          label = "Number of trees",
                                                          value = 1000, min=0, max=5000, step=100),
@@ -716,220 +701,220 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                          value = 0.5, min=0, max=1, step=0.01)
                                            )
                                          ),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.check_marker_mode=='Wilcoxon'",
-                                           wellPanel(
-                                             textInput(inputId = "sc_marker_logfc_thres",
+                                           shiny::wellPanel(
+                                             shiny::textInput(inputId = "sc_marker_logfc_thres",
                                                        label = "LogFC threshold",
                                                        value = 1.0),
-                                             textInput(inputId = "sc_marker_exp_thres",
+                                             shiny::textInput(inputId = "sc_marker_exp_thres",
                                                        label = "Cluster expression threshold",
                                                        value = 0),
-                                             checkboxInput("sc_marker_posonly","Positive only", value = TRUE)
+                                             shiny::checkboxInput("sc_marker_posonly","Positive only", value = TRUE)
                                            )
                                          ),
-                                         actionButton(inputId = "sc_marker_start", label = "Find"),
-                                         actionButton(inputId = "sc_marker_upload", label = "Save genes")
+                                         shiny::actionButton(inputId = "sc_marker_start", label = "Find"),
+                                         shiny::actionButton(inputId = "sc_marker_upload", label = "Save genes")
                                        ),
-                                       mainPanel(
-                                         dataTableOutput("sc_marker_table") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                       shiny::mainPanel(
+                                         shiny::dataTableOutput("sc_marker_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
-                            tabPanel(title = "DEG",
-                                     titlePanel("DEG between clusters"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         radioButtons("DEG_radio","Data format",
+                            shiny::tabPanel(title = "DEG",
+                                     shiny::titlePanel("DEG between clusters"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::radioButtons("DEG_radio","Data format",
                                                       choices = list("Single-cell","Spatial"),
                                                       selected = "Single-cell"),
-                                         checkboxInput("sc_check_deg_subset","Subset dataset", value = FALSE),
-                                         selectInput("sc_deg_group","Group name",
+                                         shiny::checkboxInput("sc_check_deg_subset","Subset dataset", value = FALSE),
+                                         shiny::selectInput("sc_deg_group","Group name",
                                                      c("orig.ident" = "orig.ident",
                                                        "seurat_clusters" = "seurat_clusters"),
                                                      selected = "seurat_clusters"),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = 'input.sc_check_deg_subset==false',
-                                           selectInput("sc_deg_int","Choose idents of interest","",multiple=TRUE),
-                                           selectInput("sc_deg_ref","Choose reference idents","",multiple=TRUE)
+                                           shiny::selectInput("sc_deg_int","Choose idents of interest","",multiple=TRUE),
+                                           shiny::selectInput("sc_deg_ref","Choose reference idents","",multiple=TRUE)
                                          ),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = 'input.sc_check_deg_subset==true',
-                                           selectInput("sc_deg_subset_sel","Choose clusters to subset",
+                                           shiny::selectInput("sc_deg_subset_sel","Choose clusters to subset",
                                                        choices = "", multiple=TRUE),
-                                           selectInput("sc_deg_subset_group","Choose group for DEG",
+                                           shiny::selectInput("sc_deg_subset_group","Choose group for DEG",
                                                        c("orig.ident" = "orig.ident",
                                                          "seurat_clusters" = "seurat_clusters"),
                                                        selected = "orig.ident"),
-                                           selectInput("sc_deg_subset_int","Choose idents of interest in a subset","",multiple=TRUE),
-                                           selectInput("sc_deg_subset_ref","Choose reference idents in a subset","",multiple=TRUE)
+                                           shiny::selectInput("sc_deg_subset_int","Choose idents of interest in a subset","",multiple=TRUE),
+                                           shiny::selectInput("sc_deg_subset_ref","Choose reference idents in a subset","",multiple=TRUE)
                                          ),
-                                         wellPanel(
-                                           textInput(inputId = "sc_deg_logfc_thres",
+                                         shiny::wellPanel(
+                                           shiny::textInput(inputId = "sc_deg_logfc_thres",
                                                      label = "LogFC threshold",
                                                      value = 0),
-                                           textInput(inputId = "sc_deg_exp_thres",
+                                           shiny::textInput(inputId = "sc_deg_exp_thres",
                                                      label = "Expression threshold (idents of interest)",
                                                      value = 0)
                                          ),
-                                         actionButton(inputId = "sc_deg_start", label = "Find"),
-                                         actionButton(inputId = "sc_deg_upload", label = "Save genes")
+                                         shiny::actionButton(inputId = "sc_deg_start", label = "Find"),
+                                         shiny::actionButton(inputId = "sc_deg_upload", label = "Save genes")
                                        ),
-                                       mainPanel(
-                                         dataTableOutput("sc_deg_table") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                       shiny::mainPanel(
+                                         shiny::dataTableOutput("sc_deg_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
-                            tabPanel(title = "Volcano plot",
-                                     titlePanel("Volcano plot for DEG"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         br(),
-                                         textInput(inputId = "sc_deg_volcano_p",
+                            shiny::tabPanel(title = "Volcano plot",
+                                     shiny::titlePanel("Volcano plot for DEG"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::br(),
+                                         shiny::textInput(inputId = "sc_deg_volcano_p",
                                                    label = "Adjusted P-value threshold", value= 1e-4),
-                                         textInput(inputId = "sc_deg_volcano_logfc",
+                                         shiny::textInput(inputId = "sc_deg_volcano_logfc",
                                                    label = "LogFC threshold", value= 0.5),
-                                         textInput(inputId = "sc_deg_volcano_x_title",
+                                         shiny::textInput(inputId = "sc_deg_volcano_x_title",
                                                    label = "x-axis title", value= "Log2 fold change"),
-                                         textInput(inputId = "sc_deg_volcano_y_title",
+                                         shiny::textInput(inputId = "sc_deg_volcano_y_title",
                                                    label = "y-axis title", value= "-Log10 adj. p-value"),
-                                         actionButton(inputId = "sc_deg_volcano_start", label = "Plot"),
-                                         actionButton("sc_deg_volcano_save","Save plot"),
-                                         actionButton(inputId = "sc_deg_volcano_upload", label = "Save genes")
+                                         shiny::actionButton(inputId = "sc_deg_volcano_start", label = "Plot"),
+                                         shiny::actionButton("sc_deg_volcano_save","Save plot"),
+                                         shiny::actionButton(inputId = "sc_deg_volcano_upload", label = "Save genes")
                                        ),
-                                       mainPanel(
-                                         tabsetPanel(
-                                           tabPanel("Plot", plotOutput("sc_deg_volcano") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                           tabPanel("Table", dataTableOutput("sc_deg_filter_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
+                                       shiny::mainPanel(
+                                         shiny::tabsetPanel(
+                                           shiny::tabPanel("Plot", shiny::plotOutput("sc_deg_volcano") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                           shiny::tabPanel("Table", shiny::dataTableOutput("sc_deg_filter_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                          )
                                        )
                                      )
                             ),
-                            tabPanel(title = "Enrichment",
-                                     titlePanel("Enrichment analysis for DEG"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         br(),
-                                         radioButtons("sc_deg_enrich_type","Terms to use",
+                            shiny::tabPanel(title = "Enrichment",
+                                     shiny::titlePanel("Enrichment analysis for DEG"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::br(),
+                                         shiny::radioButtons("sc_deg_enrich_type","Terms to use",
                                                       choices = list("GO","KEGG"),
                                                       selected = "GO"),
-                                         radioButtons("sc_deg_enrich_species","Species",
+                                         shiny::radioButtons("sc_deg_enrich_species","Species",
                                                       choices = list("Mouse","Human"),
                                                       selected = "Mouse"),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.sc_deg_enrich_type=='GO'",
-                                           radioButtons("sc_deg_enrich_terms","Ontology",
+                                           shiny::radioButtons("sc_deg_enrich_terms","Ontology",
                                                         choices = list("BP","CC","MF"),
                                                         selected = "BP")
                                          ),
-                                         textInput(inputId = "sc_deg_enrich_p",
+                                         shiny::textInput(inputId = "sc_deg_enrich_p",
                                                    label = "Adjusted P-value", value= 0.05),
-                                         textInput(inputId = "sc_deg_enrich_logfc",
+                                         shiny::textInput(inputId = "sc_deg_enrich_logfc",
                                                    label = "LogFC (pos: upper, neg: lower)", value= 0.3),
                                          numericInput(inputId = "sc_deg_enrich_nshow",
                                                       label = "Number of terms to show",
                                                       value = 10, min = 1, max=50),
-                                         actionButton(inputId = "sc_deg_enrich_start", label = "Plot"),
-                                         actionButton("sc_deg_enrich_save","Save")
+                                         shiny::actionButton(inputId = "sc_deg_enrich_start", label = "Plot"),
+                                         shiny::actionButton("sc_deg_enrich_save","Save")
                                        ),
-                                       mainPanel(
-                                         tabsetPanel(
-                                           tabPanel("Plot", plotOutput("sc_deg_enrich") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                           tabPanel("Table", dataTableOutput("sc_deg_enrich_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
+                                       shiny::mainPanel(
+                                         shiny::tabsetPanel(
+                                           shiny::tabPanel("Plot", shiny::plotOutput("sc_deg_enrich") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                           shiny::tabPanel("Table", shiny::dataTableOutput("sc_deg_enrich_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                          )
                                        )
                                      )
                             )
                  ),
 
-                 navbarMenu(title = "Utility",
-                            tabPanel(title = "Annotation",
-                                     titlePanel("Annotation of cell or spot clusters"),
-                                     mainPanel(
-                                       wellPanel(
-                                         radioButtons("annotation_radio","Data format",
+                 shiny::navbarMenu(title = "Utility",
+                            shiny::tabPanel(title = "Annotation",
+                                     shiny::titlePanel("Annotation of cell or spot clusters"),
+                                     shiny::mainPanel(
+                                       shiny::wellPanel(
+                                         shiny::radioButtons("annotation_radio","Data format",
                                                       choices = list("Single-cell","Spatial"),
                                                       selected = "Single-cell"),
-                                         selectInput("annotation_group","Group name",
+                                         shiny::selectInput("annotation_group","Group name",
                                                      c("orig.ident" = "orig.ident",
                                                        "seurat_clusters" = "seurat_clusters")),
-                                         h5(style = "font-family:San-serif; font-weight:bold",
+                                         shiny::h5(style = "font-family:San-serif; font-weight:bold",
                                             "Elements of the cluster to annotate"),
-                                         verbatimTextOutput("cluster_members", placeholder = TRUE),
-                                         textInput(inputId = "new_group_name",
+                                         shiny::verbatimTextOutput("cluster_members", placeholder = TRUE),
+                                         shiny::textInput(inputId = "new_group_name",
                                                    label = "New group name", value = "cluster"),
-                                         textInput(inputId = "annotation_labels",
+                                         shiny::textInput(inputId = "annotation_labels",
                                                    label = "New names to annotate: separated by comma, no space"),
-                                         checkboxInput("cluster_annotate_recode","Recode the group and save", value = TRUE),
-                                         actionButton(inputId = "cluster_new_idents", label = "Annotate")
+                                         shiny::checkboxInput("cluster_annotate_recode","Recode the group and save", value = TRUE),
+                                         shiny::actionButton(inputId = "cluster_new_idents", label = "Annotate")
                                        )
                                      )
                             ),
-                            tabPanel(title = "Module score",
-                                     titlePanel("Generate module score"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         radioButtons("module_score_radio","Data format",
+                            shiny::tabPanel(title = "Module score",
+                                     shiny::titlePanel("Generate module score"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::radioButtons("module_score_radio","Data format",
                                                       choices = list("Single-cell","Spatial"),
                                                       selected = "Single-cell"),
-                                         checkboxInput("module_score_csv_check","Import csv", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("module_score_csv_check","Import csv", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.module_score_csv_check==true",
-                                           wellPanel(
-                                             fileInput("module_score_csv", "Upload csv file of gene list",
+                                           shiny::wellPanel(
+                                             shiny::fileInput("module_score_csv", "Upload csv file of gene list",
                                                        accept = c(
                                                          "text/csv",
                                                          "text/comma-separated-values,text/plain",
                                                          ".csv")
                                              ),
-                                             checkboxInput("module_score_header", "Header", TRUE)
+                                             shiny::checkboxInput("module_score_header", "Header", TRUE)
                                            ),
-                                           wellPanel(
-                                             selectInput("module_table_select","Select columns of gene list",
+                                           shiny::wellPanel(
+                                             shiny::selectInput("module_table_select","Select columns of gene list",
                                                          "",multiple=FALSE),
-                                             actionButton(inputId = "module_score_table_apply", label = "Apply column"),
-                                             actionButton(inputId = "module_score_gene_upload", label = "Save genes")
+                                             shiny::actionButton(inputId = "module_score_table_apply", label = "Apply column"),
+                                             shiny::actionButton(inputId = "module_score_gene_upload", label = "Save genes")
                                            )
                                          ),
-                                         textInput(inputId = "module_score_name",
+                                         shiny::textInput(inputId = "module_score_name",
                                                    label = "Name of module score", value = "Gene set"),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.module_score_csv_check==false",
-                                           selectInput("module_check_saved_genes","Show saved gene list",
+                                           shiny::selectInput("module_check_saved_genes","Show saved gene list",
                                                        choice = c("All","Top 1001~2000","Top 2001~3000"),
                                                        multiple=FALSE, selected="All"),
-                                           selectizeInput(inputId = "module_score_list",
+                                           shiny::selectizeInput(inputId = "module_score_list",
                                                           label = "Gene list for module score",
                                                           choices = "", multiple=TRUE)
                                          ),
-                                         conditionalPanel(
+                                         shiny::conditionalPanel(
                                            condition = "input.module_score_csv_check==true",
-                                           textInput(inputId = "module_score_list_csv",
+                                           shiny::textInput(inputId = "module_score_list_csv",
                                                      label = "Gene list for module score",
                                                      value = "")
                                          ),
-                                         actionButton(inputId = "module_score_start", label = "Generate")
+                                         shiny::actionButton(inputId = "module_score_start", label = "Generate")
                                        ),
-                                       mainPanel(
-                                         dataTableOutput("module_score_table") %>% shinycssloaders::withSpinner(color="#0000FF")
+                                       shiny::mainPanel(
+                                         shiny::dataTableOutput("module_score_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
-                            tabPanel(title = "Subset data",
-                                     titlePanel("Subset the dataset"),
-                                     mainPanel(
-                                       wellPanel(
-                                         radioButtons("subset_radio","Data format",
+                            shiny::tabPanel(title = "Subset data",
+                                     shiny::titlePanel("Subset the dataset"),
+                                     shiny::mainPanel(
+                                       shiny::wellPanel(
+                                         shiny::radioButtons("subset_radio","Data format",
                                                       choices = list("Single-cell","Spatial"),
                                                       selected = "Single-cell"),
-                                         selectInput("subset_group","Group for subsetting",
+                                         shiny::selectInput("subset_group","Group for subsetting",
                                                      c("orig.ident" = "orig.ident",
                                                        "seurat_clusters" = "seurat_clusters")),
-                                         selectInput("subset_list","Choose clusters to subset","",multiple=TRUE),
-                                         checkboxInput("subset_recluster","Recluster",value=FALSE),
-                                         conditionalPanel(
+                                         shiny::selectInput("subset_list","Choose clusters to subset","",multiple=TRUE),
+                                         shiny::checkboxInput("subset_recluster","Recluster",value=FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.subset_recluster==true",
-                                           wellPanel(
+                                           shiny::wellPanel(
                                              sliderInput(inputId = "recluster_n_var_features",
                                                          label = "Number of HVGs",
                                                          value = 2000, min = 1000, max = 5000, step=10),
@@ -947,73 +932,73 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                          value = 0.3, min = 0, max = 1, step=0.05)
                                            )
                                          ),
-                                         actionButton(inputId = "subset_start", label = "Subset")
+                                         shiny::actionButton(inputId = "subset_start", label = "Subset")
                                        )
                                      )
                             ),
-                            tabPanel(title = "Quantitation",
-                                     titlePanel("Quantitation of values by regions"),
-                                     sidebarLayout(
-                                       sidebarPanel(
-                                         wellPanel(
-                                           checkboxInput("quantitation_agg_mode",
+                            shiny::tabPanel(title = "Quantitation",
+                                     shiny::titlePanel("Quantitation of values by regions"),
+                                     shiny::sidebarLayout(
+                                       shiny::sidebarPanel(
+                                         shiny::wellPanel(
+                                           shiny::checkboxInput("quantitation_agg_mode",
                                                          "Aggregate to boxplot (split by group and recode)",
                                                          value=FALSE),
-                                           selectInput("quantitation_mode","Calculation mode",
+                                           shiny::selectInput("quantitation_mode","Calculation mode",
                                                        c("mean", "sum",
                                                          "skewness", "kurtosis", "boxplot (spots)"="boxplot"),
                                                        selected = "mean"),
-                                           selectInput("quantitation_comp_group","Comparison group",
+                                           shiny::selectInput("quantitation_comp_group","Comparison group",
                                                        c("orig.ident" = "orig.ident",
                                                          "seurat_clusters" = "seurat_clusters"),
                                                        selected = "orig.ident"),
-                                           conditionalPanel(
+                                           shiny::conditionalPanel(
                                              condition="input.quantitation_agg_mode==false",
-                                             selectInput("quantitation_facet_group","Facet group",
+                                             shiny::selectInput("quantitation_facet_group","Facet group",
                                                          c("orig.ident" = "orig.ident",
                                                            "seurat_clusters" = "seurat_clusters"))
                                            ),
-                                           conditionalPanel(
+                                           shiny::conditionalPanel(
                                              condition="input.quantitation_agg_mode==true",
-                                             selectInput("quantitation_split_group","Split group (Go to 'Utility-Annotation' and define)",
+                                             shiny::selectInput("quantitation_split_group","Split group (Go to 'Utility-Annotation' and define)",
                                                          c("orig.ident" = "orig.ident",
                                                            "seurat_clusters" = "seurat_clusters")),
-                                             selectInput("quantitation_recode_group",
+                                             shiny::selectInput("quantitation_recode_group",
                                                          "Recode group (Go to 'Utility-Annotation' and define)",
                                                          ""),
-                                             checkboxInput("quantitation_check_pairwise",
+                                             shiny::checkboxInput("quantitation_check_pairwise",
                                                            "Add pairwise statistics", value = TRUE),
-                                             selectInput("quantitation_pairwise_stats",
+                                             shiny::selectInput("quantitation_pairwise_stats",
                                                          "Choose multiple comparison correction method",
                                                          c("bonferroni","fdr","BH","none"), selected="fdr")
                                            )
                                          ),
-                                         wellPanel(
-                                           radioButtons("quantitation_cellf_mode","Select types of data",
+                                         shiny::wellPanel(
+                                           shiny::radioButtons("quantitation_cellf_mode","Select types of data",
                                                         choices = list("metadata","genes"),
                                                         selected = "metadata"),
-                                           conditionalPanel(
+                                           shiny::conditionalPanel(
                                              condition="input.quantitation_cellf_mode=='metadata'",
-                                             selectInput("quantitation_cellf1","Metadata to quantify",
+                                             shiny::selectInput("quantitation_cellf1","Metadata to quantify",
                                                          c(""), multiple = TRUE)
                                            ),
-                                           conditionalPanel(
+                                           shiny::conditionalPanel(
                                              condition="input.quantitation_cellf_mode=='genes'",
-                                             selectInput("quantitation_check_saved_genes","Show saved gene list",
+                                             shiny::selectInput("quantitation_check_saved_genes","Show saved gene list",
                                                          choice = c("All","Top 1001~2000","Top 2001~3000"),
                                                          multiple=FALSE, selected="All"),
-                                             selectizeInput("quantitation_cellf2","Genes to quantify",
+                                             shiny::selectizeInput("quantitation_cellf2","Genes to quantify",
                                                             choices = "", multiple = TRUE)
                                            )
                                          ),
-                                         textInput(inputId = "quantitation_name",
+                                         shiny::textInput(inputId = "quantitation_name",
                                                    label = "Name of y-axis", value = "cell fraction"),
-                                         checkboxInput("quantitation_vis_cellf","Visualize values on plot", value = FALSE),
-                                         checkboxInput("spot_total_number","Visualize total spot number", value = FALSE),
-                                         checkboxInput("quantitation_check_vis","Visualization options", value = FALSE),
-                                         conditionalPanel(
+                                         shiny::checkboxInput("quantitation_vis_cellf","Visualize values on plot", value = FALSE),
+                                         shiny::checkboxInput("spot_total_number","Visualize total spot number", value = FALSE),
+                                         shiny::checkboxInput("quantitation_check_vis","Visualization options", value = FALSE),
+                                         shiny::conditionalPanel(
                                            condition = "input.quantitation_check_vis==true",
-                                           wellPanel(
+                                           shiny::wellPanel(
                                              sliderInput(inputId = "quantitation_img_width",
                                                          label = "Width of image panel",
                                                          value = 1000, min=0, max=2000, step=10),
@@ -1025,39 +1010,39 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                           value = 4, min = 1, max=10)
                                            )
                                          ),
-                                         actionButton(inputId = "quantitation_start", label = "Start"),
-                                         actionButton("quantitation_save","Save")
+                                         shiny::actionButton(inputId = "quantitation_start", label = "Start"),
+                                         shiny::actionButton("quantitation_save","Save")
                                        ),
-                                       mainPanel(
-                                         tabsetPanel(
-                                           tabPanel("Plot", plotOutput("quantitation_plot") %>% shinycssloaders::withSpinner(color="#0000FF")),
-                                           tabPanel("Table", dataTableOutput("quantitation_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
+                                       shiny::mainPanel(
+                                         shiny::tabsetPanel(
+                                           shiny::tabPanel("Plot", shiny::plotOutput("quantitation_plot") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                           shiny::tabPanel("Table", shiny::dataTableOutput("quantitation_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                          )
                                        )
                                      )
                             )
                  ),
-                 tabPanel(title = "CellDART",
-                          titlePanel("Prediction of spatial cell fraction"),
-                          mainPanel(
-                            wellPanel(
-                              checkboxInput("celldart_check_subset","Subset spot cluster", value = FALSE),
-                              conditionalPanel(
+                 shiny::tabPanel(title = "CellDART",
+                          shiny::titlePanel("Prediction of spatial cell fraction"),
+                          shiny::mainPanel(
+                            shiny::wellPanel(
+                              shiny::checkboxInput("celldart_check_subset","Subset spot cluster", value = FALSE),
+                              shiny::conditionalPanel(
                                 condition = "input.celldart_check_subset==true",
-                                wellPanel(
-                                  selectInput("celldart_group","Group to subset spots",
+                                shiny::wellPanel(
+                                  shiny::selectInput("celldart_group","Group to subset spots",
                                               c("orig.ident" = "orig.ident",
                                                 "seurat_clusters" = "seurat_clusters"),
                                               selected = "seurat_clusters"),
-                                  selectInput("celldart_group_sel","Select spot clusters to include",
+                                  shiny::selectInput("celldart_group_sel","Select spot clusters to include",
                                               "", multiple=TRUE)
                                 )
                               ),
-                              selectInput("celldart_metadata_celltype","Group for classifying celltypes",
+                              shiny::selectInput("celldart_metadata_celltype","Group for classifying celltypes",
                                           c("orig.ident" = "orig.ident",
                                             "seurat_clusters" = "seurat_clusters"),
                                           selected = "seurat_clusters"),
-                              wellPanel(
+                              shiny::wellPanel(
                                 sliderInput(inputId = "celldart_num_markers",
                                             label = "Number of markers for each celltype",
                                             value = 10, min=1, max=50, step=1),
@@ -1068,10 +1053,10 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                             label = "Number of pseudospots",
                                             value = 20000, min=10000, max=400000, step=1000),
                               ),
-                              checkboxInput("celldart_train_param","Training parameters",value=FALSE),
-                              conditionalPanel(
+                              shiny::checkboxInput("celldart_train_param","Training parameters",value=FALSE),
+                              shiny::conditionalPanel(
                                 condition = "input.celldart_train_param==true",
-                                wellPanel(
+                                shiny::wellPanel(
                                   sliderInput(inputId = "celldart_alpha",
                                               label = "Domain classifier loss weight",
                                               value = 0.6, min=0.1, max=10, step=0.1),
@@ -1092,7 +1077,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                               value = 10, min=1, max=30, step=1)
                                 )
                               ),
-                              actionButton(inputId = "celldart_start", label = "Start")
+                              shiny::actionButton(inputId = "celldart_start", label = "Start")
                             )
                           )
                  )
@@ -1102,21 +1087,6 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
 #' Internal server function
 #' @description Server function for STquantool
 #' @keywords internal
-#' @importFrom shiny actionButton br checkboxInput column conditionalPanel
-#' @importFrom shiny dataTableOutput div downloadButton downloadHandler
-#' @importFrom shiny eventReactive fileInput flowLayout fluidPage fluidRow
-#' @importFrom shiny h1 h2 h3 h4 h5 h6 img isolate
-#' @importFrom shiny mainPanel modalButton modalDialog navbarMenu navbarPage
-#' @importFrom shiny observe observeEvent plotOutput radioButtons reactive
-#' @importFrom shiny reactiveVal reactiveValues removeModal renderDataTable
-#' @importFrom shiny renderImage renderPlot renderPrint renderTable
-#' @importFrom shiny renderText runApp
-#' @importFrom shiny selectInput selectizeInput
-#' @importFrom shiny shinyApp showModal
-#' @importFrom shiny sidebarLayout sidebarPanel sliderInput stopApp
-#' @importFrom shiny tableOutput tabPanel tabsetPanel textInput textOutput titlePanel
-#' @importFrom shiny updateCheckboxInput updateNumericInput updateRadioButtons updateSelectInput
-#' @importFrom shiny updateSelectizeInput updateSliderInput updateTextInput verbatimTextOutput wellPanel
 server <- function(input,output,session){
   # Directory setting
   shinyFiles::shinyDirChoose(
@@ -1126,15 +1096,15 @@ server <- function(input,output,session){
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
-  global <- reactiveValues(datapath = '/home/nmadmin/DATA1/Spatial')
+  global <- shiny::reactiveValues(datapath = '/home/nmadmin/DATA1/Spatial')
 
-  dir <- reactive(input$dir)
+  dir <- shiny::reactive(input$dir)
 
-  output$dir <- renderText({
+  output$dir <- shiny::renderText({
     global$datapath
   })
 
-  observeEvent(ignoreNULL = TRUE,
+  shiny::observeEvent(ignoreNULL = TRUE,
                eventExpr = {
                  input$dir
                },
@@ -1147,7 +1117,7 @@ server <- function(input,output,session){
                })
 
   # Set working directory
-  observeEvent(input$set_wd, {
+  shiny::observeEvent(input$set_wd, {
     v$setwd_count <- v$setwd_count + 1
     if (v$setwd_count==1){
       # save the original working directory for the first click
@@ -1155,13 +1125,13 @@ server <- function(input,output,session){
     }
     setwd(global$datapath)
 
-    output$cmd <- renderText({
+    output$cmd <- shiny::renderText({
       "Working directory was set"
     })
   })
 
   # Make output folder
-  observeEvent(input$output_make,
+  shiny::observeEvent(input$output_make,
                {
                  # Assign the name of directories for saving figures
                  if (!file.exists(input$output_folder_name)){
@@ -1170,7 +1140,7 @@ server <- function(input,output,session){
 
                    if (!file.exists(fig_dir)){
                      dir.create(fig_dir)
-                     output$cmd <- renderText({
+                     output$cmd <- shiny::renderText({
                        "Output and data file folders were created"
                      })}
 
@@ -1178,10 +1148,10 @@ server <- function(input,output,session){
                    fig_dir <- file.path(global$datapath,input$output_folder_name,'data_files')
                    if (!file.exists(fig_dir)){
                      dir.create(fig_dir)
-                     output$cmd <- renderText({
+                     output$cmd <- shiny::renderText({
                        "Output folder already exists\nData file folder was created"
                      })} else{
-                       output$cmd <- renderText({
+                       output$cmd <- shiny::renderText({
                          "Output and data file folders already exist"
                        })
                      }
@@ -1197,9 +1167,9 @@ server <- function(input,output,session){
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
-  qc_dir <- reactive(input$qc_dir)
+  qc_dir <- shiny::reactive(input$qc_dir)
 
-  qc_path <- eventReactive(input$qc_dir, {
+  qc_path <- shiny::eventReactive(input$qc_dir, {
     if (is.null(names(qc_dir()))){
 
     } else if (qc_dir()$root[[1]]=='wd'){
@@ -1213,11 +1183,11 @@ server <- function(input,output,session){
   }
   )
 
-  output$qc_dir <- renderText({qc_path()})
+  output$qc_dir <- shiny::renderText({qc_path()})
 
 
   ## Define reactive values
-  v <- reactiveValues()
+  v <- shiny::reactiveValues()
   v$sc_data <- NULL
   v$sp_data <- NULL
   v$setwd_count <- 0
@@ -1227,7 +1197,7 @@ server <- function(input,output,session){
   # v$orig_wd <- substring(tmp, 1, nchar(tmp)-5)
 
   ## Load single-cell or spatial data for qc
-  observeEvent(input$dir_qc, {
+  shiny::observeEvent(input$dir_qc, {
     if (!is.null(qc_path())){
       shinybusy::show_modal_spinner()
       if (input$qc_data_type=='Single-cell'){
@@ -1263,7 +1233,7 @@ server <- function(input,output,session){
   })
 
   # single-cell QC plot
-  output$sc_qc_vlnplot <- renderPlot({
+  output$sc_qc_vlnplot <- shiny::renderPlot({
     if (!is.null(v$sc_qc_data)){
       v$sc_qc_vlnplot <- Seurat::VlnPlot(v$sc_qc_data,
                                          features = c("nFeature_RNA","nCount_RNA","percent.mt"),
@@ -1273,7 +1243,7 @@ server <- function(input,output,session){
   })
 
   # spatial QC plot
-  output$sp_qc_vlnplot <- renderPlot({
+  output$sp_qc_vlnplot <- shiny::renderPlot({
     if (!is.null(v$sp_qc_data)){
       v$sp_qc_vlnplot <- Seurat::VlnPlot(v$sp_qc_data,
                                          features = c("nFeature_Spatial","nCount_Spatial","percent.mt"),
@@ -1284,35 +1254,35 @@ server <- function(input,output,session){
 
   ## QC plot for single-cell
   # Save variables from slidebar and plot
-  qc_list_sc <- eventReactive(input$qc_start, {
+  qc_list_sc <- shiny::eventReactive(input$qc_start, {
     list(input$nCount_RNA, input$percent.mt, input$nFeature_RNA,
          input$histo_breaks, input$histo_xmax, input$qc_radio, v$sc_qc_data)
   })
 
-  output$sc_feat_scatter <- renderPlot({
+  output$sc_feat_scatter <- shiny::renderPlot({
     if (!is.null(qc_list_sc()[[7]])){
       temp <- qc_list_sc()[[7]]
       v$p1 <- Seurat::FeatureScatter(temp, feature1 = "nCount_RNA", feature2 = "percent.mt") +
-        geom_hline(yintercept = qc_list_sc()[[2]]) + geom_vline(xintercept = qc_list_sc()[[1]])
+        ggplot2::geom_hline(yintercept = qc_list_sc()[[2]]) + ggplot2::geom_vline(xintercept = qc_list_sc()[[1]])
       v$p2 <- Seurat::FeatureScatter(temp, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") +
-        geom_hline(yintercept = qc_list_sc()[[3]]) + geom_vline(xintercept = qc_list_sc()[[1]])
+        ggplot2::geom_hline(yintercept = qc_list_sc()[[3]]) + ggplot2::geom_vline(xintercept = qc_list_sc()[[1]])
       v$p1 + v$p2
     }
   })
-  output$sc_hist <- renderPlot({
+  output$sc_hist <- shiny::renderPlot({
     if (!is.null(qc_list_sc()[[7]])){
       temp <- qc_list_sc()[[7]]
       # Draw histogram for total count, nFeature_RNA, and percent mitochondrial genes
       if (qc_list_sc()[[6]] == "nCount_RNA"){
-        hist(temp@meta.data$nCount_RNA, breaks=qc_list_sc()[[4]],
+        grahics::hist(temp@meta.data$nCount_RNA, breaks=qc_list_sc()[[4]],
              xlim=c(0,qc_list_sc()[[5]]), main = "Histogram for nCount_RNA",
              xlab = "nCount_RNA")
       } else if (qc_list_sc()[[6]] == "nFeature_RNA"){
-        hist(temp@meta.data$nFeature_RNA, breaks=qc_list_sc()[[4]],
+        grahics::hist(temp@meta.data$nFeature_RNA, breaks=qc_list_sc()[[4]],
              xlim=c(0,qc_list_sc()[[5]]), main = "Histogram for nFeature_RNA",
              xlab = "nFeature_RNA")
       } else if (qc_list_sc()[[6]] == "percent.mt"){
-        hist(temp@meta.data$percent.mt, breaks=qc_list_sc()[[4]],
+        grahics::hist(temp@meta.data$percent.mt, breaks=qc_list_sc()[[4]],
              xlim=c(0,qc_list_sc()[[5]]), main = "Histogram for percent.mt",
              xlab = "percent.mt")
       }
@@ -1320,54 +1290,54 @@ server <- function(input,output,session){
   })
 
   ## QC plot for spatial
-  qc_list_sp <- eventReactive(input$qc_sp_start, {
+  qc_list_sp <- shiny::eventReactive(input$qc_sp_start, {
     list(input$sp_nCount_Spatial, input$sp_percent.mt, input$sp_nFeature_Spatial,
          input$histo_sp_breaks, input$histo_sp_xmax, input$qc_sp_radio,
          input$tissue_qc_minmax, v$sp_qc_data)
   })
-  observeEvent(c(v$sp_qc_data, input$qc_sp_radio), {
+  shiny::observeEvent(c(v$sp_qc_data, input$qc_sp_radio), {
     if (!is.null(v$sp_qc_data)){
       temp <- v$sp_qc_data
       val = eval(parse(text=paste0('temp$',input$qc_sp_radio)))
       sp.max = max(val)
 
-      updateSliderInput(session, "tissue_qc_minmax",
+      shiny::updateSliderInput(session, "tissue_qc_minmax",
                         label = "QC metric minmax",
                         value = c(0, sp.max),
                         min = 0, max = sp.max, step = sp.max/100)
     }
   })
 
-  output$sp_feat_scatter <- renderPlot({
+  output$sp_feat_scatter <- shiny::renderPlot({
     if (!is.null(qc_list_sp()[[8]])){
       temp <- qc_list_sp()[[8]]
       v$p1 <- Seurat::FeatureScatter(temp, feature1 = "nCount_Spatial", feature2 = "percent.mt") +
-        geom_hline(yintercept = qc_list_sp()[[2]]) + geom_vline(xintercept = qc_list_sp()[[1]])
+        ggplot2::geom_hline(yintercept = qc_list_sp()[[2]]) + ggplot2::geom_vline(xintercept = qc_list_sp()[[1]])
       v$p2 <- Seurat::FeatureScatter(temp, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial") +
-        geom_hline(yintercept = qc_list_sp()[[3]]) + geom_vline(xintercept = qc_list_sp()[[1]])
+        ggplot2::geom_hline(yintercept = qc_list_sp()[[3]]) + ggplot2::geom_vline(xintercept = qc_list_sp()[[1]])
       v$p1 + v$p2
     }
   })
-  output$sp_hist <- renderPlot({
+  output$sp_hist <- shiny::renderPlot({
     if (!is.null(qc_list_sp()[[8]])){
       temp <- qc_list_sp()[[8]]
       # Draw histogram for total count, nFeature_RNA, and percent mitochondrial genes
       if (qc_list_sp()[[6]] == "nCount_Spatial"){
-        hist(temp@meta.data$nCount_Spatial, breaks=qc_list_sp()[[4]],
+        grahics::hist(temp@meta.data$nCount_Spatial, breaks=qc_list_sp()[[4]],
              xlim=c(0,qc_list_sp()[[5]]), main = "Histogram for nCount_Spatial",
              xlab = "nCount_Spatial")
       } else if (qc_list_sp()[[6]] == "nFeature_Spatial"){
-        hist(temp@meta.data$nFeature_Spatial, breaks=qc_list_sp()[[4]],
+        grahics::hist(temp@meta.data$nFeature_Spatial, breaks=qc_list_sp()[[4]],
              xlim=c(0,qc_list_sp()[[5]]), main = "Histogram for nFeature_Spatial",
              xlab = "nFeature_Spatial")
       } else if (qc_list_sp()[[6]] == "percent.mt"){
-        hist(temp@meta.data$percent.mt, breaks=qc_list_sp()[[4]],
+        grahics::hist(temp@meta.data$percent.mt, breaks=qc_list_sp()[[4]],
              xlim=c(0,qc_list_sp()[[5]]), main = "Histogram for percent.mt",
              xlab = "percent.mt")
       }
     }
   })
-  output$sp_tissue <- renderPlot({
+  output$sp_tissue <- shiny::renderPlot({
     if (!is.null(qc_list_sp()[[8]])){
       temp <- qc_list_sp()[[8]]
       # Draw histogram for total count, nFeature_RNA, and percent mitochondrial genes
@@ -1376,23 +1346,23 @@ server <- function(input,output,session){
     }
   })
 
-  observeEvent(input$horizontal_flip_start, {
+  shiny::observeEvent(input$horizontal_flip_start, {
     if (!is.null(qc_path())){
-      showModal(flipModal(text="horizontally", input_name="ok_horizontal"))
+      shiny::showModal(flipModal(text="horizontally", input_name="ok_horizontal"))
     }
   })
-  observeEvent(input$ok_horizontal, {
+  shiny::observeEvent(input$ok_horizontal, {
     horizontal_flip(qc_path())
-    removeModal()
+    shiny::removeModal()
   })
-  observeEvent(input$vertical_flip_start, {
+  shiny::observeEvent(input$vertical_flip_start, {
     if (!is.null(qc_path())){
-      showModal(flipModal(text="vertically", input_name="ok_vertical"))
+      shiny::showModal(flipModal(text="vertically", input_name="ok_vertical"))
     }
   })
-  observeEvent(input$ok_vertical, {
+  shiny::observeEvent(input$ok_vertical, {
     vertical_flip(qc_path())
-    removeModal()
+    shiny::removeModal()
   })
 
 
@@ -1405,9 +1375,9 @@ server <- function(input,output,session){
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
-  dir_integ <- reactive(input$dir_integ)
+  dir_integ <- shiny::reactive(input$dir_integ)
 
-  integ_path <- eventReactive(input$dir_integ, {
+  integ_path <- shiny::eventReactive(input$dir_integ, {
     if (is.null(names(dir_integ()))){
 
     } else if (dir_integ()$root[[1]]=='wd'){
@@ -1421,11 +1391,11 @@ server <- function(input,output,session){
   }
   )
 
-  output$dir_integ <- renderText({integ_path()})
+  output$dir_integ <- shiny::renderText({integ_path()})
 
 
   ## Load single-cell or spatial data and visualize the collected files
-  dir_list <- eventReactive(input$check_files, {
+  dir_list <- shiny::eventReactive(input$check_files, {
     data_dir <- list()
     a <- list.dirs(integ_path(), recursive = TRUE)
     for (i in 1:length(a)){
@@ -1453,41 +1423,41 @@ server <- function(input,output,session){
     unlist(plyr::compact(data_dir))
   })
 
-  output$dir_list <- renderText({paste(dir_list(), collapse='\n')})
+  output$dir_list <- shiny::renderText({paste(dir_list(), collapse='\n')})
 
   # Defined customized UI function
   # https://github.com/rstudio/shiny/issues/518
 
   # Update select input according to resulting directories
-  observeEvent(input$check_files, {
-    updateSelectInput(session, "dir_integ_sel",
+  shiny::observeEvent(input$check_files, {
+    shiny::updateSelectInput(session, "dir_integ_sel",
                       label = "Select files to include",
                       choices = dir_list())
-    updateSelectInput(session, "ref_index",
+    shiny::updateSelectInput(session, "ref_index",
                       label = "Select files for reference dataset (blank for NULL)",
                       choices = dir_list())
   })
-  observeEvent(input$dir_integ_sel, {
-    updateSelectInput(session, "ref_index",
+  shiny::observeEvent(input$dir_integ_sel, {
+    shiny::updateSelectInput(session, "ref_index",
                       label = "Select files for reference dataset (blank for NULL)",
                       choices = input$dir_integ_sel)
     dir_names <- as.vector(sapply(input$dir_integ_sel, function(x){
-      tail(strsplit(x, '/')[[1]],1)
+      utils::tail(strsplit(x, '/')[[1]],1)
     }))
-    updateTextInput(session, "grp_name",
+    shiny::updateTextInput(session, "grp_name",
                     label = "Names for each data: separated by comma, no space",
                     value = dir_names)
-    updateTextInput(session, "nFeature_RNA_thres",
+    shiny::updateTextInput(session, "nFeature_RNA_thres",
                     label = "Lower thresholds for total number of genes in a cell: separated by comma, no space",
                     value = rep(0, length(input$dir_integ_sel)))
-    updateTextInput(session, "percent_mt_thres",
+    shiny::updateTextInput(session, "percent_mt_thres",
                     label = "Upper thresholds for mitochondrial gene % in a cell: separated by comma, no space",
                     value = rep(100, length(input$dir_integ_sel)))
   })
 
 
   ## Start integration of single-cell or spatial data
-  observeEvent(input$integ_start, {
+  shiny::observeEvent(input$integ_start, {
     if (length(input$dir_integ_sel)==1){
       if (input$preproc_radio=='Single-cell'){
         shinybusy::show_modal_spinner()
@@ -1553,7 +1523,7 @@ server <- function(input,output,session){
 
 
   ## Update the metadata and genes of single-cell and spatial data
-  observeEvent(v$sc_data, {
+  shiny::observeEvent(v$sc_data, {
     shinybusy::show_modal_spinner()
     temp <- v$sc_data
     v$sc_gene_list <- c()
@@ -1582,7 +1552,7 @@ server <- function(input,output,session){
     shinybusy::remove_modal_spinner()
   })
 
-  observeEvent(v$sp_data, {
+  shiny::observeEvent(v$sp_data, {
     shinybusy::show_modal_spinner()
     temp <- v$sp_data
     v$sp_gene_list <- c()
@@ -1614,56 +1584,56 @@ server <- function(input,output,session){
   })
 
   ## Update the gene list
-  observeEvent(v$gene_upload, {
+  shiny::observeEvent(v$gene_upload, {
     sel_list <- names(v$gene_upload)
-    updateSelectInput(session, "sc_check_saved_genes",
+    shiny::updateSelectInput(session, "sc_check_saved_genes",
                       label = "Show saved gene list",
                       choices = c("All","Top 1001~2000","Top 2001~3000", sel_list), selected = "All")
-    updateSelectInput(session, "sp_check_saved_genes",
+    shiny::updateSelectInput(session, "sp_check_saved_genes",
                       label = "Show saved gene list",
                       choices = c("All","Top 1001~2000","Top 2001~3000", sel_list), selected = "All")
-    updateSelectInput(session, "vln_check_saved_genes",
+    shiny::updateSelectInput(session, "vln_check_saved_genes",
                       label = "Show saved gene list",
                       choices = c("All","Top 1001~2000","Top 2001~3000", sel_list), selected = "All")
-    updateSelectInput(session, "ridge_check_saved_genes",
+    shiny::updateSelectInput(session, "ridge_check_saved_genes",
                       label = "Show saved gene list",
                       choices = c("All","Top 1001~2000","Top 2001~3000", sel_list), selected = "All")
-    updateSelectInput(session, "module_check_saved_genes",
+    shiny::updateSelectInput(session, "module_check_saved_genes",
                       label = "Show saved gene list",
                       choices = c("All","Top 1001~2000","Top 2001~3000", sel_list), selected = "All")
-    updateSelectInput(session, "quantitation_check_saved_genes",
+    shiny::updateSelectInput(session, "quantitation_check_saved_genes",
                       label = "Show saved gene list",
                       choices = c("All","Top 1001~2000","Top 2001~3000", sel_list), selected = "All")
   })
 
 
   # Update the SelectInput function according to input: Dimplot and Frequency plot
-  observeEvent(c(v$sc_data,v$sp_data,input$dimplot_radio), {
+  shiny::observeEvent(c(v$sc_data,v$sp_data,input$dimplot_radio), {
     if (input$dimplot_radio=="Single-cell"){
       sel_list <- v$sc_meta_list_factor
     } else if (input$dimplot_radio=="Spatial"){
       sel_list <- v$sp_meta_list_factor
     }
-    updateSelectInput(session, "sc_group_var",
+    shiny::updateSelectInput(session, "sc_group_var",
                       label = "Group name",
                       choices = sel_list)
   })
 
-  observeEvent(c(v$sc_data,v$sp_data,input$freqplot_radio), {
+  shiny::observeEvent(c(v$sc_data,v$sp_data,input$freqplot_radio), {
     if (input$freqplot_radio=="Single-cell"){
       sel_list <- v$sc_meta_list_factor
     } else if (input$freqplot_radio=="Spatial"){
       sel_list <- v$sp_meta_list_factor
     }
-    updateSelectInput(session, "sc_group_var_freq",
+    shiny::updateSelectInput(session, "sc_group_var_freq",
                       label = "Group name (x-axis)",
                       choices = sel_list)
-    updateSelectInput(session, "sc_cluster_var_freq",
+    shiny::updateSelectInput(session, "sc_cluster_var_freq",
                       label = "Cluster name (y-axis)",
                       choices = sel_list)
   })
 
-  observeEvent(c(input$sc_group_var,v$sc_data,v$sp_data), {
+  shiny::observeEvent(c(input$sc_group_var,v$sc_data,v$sp_data), {
     if (input$dimplot_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$dimplot_radio=="Spatial"){
@@ -1671,7 +1641,7 @@ server <- function(input,output,session){
     }
     if (!is.null(temp)){
       if (input$sc_group_var %in% colnames(temp@meta.data)){
-        updateSelectInput(session, "sc_cell_high_cluster",
+        shiny::updateSelectInput(session, "sc_cell_high_cluster",
                           label = "Choose clusters to highlight:",
                           choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                          input$sc_group_var))))))
@@ -1680,7 +1650,7 @@ server <- function(input,output,session){
   })
 
   # Visualizing the single-cell dim plot
-  sc_dimplot_list <- eventReactive(input$sc_vis_clust_start, {
+  sc_dimplot_list <- shiny::eventReactive(input$sc_vis_clust_start, {
     if (input$dimplot_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$dimplot_radio=="Spatial"){
@@ -1695,7 +1665,7 @@ server <- function(input,output,session){
          input$sc_cell_high_cluster, temp, input$sc_dot_size)
   })
   # Draw dimplot
-  output$sc_dimplot <- renderPlot({
+  output$sc_dimplot <- shiny::renderPlot({
     if (!is.null(sc_dimplot_list()[[8]])){
       if (sc_dimplot_list()[[5]]){
         p <- list()
@@ -1712,8 +1682,8 @@ server <- function(input,output,session){
                                               "#683c00", "#d9dc22", "#992a13", "#ec102f", "#df6e78", "#fa7922",
                                               "#ae783e", "#7fdc64", "#6f2b6e", "#56cac1", "#1b511d", "#ec9fe7",
                                               "#214a65", "#b3d9fa", "#1932bf", "#34f50e")) +
-          ggtitle(sc_dimplot_list()[[4]]) +
-          theme(plot.title=element_text(size=14,face='bold',hjust=0.5))
+          ggplot2::ggtitle(sc_dimplot_list()[[4]]) +
+          ggplot2::theme(plot.title=ggplot2::element_text(size=14,face='bold',hjust=0.5))
         v$dimplot
 
       } else {
@@ -1727,8 +1697,8 @@ server <- function(input,output,session){
                                               "#683c00", "#d9dc22", "#992a13", "#ec102f", "#df6e78", "#fa7922",
                                               "#ae783e", "#7fdc64", "#6f2b6e", "#56cac1", "#1b511d", "#ec9fe7",
                                               "#214a65", "#b3d9fa", "#1932bf", "#34f50e")) +
-          ggtitle(sc_dimplot_list()[[4]]) +
-          theme(plot.title=element_text(size=14,face='bold',hjust=0.5))
+          ggplot2::ggtitle(sc_dimplot_list()[[4]]) +
+          ggplot2::theme(plot.title=ggplot2::element_text(size=14,face='bold',hjust=0.5))
         v$dimplot
       }
     }
@@ -1736,7 +1706,7 @@ server <- function(input,output,session){
 
 
   ## Frequency plot
-  observeEvent(input$sc_vis_freq_start, {
+  shiny::observeEvent(input$sc_vis_freq_start, {
     if (input$freqplot_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$freqplot_radio=="Spatial"){
@@ -1760,7 +1730,7 @@ server <- function(input,output,session){
     }
   })
 
-  output$sc_freqplot <- renderPlot({
+  output$sc_freqplot <- shiny::renderPlot({
     v$freq_boxplot[[1]]
   })
 
@@ -1771,7 +1741,7 @@ server <- function(input,output,session){
 
 
   # Update the SelectInput function according to input: featureplot
-  observeEvent(c(input$sc_check_metadata,v$sc_data,v$sp_data,
+  shiny::observeEvent(c(input$sc_check_metadata,v$sc_data,v$sp_data,
                  input$featureplot_radio, input$sc_check_saved_genes), {
                    if (input$featureplot_radio=="Single-cell"){
                      if (!(input$sc_check_saved_genes=="All")){
@@ -1792,15 +1762,15 @@ server <- function(input,output,session){
                      }
                      sel_list <- v$sp_meta_list_value
                    }
-                   updateSelectizeInput(session, "sc_vis_feat",
+                   shiny::updateSelectizeInput(session, "sc_vis_feat",
                                         label = "Choose genes to visualize",
                                         choices = gene_list, server = TRUE)
-                   updateSelectInput(session, "sc_vis_metadata",
+                   shiny::updateSelectInput(session, "sc_vis_metadata",
                                      label = "Choose metadata to visualize",
                                      choices = sel_list)
                  })
   # Update the minmax value according to input
-  observeEvent(c(input$sc_check_metadata,input$sc_vis_metadata,input$featureplot_radio), {
+  shiny::observeEvent(c(input$sc_check_metadata,input$sc_vis_metadata,input$featureplot_radio), {
     if (input$featureplot_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$featureplot_radio=="Spatial"){
@@ -1819,13 +1789,13 @@ server <- function(input,output,session){
           } else {
             sc.min = sc.min; sc.max=sc.max
           }
-          updateSliderInput(session, "sc_feat_minmax",
+          shiny::updateSliderInput(session, "sc_feat_minmax",
                             label = "Min max value",
                             value = c(sc.min, sc.max),
                             min = sc.min, max = sc.max, step=(sc.max-sc.min)/100)
         }
       } else {
-        updateSliderInput(session, "sc_feat_minmax",
+        shiny::updateSliderInput(session, "sc_feat_minmax",
                           label = "Min max value",
                           value = c(0,3), min = 0, max = 10, step=0.1)
       }
@@ -1833,7 +1803,7 @@ server <- function(input,output,session){
   })
 
   # Visualizing the single-cell feature plot
-  sc_featplot_list <- eventReactive(input$sc_vis_feat_start, {
+  sc_featplot_list <- shiny::eventReactive(input$sc_vis_feat_start, {
     if (input$featureplot_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$featureplot_radio=="Spatial"){
@@ -1846,7 +1816,7 @@ server <- function(input,output,session){
   })
 
 
-  output$sc_featplot <- renderPlot({
+  output$sc_featplot <- shiny::renderPlot({
     if (sc_featplot_list()[[1]]){
       v$sc_feat_list <- sc_featplot_list()[[2]]
     } else {
@@ -1868,23 +1838,23 @@ server <- function(input,output,session){
 
   ## Spatial cluster plot
   # Update the SelectInput function according to input: featureplot
-  observeEvent(v$sp_data, {
-    updateSelectInput(session, "sp_clust_cluster_name",
+  shiny::observeEvent(v$sp_data, {
+    shiny::updateSelectInput(session, "sp_clust_cluster_name",
                       "Group name",
                       choices = v$sp_meta_list_factor)
     if (!is.null(v$sp_data)){
       temp <- v$sp_data
-      updateSelectInput(session, "sp_clust_slide.to.visualize",
+      shiny::updateSelectInput(session, "sp_clust_slide.to.visualize",
                         "Choose slide to visualize",
                         choices = levels(factor(temp$orig.ident)))
     }
 
   })
-  observeEvent(c(v$sp_data, input$sp_clust_cluster_name), {
+  shiny::observeEvent(c(v$sp_data, input$sp_clust_cluster_name), {
     temp <- v$sp_data
     if (!is.null(temp)){
       if (input$sp_clust_cluster_name %in% colnames(temp@meta.data)){
-        updateSelectInput(session, "sp_clust_spot.cluster.highlight",
+        shiny::updateSelectInput(session, "sp_clust_spot.cluster.highlight",
                           "Choose clusters to subset",
                           choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                          input$sp_clust_cluster_name))))))
@@ -1894,7 +1864,7 @@ server <- function(input,output,session){
 
 
   # Visualizing the spatial cluster plot
-  sp_clusterplot_list <- eventReactive(input$sp_vis_cluster_start, {
+  sp_clusterplot_list <- shiny::eventReactive(input$sp_vis_cluster_start, {
     temp <- v$sp_data
     list(input$sp_cluster_alpha, input$sp_cluster_image.alpha,
          input$sp_clust_slide.to.visualize,
@@ -1906,7 +1876,7 @@ server <- function(input,output,session){
   })
 
 
-  output$sp_clusterplot <- renderPlot({
+  output$sp_clusterplot <- shiny::renderPlot({
 
     if (!is.null(sp_clusterplot_list()[[13]])){
       if (!is.null(sp_clusterplot_list()[[3]])){
@@ -1928,18 +1898,18 @@ server <- function(input,output,session){
                                                label.size=sp_clusterplot_list()[[12]])
       v$sp_clusterplot
     }
-  }, width = reactive({input$sp_cluster_img_width}),
-  height = reactive({input$sp_cluster_img_height}), bg="grey"
+  }, width = shiny::reactive({input$sp_cluster_img_width}),
+  height = shiny::reactive({input$sp_cluster_img_height}), bg="grey"
   )
 
 
 
   ## Spatial gene expression
   # Update the SelectInput function according to input: featureplot
-  observeEvent(c(v$sp_data, input$sp_check_metadata, input$sp_check_saved_genes), {
+  shiny::observeEvent(c(v$sp_data, input$sp_check_metadata, input$sp_check_saved_genes), {
     if (!is.null(v$sp_data)){
       temp <- v$sp_data
-      updateSelectInput(session, "sp_slide.to.visualize",
+      shiny::updateSelectInput(session, "sp_slide.to.visualize",
                         label = "Choose slide to visualize",
                         choices = levels(factor(temp$orig.ident)))
     }
@@ -1951,28 +1921,28 @@ server <- function(input,output,session){
     } else {
       gene_list <- v$sp_gene_list
     }
-    updateSelectizeInput(session, "sp_vis_feat",
+    shiny::updateSelectizeInput(session, "sp_vis_feat",
                          label = "Choose genes to visualize",
                          choices = gene_list, server = TRUE)
-    updateSelectInput(session, "sp_cluster_name",
+    shiny::updateSelectInput(session, "sp_cluster_name",
                       label = "Group name",
                       choices = v$sp_meta_list_factor)
-    updateSelectInput(session, "sp_vis_metadata",
+    shiny::updateSelectInput(session, "sp_vis_metadata",
                       label = "Choose metadata to visualize",
                       choices = v$sp_meta_list_value)
   })
-  observeEvent(c(v$sp_data, input$sp_cluster_name), {
+  shiny::observeEvent(c(v$sp_data, input$sp_cluster_name), {
     if (!is.null(v$sp_data)){
       temp <- v$sp_data
       if (input$sp_cluster_name %in% colnames(temp@meta.data)){
-        updateSelectInput(session, "sp_spot.cluster.highlight",
+        shiny::updateSelectInput(session, "sp_spot.cluster.highlight",
                           label = "Choose clusters to subset",
                           choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                          input$sp_cluster_name))))))
       }
     }
   })
-  observeEvent(c(input$sp_vis_metadata, input$sp_check_metadata), {
+  shiny::observeEvent(c(input$sp_vis_metadata, input$sp_check_metadata), {
     temp <- v$sp_data
     if (!is.null(temp)){
       if (input$sp_check_metadata){
@@ -1987,13 +1957,13 @@ server <- function(input,output,session){
           } else {
             sp.min=sp.min; sp.max=sp.max
           }
-          updateSliderInput(session, "sp_feat_minmax",
+          shiny::updateSliderInput(session, "sp_feat_minmax",
                             label = "Min max value",
                             value = c(sp.min, sp.max),
                             min = sp.min, max = sp.max, step=(sp.max-sp.min)/100)
         }
       } else {
-        updateSliderInput(session, "sp_feat_minmax",
+        shiny::updateSliderInput(session, "sp_feat_minmax",
                           label = "Min max value",
                           value = c(0,3), min = 0, max = 10, step=0.1)
       }
@@ -2002,7 +1972,7 @@ server <- function(input,output,session){
 
 
   # Visualizing the spatial feature plot
-  sp_featplot_list <- eventReactive(input$sp_vis_feat_start, {
+  sp_featplot_list <- shiny::eventReactive(input$sp_vis_feat_start, {
     temp <- v$sp_data
     list(input$sp_check_metadata, input$sp_vis_feat, input$sp_vis_metadata,
          input$sp_feat_minmax, input$sp_feat_alpha, input$sp_feat_image.alpha,
@@ -2013,7 +1983,7 @@ server <- function(input,output,session){
          input$sp_feat_img_width, input$sp_feat_img_height, temp,
          input$sp_title_size)
   })
-  sp_featplot_multi_list <- eventReactive(input$sp_feat_save_by_n, {
+  sp_featplot_multi_list <- shiny::eventReactive(input$sp_feat_save_by_n, {
     temp <- v$sp_data
     list(input$sp_check_metadata, input$sp_vis_feat, input$sp_vis_metadata,
          input$sp_feat_minmax, input$sp_feat_alpha, input$sp_feat_image.alpha,
@@ -2026,7 +1996,7 @@ server <- function(input,output,session){
   })
 
 
-  output$sp_featplot <- renderPlot({
+  output$sp_featplot <- shiny::renderPlot({
     if (sp_featplot_list()[[1]]){
       v$sp_feat_list <- sp_featplot_list()[[3]]
     } else {
@@ -2061,19 +2031,19 @@ server <- function(input,output,session){
                                                    title_size=sp_featplot_list()[[19]])
       v$sp_featureplot
     }
-  }, width = reactive({input$sp_feat_img_width}),
-  height = reactive({input$sp_feat_img_height}), bg="grey"
+  }, width = shiny::reactive({input$sp_feat_img_width}),
+  height = shiny::reactive({input$sp_feat_img_height}), bg="grey"
   )
 
   ## Upload gene list from feature plot multiple save
-  observeEvent(input$sp_feat_upload, {
-    showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+  shiny::observeEvent(input$sp_feat_upload, {
+    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
                                    text_input_name="sp_feat_save_name",
                                    text_input_explain = "Name of the gene list",
                                    file_save_name="gene_list",
                                    action_button_name = "ok_sp_feat_upload"))
   })
-  observeEvent(input$ok_sp_feat_upload, {
+  shiny::observeEvent(input$ok_sp_feat_upload, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$sp_csv_table)&!is.null(input$sp_column_select)){
       data_table <- v$sp_csv_table
@@ -2094,24 +2064,24 @@ server <- function(input,output,session){
     DT::datatable(v$sp_csv_table,
                   options=list(lengthMenu=c(5,10,20,40,80),pageLength=5))
   })
-  observeEvent(v$sp_csv_table, {
+  shiny::observeEvent(v$sp_csv_table, {
     if (!is.null(v$sp_csv_table)){
       if(dim(v$sp_csv_table)[2]>0){
-        updateSelectInput(session, "sp_column_select", "Select columns of gene list",
+        shiny::updateSelectInput(session, "sp_column_select", "Select columns of gene list",
                           choices = colnames(v$sp_csv_table))
       }
     }
   })
-  observeEvent(c(input$sp_feat_img_width, input$sp_feat_img_height),{
-    updateSliderInput(session, "sp_save_by_n_width", "Width in cm",
+  shiny::observeEvent(c(input$sp_feat_img_width, input$sp_feat_img_height),{
+    shiny::updateSliderInput(session, "sp_save_by_n_width", "Width in cm",
                       value = round(input$sp_feat_img_width/28.35))
-    updateSliderInput(session, "sp_save_by_n_height", "Height in cm",
+    shiny::updateSliderInput(session, "sp_save_by_n_height", "Height in cm",
                       value = round(input$sp_feat_img_height/28.35))
   })
 
 
   # Start save feature by n
-  observeEvent(input$sp_feat_save_by_n, {
+  shiny::observeEvent(input$sp_feat_save_by_n, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$sp_csv_table)&!is.null(input$sp_column_select)){
       data_tmp <- v$sp_csv_table
@@ -2156,7 +2126,7 @@ server <- function(input,output,session){
 
   ## Draw Violinplot
   # Update the SelectInput function according to input: featureplot
-  observeEvent(c(input$vln_check_metadata,v$sc_data,v$sp_data,
+  shiny::observeEvent(c(input$vln_check_metadata,v$sc_data,v$sp_data,
                  input$vlnplot_radio, input$vln_check_saved_genes), {
                    if (input$vlnplot_radio=="Single-cell"){
                      if (!(input$vln_check_saved_genes=="All")){
@@ -2180,21 +2150,21 @@ server <- function(input,output,session){
                      sel_list_inv <- v$sp_meta_list_value
                    }
 
-                   updateSelectizeInput(session, "vln_vis_feat",
+                   shiny::updateSelectizeInput(session, "vln_vis_feat",
                                         label = "Choose genes to visualize",
                                         choices = gene_list, server = TRUE)
-                   updateSelectInput(session, "vln_vis_metadata",
+                   shiny::updateSelectInput(session, "vln_vis_metadata",
                                      label = "Choose metadata to visualize",
                                      choices = sel_list_inv)
-                   updateSelectInput(session, "vln_color_group",
+                   shiny::updateSelectInput(session, "vln_color_group",
                                      label = "Color group",
                                      choices = sel_list)
-                   updateSelectInput(session, "vln_facet_group",
+                   shiny::updateSelectInput(session, "vln_facet_group",
                                      label = "Facet group",
                                      choices = sel_list)
                  })
 
-  vlnplot_list <- eventReactive(input$vln_start, {
+  vlnplot_list <- shiny::eventReactive(input$vln_start, {
     if (input$vlnplot_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$vlnplot_radio=="Spatial"){
@@ -2209,7 +2179,7 @@ server <- function(input,output,session){
   })
 
   # Visualize data with Violin plot
-  output$vlnplot <- renderPlot({
+  output$vlnplot <- shiny::renderPlot({
     if (vlnplot_list()[[1]]){
       v$vlnplot_feat_list <- vlnplot_list()[[2]]
     } else {
@@ -2233,38 +2203,38 @@ server <- function(input,output,session){
                                            group.by=vlnplot_list()[[4]], pt.size=0) +
             ggplot2::facet_grid(val_facet) +
             ggpubr::stat_compare_means(method = "kruskal.test", label='p') +
-            xlab('') +
-            scale_fill_manual(values = pal) +
-            theme(axis.title.y = element_text(size = 12),
-                  axis.text.x = element_text(size = 9),
-                  axis.text.y = element_text(size = 12),
-                  legend.title = element_text(size = 12),
-                  legend.text = element_text(size = 12)) + NoLegend()
+            ggplot2::xlab('') +
+            ggplot2::scale_fill_manual(values = pal) +
+            ggplot2::theme(axis.title.y = ggplot2::element_text(size = 12),
+                  axis.text.x = ggplot2::element_text(size = 9),
+                  axis.text.y = ggplot2::element_text(size = 12),
+                  legend.title = ggplot2::element_text(size = 12),
+                  legend.text = ggplot2::element_text(size = 12)) + Seurat::NoLegend()
         }
       } else {
         for (i in 1:length(v$vlnplot_feat_list)){
           plot_tmp[[i]] <- Seurat::VlnPlot(temp, features=v$vlnplot_feat_list[i],
                                            group.by=vlnplot_list()[[4]], pt.size=0) +
             ggpubr::stat_compare_means(method = "kruskal.test", label='p') +
-            xlab('') +
-            scale_fill_manual(values = pal) +
-            theme(axis.title.y = element_text(size = 12),
-                  axis.text.x = element_text(size = 9),
-                  axis.text.y = element_text(size = 12),
-                  legend.title = element_text(size = 12),
-                  legend.text = element_text(size = 12)) + NoLegend()
+            ggplot2::xlab('') +
+            ggplot2::scale_fill_manual(values = pal) +
+            ggplot2::theme(axis.title.y = ggplot2::element_text(size = 12),
+                  axis.text.x = ggplot2::element_text(size = 9),
+                  axis.text.y = ggplot2::element_text(size = 12),
+                  legend.title = ggplot2::element_text(size = 12),
+                  legend.text = ggplot2::element_text(size = 12)) + Seurat::NoLegend()
         }
       }
       v$vlnplot <- plot_tmp
       patchwork::wrap_plots(plot_tmp, ncol = vlnplot_list()[[6]])
     }
 
-  }, width = reactive({input$vln_img_width}),
-  height = reactive({input$vln_img_height}))
+  }, width = shiny::reactive({input$vln_img_width}),
+  height = shiny::reactive({input$vln_img_height}))
 
 
   ## Draw ridgeplot
-  observeEvent(c(input$ridge_check_metadata,v$sc_data,v$sp_data,
+  shiny::observeEvent(c(input$ridge_check_metadata,v$sc_data,v$sp_data,
                  input$ridgeplot_radio, input$ridge_check_saved_genes), {
                    if (input$ridgeplot_radio=="Single-cell"){
                      if (!(input$ridge_check_saved_genes=="All")){
@@ -2288,20 +2258,20 @@ server <- function(input,output,session){
                      sel_list_inv <- v$sp_meta_list_value
                    }
 
-                   updateSelectizeInput(session, "ridge_vis_feat",
+                   shiny::updateSelectizeInput(session, "ridge_vis_feat",
                                         label = "Choose genes to visualize",
                                         choices = gene_list, server = TRUE)
 
-                   updateSelectInput(session, "ridge_vis_metadata",
+                   shiny::updateSelectInput(session, "ridge_vis_metadata",
                                      label = "Choose metadata to visualize",
                                      choices = sel_list_inv)
-                   updateSelectInput(session, "ridge_vis_group",
+                   shiny::updateSelectInput(session, "ridge_vis_group",
                                      label = "Group by",
                                      choices = sel_list)
                  })
 
   # Update the minmax value according to input
-  observeEvent(c(input$ridge_check_metadata,input$ridge_vis_metadata,input$ridgeplot_radio), {
+  shiny::observeEvent(c(input$ridge_check_metadata,input$ridge_vis_metadata,input$ridgeplot_radio), {
     if (input$ridgeplot_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$ridgeplot_radio=="Spatial"){
@@ -2320,20 +2290,20 @@ server <- function(input,output,session){
           } else {
             sc.min = sc.min; sc.max=sc.max
           }
-          updateSliderInput(session, "ridge_feat_minmax",
+          shiny::updateSliderInput(session, "ridge_feat_minmax",
                             label = "Min max value",
                             value = c(sc.min, sc.max),
                             min = sc.min, max = sc.max, step=(sc.max-sc.min)/100)
         }
       } else {
-        updateSliderInput(session, "ridge_feat_minmax",
+        shiny::updateSliderInput(session, "ridge_feat_minmax",
                           label = "Min max value",
                           value = c(-0.5,6), min = -1, max = 10, step=0.1)
       }
     }
   })
 
-  ridgeplot_list <- eventReactive(input$ridge_feat_start, {
+  ridgeplot_list <- shiny::eventReactive(input$ridge_feat_start, {
     if (input$ridgeplot_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$ridgeplot_radio=="Spatial"){
@@ -2349,7 +2319,7 @@ server <- function(input,output,session){
   })
 
 
-  output$ridgeplot <- renderPlot({
+  output$ridgeplot <- shiny::renderPlot({
     if (ridgeplot_list()[[1]]){
       v$ridge_feat_list <- ridgeplot_list()[[2]]
     } else {
@@ -2366,38 +2336,38 @@ server <- function(input,output,session){
       v$ridgeplot
     }
 
-  }, width = reactive({input$ridge_img_width}),
-  height = reactive({input$ridge_img_height}))
+  }, width = shiny::reactive({input$ridge_img_width}),
+  height = shiny::reactive({input$ridge_img_height}))
 
 
 
   ## Marker gene finding and DEG
   # Update the SelectInput function according to input: marker and deg
-  observeEvent(c(v$sc_data,v$sp_data, input$marker_radio), {
+  shiny::observeEvent(c(v$sc_data,v$sp_data, input$marker_radio), {
     if (input$marker_radio=="Single-cell"){
       sel_list <- v$sc_meta_list_factor
     } else if (input$marker_radio=="Spatial"){
       sel_list <- v$sp_meta_list_factor
     }
-    updateSelectInput(session, "sc_marker_group",
+    shiny::updateSelectInput(session, "sc_marker_group",
                       label = "Group name",
                       choices = sel_list)
   })
-  observeEvent(c(v$sc_data, v$sp_data,input$DEG_radio), {
+  shiny::observeEvent(c(v$sc_data, v$sp_data,input$DEG_radio), {
     if (input$DEG_radio=="Single-cell"){
       sel_list <- v$sc_meta_list_factor
     } else if (input$DEG_radio=="Spatial"){
       sel_list <- v$sp_meta_list_factor
     }
-    updateSelectInput(session, "sc_deg_group",
+    shiny::updateSelectInput(session, "sc_deg_group",
                       label = "Group name",
                       choices = sel_list)
-    updateSelectInput(session, "sc_deg_subset_group",
+    shiny::updateSelectInput(session, "sc_deg_subset_group",
                       label = "Choose group for DEG",
                       choices = sel_list)
   })
 
-  observeEvent(c(input$sc_deg_group,v$sc_data,v$sp_data), {
+  shiny::observeEvent(c(input$sc_deg_group,v$sc_data,v$sp_data), {
     if (input$DEG_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$DEG_radio=="Spatial"){
@@ -2406,22 +2376,22 @@ server <- function(input,output,session){
 
     if (!is.null(temp)){
       if (input$sc_deg_group %in% colnames(temp@meta.data)){
-        updateSelectInput(session, "sc_deg_ref",
+        shiny::updateSelectInput(session, "sc_deg_ref",
                           label = "Choose reference idents",
                           choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                          input$sc_deg_group))))))
-        updateSelectInput(session, "sc_deg_int",
+        shiny::updateSelectInput(session, "sc_deg_int",
                           label = "Choose idents of interest",
                           choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                          input$sc_deg_group))))))
-        updateSelectInput(session, "sc_deg_subset_sel",
+        shiny::updateSelectInput(session, "sc_deg_subset_sel",
                           label = "Choose cluster to subset",
                           choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                          input$sc_deg_group))))))
       }
     }
   })
-  observeEvent(c(input$sc_deg_subset_group,input$sc_deg_subset_sel,
+  shiny::observeEvent(c(input$sc_deg_subset_group,input$sc_deg_subset_sel,
                  v$sc_data,v$sp_data), {
                    if (input$DEG_radio=="Single-cell"){
                      temp <- v$sc_data
@@ -2431,11 +2401,11 @@ server <- function(input,output,session){
 
                    if (!is.null(temp)){
                      if (input$sc_deg_subset_group %in% colnames(temp@meta.data)){
-                       updateSelectInput(session, "sc_deg_subset_int",
+                       shiny::updateSelectInput(session, "sc_deg_subset_int",
                                          label = "Choose idents of interest in a subset",
                                          choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                                         input$sc_deg_subset_group))))))
-                       updateSelectInput(session, "sc_deg_subset_ref",
+                       shiny::updateSelectInput(session, "sc_deg_subset_ref",
                                          label = "Choose reference idents in a subset",
                                          choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                                         input$sc_deg_subset_group))))))
@@ -2444,7 +2414,7 @@ server <- function(input,output,session){
                  })
 
   ## Define reactive values to action button
-  sc_marker_list <- eventReactive(input$sc_marker_start, {
+  sc_marker_list <- shiny::eventReactive(input$sc_marker_start, {
     if (input$marker_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$marker_radio=="Spatial"){
@@ -2463,7 +2433,7 @@ server <- function(input,output,session){
     }
   })
 
-  sc_deg_list <- eventReactive(input$sc_deg_start, {
+  sc_deg_list <- shiny::eventReactive(input$sc_deg_start, {
     if (input$DEG_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$DEG_radio=="Spatial"){
@@ -2497,7 +2467,7 @@ server <- function(input,output,session){
                               test.use='wilcox')
 
       v$sc_marker <- temp %>% dplyr::filter(avg_exp_clust > as.numeric(sc_marker_list()[[10]])) %>%
-        dplyr::group_by(cluster) %>% dplyr::arrange(desc(avg_exp_clust), .by_group = TRUE)
+        dplyr::group_by(cluster) %>% dplyr::arrange(dplyr::desc(avg_exp_clust), .by_group = TRUE)
       try({utils::write.csv(v$sc_marker, file.path(global$datapath,input$output_folder_name,
                                                    'data_files',paste0(input$marker_radio,'_marker_',
                                                                        sc_marker_list()[[1]],'.csv')))})
@@ -2527,14 +2497,14 @@ server <- function(input,output,session){
   })
 
   ## Upload gene list
-  observeEvent(input$sc_marker_upload,{
-    showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+  shiny::observeEvent(input$sc_marker_upload,{
+    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
                                    text_input_name="marker_save_name",
                                    text_input_explain = "Name of the gene list",
                                    file_save_name="gene_list",
                                    action_button_name = "ok_sc_marker_gene"))
   })
-  observeEvent(input$ok_sc_marker_gene, {
+  shiny::observeEvent(input$ok_sc_marker_gene, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$sc_marker)){
       if (sc_marker_list()[[5]]=='Wilcoxon'){
@@ -2570,7 +2540,7 @@ server <- function(input,output,session){
                               logfc.threshold = as.numeric(sc_deg_list()[[10]]))
       v$DEG <- temp %>% dplyr::filter(avg_exp_ident.1 > as.numeric(sc_deg_list()[[11]])) %>%
         dplyr::mutate(sign = ifelse(avg_log2FC > 0, "pos", "neg")) %>%
-        dplyr::arrange(desc(avg_exp_ident.1)) %>% dplyr::arrange(desc(sign)) %>%
+        dplyr::arrange(dplyr::desc(avg_exp_ident.1)) %>% dplyr::arrange(dplyr::desc(sign)) %>%
         dplyr::select(-sign)
 
       try({utils::write.csv(v$DEG, file.path(global$datapath,input$output_folder_name,
@@ -2590,7 +2560,7 @@ server <- function(input,output,session){
                               logfc.threshold = as.numeric(sc_deg_list()[[10]]))
       v$DEG <- temp %>% dplyr::filter(avg_exp_ident.1 > as.numeric(sc_deg_list()[[11]])) %>%
         dplyr::mutate(sign = ifelse(avg_log2FC > 0, "pos", "neg")) %>%
-        dplyr::arrange(desc(avg_exp_ident.1)) %>% dplyr::arrange(desc(sign)) %>%
+        dplyr::arrange(dplyr::desc(avg_exp_ident.1)) %>% dplyr::arrange(dplyr::desc(sign)) %>%
         dplyr::select(-sign)
 
       try({utils::write.csv(v$DEG, file.path(global$datapath,input$output_folder_name,
@@ -2606,15 +2576,15 @@ server <- function(input,output,session){
   })
 
   ## Upload gene list
-  observeEvent(input$sc_deg_upload,{
-    showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+  shiny::observeEvent(input$sc_deg_upload,{
+    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
                                    text_input_name="deg_save_name",
                                    text_input_explain = "Name of the gene list",
                                    file_save_name="gene_list",
                                    action_button_name = "ok_sc_deg"))
   })
 
-  observeEvent(input$ok_sc_deg, {
+  shiny::observeEvent(input$ok_sc_deg, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$DEG)){
       v[['gene_upload']][[input$deg_save_name]] <- v$DEG[['gene']]
@@ -2624,7 +2594,7 @@ server <- function(input,output,session){
 
 
   # Draw volcano plot
-  sc_deg_plot <- eventReactive(input$sc_deg_volcano_start,{
+  sc_deg_plot <- shiny::eventReactive(input$sc_deg_volcano_start,{
     if (!is.null(v$DEG)){
       deg_subset <- v$DEG
       eval(parse(text=paste0('v$deg_subset <- deg_subset[deg_subset$p_val_adj<',
@@ -2638,7 +2608,7 @@ server <- function(input,output,session){
   })
 
 
-  output$sc_deg_volcano <- renderPlot({
+  output$sc_deg_volcano <- shiny::renderPlot({
     if(!is.null(v$DEG)){
       if (sc_deg_plot()[[1]]){
         v$volcano <- EnhancedVolcano::EnhancedVolcano(v$DEG,
@@ -2694,15 +2664,15 @@ server <- function(input,output,session){
   })
 
   # Upload gene list
-  observeEvent(input$sc_deg_volcano_upload,{
-    showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+  shiny::observeEvent(input$sc_deg_volcano_upload,{
+    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
                                    text_input_name="deg_volcano_save_name",
                                    text_input_explain = "Name of the gene list",
                                    file_save_name="gene_list",
                                    action_button_name = "ok_sc_deg_volcano"))
   })
 
-  observeEvent(input$ok_sc_deg_volcano, {
+  shiny::observeEvent(input$ok_sc_deg_volcano, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$deg_subset)){
       v[['gene_upload']][[input$deg_volcano_save_name]] <- v$deg_subset[['gene']]
@@ -2713,7 +2683,7 @@ server <- function(input,output,session){
 
 
   ## Enrichment analysis for selected genes
-  sc_deg_enrich_plot <- eventReactive(input$sc_deg_enrich_start, {
+  sc_deg_enrich_plot <- shiny::eventReactive(input$sc_deg_enrich_start, {
     if(!is.null(v$DEG)){
       deg_subset <- v$DEG
       if (as.numeric(input$sc_deg_enrich_logfc) < 0){logfc <- "-"+input$sc_deg_enrich_logfc}
@@ -2728,13 +2698,13 @@ server <- function(input,output,session){
          input$sc_deg_enrich_nshow, input$sc_deg_enrich_terms)
   })
 
-  output$sc_deg_enrich <- renderPlot({
+  output$sc_deg_enrich <- shiny::renderPlot({
     if (sc_deg_enrich_plot()[[2]]=="Mouse"){
-      library(org.Mm.eg.db)
+      require(org.Mm.eg.db)
       species_go <- "org.Mm.eg.db"
       species_kegg <- "mmu"
     } else if (sc_deg_enrich_plot()[[2]]=="Human") {
-      library(org.Hs.eg.db)
+      require(org.Hs.eg.db)
       species_go <- "org.Hs.eg.db"
       species_kegg <- "hsa"
     }
@@ -2752,7 +2722,7 @@ server <- function(input,output,session){
                                           pAdjustMethod = 'BH',
                                           pvalueCutoff  = 0.05,
                                           qvalueCutoff  = 0.2)
-        v$dotplot <- clusterProfiler::dotplot(v$go, showCategory=sc_deg_enrich_plot()[[5]]) + ggtitle('GO analysis')
+        v$dotplot <- clusterProfiler::dotplot(v$go, showCategory=sc_deg_enrich_plot()[[5]]) + ggplot2::ggtitle('GO analysis')
         v$dotplot
 
       } else if (sc_deg_enrich_plot()[[1]]=="KEGG") {
@@ -2761,7 +2731,7 @@ server <- function(input,output,session){
                                               pAdjustMethod = "BH",
                                               pvalueCutoff = 0.05,
                                               qvalueCutoff = 0.2)
-        v$dotplot <- clusterProfiler::dotplot(v$kegg, showCategory=sc_deg_enrich_plot()[[5]]) + ggtitle('KEGG analysis')
+        v$dotplot <- clusterProfiler::dotplot(v$kegg, showCategory=sc_deg_enrich_plot()[[5]]) + ggplot2::ggtitle('KEGG analysis')
         v$dotplot
       }
     }
@@ -2774,16 +2744,16 @@ server <- function(input,output,session){
 
 
   # Annotate cell clusters
-  observeEvent(c(v$sc_data,v$sp_data,input$annotation_radio), {
+  shiny::observeEvent(c(v$sc_data,v$sp_data,input$annotation_radio), {
     if (input$annotation_radio=="Single-cell"){
       sel_list <- v$sc_meta_list_factor
     } else if (input$annotation_radio=="Spatial"){
       sel_list <- v$sp_meta_list_factor
     }
-    updateSelectInput(session, "annotation_group", "Group name", choices = sel_list)
+    shiny::updateSelectInput(session, "annotation_group", "Group name", choices = sel_list)
   })
 
-  observeEvent(c(v$sc_data,v$sp_data,input$annotation_group,
+  shiny::observeEvent(c(v$sc_data,v$sp_data,input$annotation_group,
                  input$annotation_radio), {
 
                    if (input$annotation_radio=="Single-cell"){
@@ -2809,8 +2779,8 @@ server <- function(input,output,session){
                                                             input$annotation_group))))
                        if (is.null(tmp)){tmp <- levels(factor(eval(parse(text=paste0('temp$',
                                                                                      input$annotation_group)))))}
-                       output$cluster_members <- renderText({tmp})
-                       updateTextInput(session, "annotation_labels",
+                       output$cluster_members <- shiny::renderText({tmp})
+                       shiny::updateTextInput(session, "annotation_labels",
                                        label = "New names to annotate: separated by comma, no space",
                                        value = tmp)
                      }
@@ -2818,7 +2788,7 @@ server <- function(input,output,session){
                  })
 
   # Perform annotation
-  observeEvent(input$cluster_new_idents, {
+  shiny::observeEvent(input$cluster_new_idents, {
     shinybusy::show_modal_spinner()
     if (input$annotation_radio=="Single-cell"){
       temp <- v$sc_data
@@ -2867,7 +2837,7 @@ server <- function(input,output,session){
 
 
   # Module score generation
-  observeEvent(c(v$sc_data, v$sp_data, input$module_score_radio),{
+  shiny::observeEvent(c(v$sc_data, v$sp_data, input$module_score_radio),{
     if (input$module_score_radio=="Single-cell"){
       if (!(input$module_check_saved_genes=="All")){
         if (input$module_check_saved_genes=="Top 1001~2000"){gene_list <- v$sc_gene_list[1001:2000]}
@@ -2886,13 +2856,13 @@ server <- function(input,output,session){
       }
     }
     if (!input$module_score_csv_check) {
-      updateSelectizeInput(session, "module_score_list",
+      shiny::updateSelectizeInput(session, "module_score_list",
                            label = "Gene list for module score",
                            choices = gene_list, server = TRUE)
     }
   })
 
-  observeEvent(input$module_score_start, {
+  shiny::observeEvent(input$module_score_start, {
     shinybusy::show_modal_spinner()
     if (input$module_score_radio=="Single-cell"){
       temp <- v$sc_data
@@ -2930,16 +2900,16 @@ server <- function(input,output,session){
                   options=list(lengthMenu=c(5,10,20,40,80),pageLength=5))
   })
 
-  observeEvent(v$module_table, {
+  shiny::observeEvent(v$module_table, {
     if (!is.null(v$module_table)){
       if(dim(v$module_table)[2]>0){
-        updateSelectInput(session, "module_table_select", "Select columns of gene list",
+        shiny::updateSelectInput(session, "module_table_select", "Select columns of gene list",
                           choices = colnames(v$module_table))
       }
     }
   })
 
-  observeEvent(c(v$sc_data,v$sp_data,input$module_score_radio,
+  shiny::observeEvent(c(v$sc_data,v$sp_data,input$module_score_radio,
                  input$module_score_table_apply), {
                    if (!is.null(v$module_table)){
                      if(dim(v$module_table)[1]>0){
@@ -2952,7 +2922,7 @@ server <- function(input,output,session){
                        if (!is.null(gene_list)){
                          intersect_genes <- intersect(gene_list,
                                                       eval(parse(text=paste0('unique(tb$',input$module_table_select,')'))))
-                         updateTextInput(session, "module_score_list_csv",
+                         shiny::updateTextInput(session, "module_score_list_csv",
                                          label = "Gene list for module score",
                                          value = intersect_genes)
                        }
@@ -2961,14 +2931,14 @@ server <- function(input,output,session){
                  })
 
   ## Upload gene list from feature plot multiple save
-  observeEvent(input$module_score_gene_upload, {
-    showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+  shiny::observeEvent(input$module_score_gene_upload, {
+    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
                                    text_input_name="module_score_feat_save_name",
                                    text_input_explain = "Name of the gene list",
                                    file_save_name="gene_list",
                                    action_button_name = "ok_module_score_feat_upload"))
   })
-  observeEvent(input$ok_module_score_feat_upload, {
+  shiny::observeEvent(input$ok_module_score_feat_upload, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$module_table)&!is.null(input$module_table_select)){
       data_table <- v$module_table
@@ -2985,17 +2955,17 @@ server <- function(input,output,session){
 
 
   ## Subset the data
-  observeEvent(c(v$sp_data, v$sc_data, input$subset_radio), {
+  shiny::observeEvent(c(v$sp_data, v$sc_data, input$subset_radio), {
     if (input$subset_radio=="Single-cell"){
       sel_list <- v$sc_meta_list_factor
     } else if (input$subset_radio=="Spatial"){
       sel_list <- v$sp_meta_list_factor
     }
-    updateSelectInput(session, "subset_group",
+    shiny::updateSelectInput(session, "subset_group",
                       label = "Group for subsetting",
                       choices = sel_list)
   })
-  observeEvent(c(v$sc_data,v$sp_data,input$subset_group), {
+  shiny::observeEvent(c(v$sc_data,v$sp_data,input$subset_group), {
     if (input$subset_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$subset_radio=="Spatial"){
@@ -3003,14 +2973,14 @@ server <- function(input,output,session){
     }
     if (!is.null(temp)){
       if (input$subset_group %in% colnames(temp@meta.data)){
-        updateSelectInput(session, "subset_list",
+        shiny::updateSelectInput(session, "subset_list",
                           label = "Choose clusters to subset",
                           choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                          input$subset_group))))))
       }
     }
   })
-  observeEvent(input$subset_start, {
+  shiny::observeEvent(input$subset_start, {
     shinybusy::show_modal_spinner()
     if (input$subset_radio=="Single-cell"){
       temp <- v$sc_data
@@ -3062,47 +3032,47 @@ server <- function(input,output,session){
 
 
   ## Regional value quantitation
-  observeEvent(v$sp_data, {
-    updateSelectInput(session, "quantitation_comp_group",
+  shiny::observeEvent(v$sp_data, {
+    shiny::updateSelectInput(session, "quantitation_comp_group",
                       label = "Comparison group",
                       choices = v$sp_meta_list_factor)
-    updateSelectInput(session, "quantitation_facet_group",
+    shiny::updateSelectInput(session, "quantitation_facet_group",
                       label = "Facet group",
                       choices = v$sp_meta_list_factor)
   })
-  observeEvent(input$quantitation_agg_mode, {
+  shiny::observeEvent(input$quantitation_agg_mode, {
     if (input$quantitation_agg_mode){
-      updateSelectInput(session, "quantitation_mode",
+      shiny::updateSelectInput(session, "quantitation_mode",
                         label = "Calculation mode",
                         choices = c("mean", "sum", "skewness", "kurtosis"), selected = "mean")
     } else {
-      updateSelectInput(session, "quantitation_mode",
+      shiny::updateSelectInput(session, "quantitation_mode",
                         label = "Calculation mode",
                         choices = c("mean", "sum", "skewness", "kurtosis",
                                     "boxplot (spots)"="boxplot"), selected = "mean")
     }
   })
 
-  observeEvent(v$annotate_recode, {
-    updateSelectInput(session, "quantitation_split_group",
+  shiny::observeEvent(v$annotate_recode, {
+    shiny::updateSelectInput(session, "quantitation_split_group",
                       label = "Split group (Go to 'Utility-Annotation' and define)",
                       choices = c(names(v$annotate_recode), "seurat_clusters"))
   })
 
-  observeEvent(c(input$quantitation_split_group, v$annotate_recode), {
+  shiny::observeEvent(c(input$quantitation_split_group, v$annotate_recode), {
     if (!is.null(v$annotate_recode[[input$quantitation_split_group]])){
-      updateSelectInput(session, "quantitation_recode_group",
+      shiny::updateSelectInput(session, "quantitation_recode_group",
                         label = "Recode group (Go to 'Utility-Annotation' and define)",
                         choices = v$annotate_recode[[input$quantitation_split_group]])
     } else {
-      updateSelectInput(session, "quantitation_recode_group",
+      shiny::updateSelectInput(session, "quantitation_recode_group",
                         label = "Recode group (Go to 'Utility-Annotation' and define)",
                         choices = "")
     }
   })
 
 
-  observeEvent(c(v$sp_data, input$quantitation_cellf_mode,
+  shiny::observeEvent(c(v$sp_data, input$quantitation_cellf_mode,
                  input$quantitation_check_saved_genes), {
                    if (input$quantitation_cellf_mode=="metadata"){
                      if (!identical(grep('_cellf', v$sp_meta_list_value, value=TRUE),character(0))){
@@ -3110,7 +3080,7 @@ server <- function(input,output,session){
                      } else {
                        cellf_list <- NULL
                      }
-                     updateSelectInput(session, "quantitation_cellf1",
+                     shiny::updateSelectInput(session, "quantitation_cellf1",
                                        label = "Metadata to quantify",
                                        choices = v$sp_meta_list_value, selected = cellf_list)
                    } else if (input$quantitation_cellf_mode=="genes"){
@@ -3121,13 +3091,13 @@ server <- function(input,output,session){
                      } else {
                        gene_list <- v$sp_gene_list
                      }
-                     updateSelectizeInput(session, "quantitation_cellf2",
+                     shiny::updateSelectizeInput(session, "quantitation_cellf2",
                                           label = "Genes to quantify",
                                           choices = gene_list, server=TRUE)
                    }
                  })
 
-  observeEvent(c(input$quantitation_cellf1, input$quantitation_cellf2), {
+  shiny::observeEvent(c(input$quantitation_cellf1, input$quantitation_cellf2), {
     y_axis_name <- "values"
     if (input$quantitation_cellf_mode=="metadata" &
         !is.null(input$quantitation_cellf1)){
@@ -3143,13 +3113,13 @@ server <- function(input,output,session){
         !is.null(input$quantitation_cellf2)){
       y_axis_name <- "expression"
     }
-    updateTextInput(session, inputId = "quantitation_name",
+    shiny::updateTextInput(session, inputId = "quantitation_name",
                     label = "Name of y-axis", value = y_axis_name)
   })
 
 
   ## Quantitation plot
-  observeEvent(input$quantitation_start, {
+  shiny::observeEvent(input$quantitation_start, {
     shinybusy::show_modal_spinner()
     if (((input$quantitation_agg_mode &
           input$quantitation_comp_group != input$quantitation_split_group)|
@@ -3221,10 +3191,10 @@ server <- function(input,output,session){
     shinybusy::remove_modal_spinner()
   })
 
-  output$quantitation_plot <- renderPlot({
+  output$quantitation_plot <- shiny::renderPlot({
     v$quantitation_result[[1]]
-  }, width = reactive({input$quantitation_img_width}),
-  height = reactive({input$quantitation_img_height}))
+  }, width = shiny::reactive({input$quantitation_img_width}),
+  height = shiny::reactive({input$quantitation_img_height}))
 
   output$quantitation_table <- DT::renderDataTable({
     DT::datatable(v$quantitation_result[[2]],
@@ -3232,27 +3202,27 @@ server <- function(input,output,session){
   })
 
   ## CellDART analysis: cell type deconvolution
-  observeEvent(v$sp_data, {
-    updateSelectInput(session, "celldart_group", "Group to subset spots",
+  shiny::observeEvent(v$sp_data, {
+    shiny::updateSelectInput(session, "celldart_group", "Group to subset spots",
                       choices = v$sp_meta_list_factor)
   })
-  observeEvent(v$sc_data, {
-    updateSelectInput(session, "celldart_metadata_celltype",
+  shiny::observeEvent(v$sc_data, {
+    shiny::updateSelectInput(session, "celldart_metadata_celltype",
                       "Group for classifying celltypes",
                       choices = v$sc_meta_list_factor)
   })
-  observeEvent(c(v$sp_data, input$celldart_group),{
+  shiny::observeEvent(c(v$sp_data, input$celldart_group),{
     temp <- v$sp_data
     if (!is.null(temp)){
       if (input$celldart_group %in% colnames(temp@meta.data)){
-        updateSelectInput(session, "celldart_group_sel",
+        shiny::updateSelectInput(session, "celldart_group_sel",
                           "Select spot clusters to include",
                           choices = levels(factor(eval(parse(text=paste0('temp$',
                                                                          input$celldart_group))))))
       }
     }
   })
-  observeEvent(input$celldart_start, {
+  shiny::observeEvent(input$celldart_start, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$sp_data)&!is.null(v$sc_data)){
       brain.tmp <- pred_cellf_celldart(sp_data=v$sp_data,sc_data=v$sc_data,
@@ -3279,14 +3249,14 @@ server <- function(input,output,session){
 
   ## Save image files
   # Dimplot
-  observeEvent(input$sc_clust_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "sc_clust_save_dpi",
+  shiny::observeEvent(input$sc_clust_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_clust_save_dpi",
                                  width_name = "sc_clust_width",
                                  height_name = "sc_clust_height",
                                  width_value=15, height_value=15,
                                  action_button_name = "sc_clust_save_start"))
   })
-  observeEvent(input$sc_clust_save_start, {
+  shiny::observeEvent(input$sc_clust_save_start, {
     shinybusy::show_modal_spinner()
     v$dimplot
     if (!is.null(input$sc_cell_high_cluster)&input$sc_cell_high){
@@ -3294,7 +3264,7 @@ server <- function(input,output,session){
     } else {
       cell_highlight <- ""
     }
-    try({ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
                           paste0(input$dimplot_radio,'_dimplot_',
                                  input$sc_group_var,'_',cell_highlight,
@@ -3303,22 +3273,22 @@ server <- function(input,output,session){
                 height = input$sc_clust_height, units = c("cm"),
                 dpi = input$sc_clust_save_dpi, bg = "white")})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
   # Frequency plot
-  observeEvent(input$sc_freq_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "sc_freq_save_dpi",
+  shiny::observeEvent(input$sc_freq_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_freq_save_dpi",
                                  width_name = "sc_freq_width",
                                  height_name = "sc_freq_height",
                                  width_value=15, height_value=20,
                                  action_button_name = "sc_freq_save_start"))
   })
 
-  observeEvent(input$sc_freq_save_start, {
+  shiny::observeEvent(input$sc_freq_save_start, {
     shinybusy::show_modal_spinner()
     v$freq_boxplot[[1]]
-    try({ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
                           paste0(input$freqplot_radio,'_freqplot_',
                                  input$sc_group_var_freq,'_',
@@ -3326,22 +3296,22 @@ server <- function(input,output,session){
                 width = input$sc_freq_width, height = input$sc_freq_height, units = c("cm"),
                 dpi = input$sc_freq_save_dpi, bg = "white")})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
   # Feature plot
-  observeEvent(input$sc_feat_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "sc_feat_save_dpi",
+  shiny::observeEvent(input$sc_feat_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_feat_save_dpi",
                                  width_name = "sc_feat_width",
                                  height_name = "sc_feat_height",
                                  width_value=15*input$sc_feat_ncol,
                                  height_value=15*(((length(v$sc_feat_list)-1)%/%input$sc_feat_ncol)+1),
                                  action_button_name = "sc_feat_save_start"))
   })
-  observeEvent(input$sc_feat_save_start, {
+  shiny::observeEvent(input$sc_feat_save_start, {
     shinybusy::show_modal_spinner()
     v$sc_featureplot
-    try({ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
                           paste0(input$featureplot_radio,'_featplot_',
                                  paste(v$sc_feat_list,collapse='_'),'.png')),
@@ -3350,44 +3320,44 @@ server <- function(input,output,session){
                 units = c("cm"),
                 dpi = input$sc_feat_save_dpi, bg = "white")})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
   # Spatial cluster plot
-  observeEvent(input$sp_cluster_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "sp_cluster_save_dpi",
+  shiny::observeEvent(input$sp_cluster_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sp_cluster_save_dpi",
                                  width_name = "sp_cluster_width",
                                  height_name = "sp_cluster_height",
                                  width_value=input$sp_cluster_img_width/28.35,
                                  height_value=input$sp_cluster_img_height/28.35,
                                  action_button_name = "sp_cluster_save_start"))
   })
-  observeEvent(input$sp_cluster_save_start, {
+  shiny::observeEvent(input$sp_cluster_save_start, {
     shinybusy::show_modal_spinner()
     v$sc_clusterplot
-    try({ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
                           paste0('spclustplot_seurat_clusters.png')),
                 width = input$sp_cluster_width,
                 height = input$sp_cluster_height, units = c("cm"),
                 dpi = input$sp_cluster_save_dpi, bg = "white")})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
   # Spatial feature plot
-  observeEvent(input$sp_feat_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "sp_feat_save_dpi",
+  shiny::observeEvent(input$sp_feat_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sp_feat_save_dpi",
                                  width_name = "sp_feat_width",
                                  height_name = "sp_feat_height",
                                  width_value=input$sp_feat_img_width/28.35,
                                  height_value=input$sp_feat_img_height/28.35,
                                  action_button_name = "sp_feat_save_start"))
   })
-  observeEvent(input$sp_feat_save_start, {
+  shiny::observeEvent(input$sp_feat_save_start, {
     shinybusy::show_modal_spinner()
     v$sp_featureplot
-    try({ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
                           paste0('spfeatplot_',
                                  paste(v$sp_feat_list,collapse='_'),'.png')),
@@ -3395,24 +3365,24 @@ server <- function(input,output,session){
                 height = input$sp_feat_height, units = c("cm"),
                 dpi = input$sp_feat_save_dpi, bg = "white")})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
   # Violin plot
-  observeEvent(input$vln_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "vln_save_dpi",
+  shiny::observeEvent(input$vln_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "vln_save_dpi",
                                  width_name = "vln_width",
                                  height_name = "vln_height",
                                  width_value=input$vln_img_width/28.35,
                                  height_value=input$vln_img_height/28.35,
                                  action_button_name = "vln_save_start"))
   })
-  observeEvent(input$vln_save_start, {
+  shiny::observeEvent(input$vln_save_start, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$vlnplot)){
       patchwork::wrap_plots(v$vlnplot, ncol=input$vln_ncol)
     }
-    try({ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
                           paste0(input$vlnplot_radio,'_vlnplot_',
                                  paste(v$vlnplot_feat_list,collapse='_'),'.png')),
@@ -3420,22 +3390,22 @@ server <- function(input,output,session){
                 height = input$vln_height, units = c("cm"),
                 dpi = input$vln_save_dpi, bg = "white")})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
   # Ridge plot
-  observeEvent(input$ridge_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "ridge_save_dpi",
+  shiny::observeEvent(input$ridge_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "ridge_save_dpi",
                                  width_name = "ridge_width",
                                  height_name = "ridge_height",
                                  width_value=input$ridge_img_width/28.35,
                                  height_value=input$ridge_img_height/28.35,
                                  action_button_name = "ridge_save_start"))
   })
-  observeEvent(input$ridge_save_start, {
+  shiny::observeEvent(input$ridge_save_start, {
     shinybusy::show_modal_spinner()
     v$ridgeplot
-    try({ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
                           paste0(input$ridgeplot_radio,'_ridgeplot_',
                                  paste(v$ridge_feat_list,collapse='_'),'.png')),
@@ -3443,19 +3413,19 @@ server <- function(input,output,session){
                 height = input$ridge_height, units = c("cm"),
                 dpi = input$ridge_save_dpi, bg = "white")})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
 
   # Volcano plot
-  observeEvent(input$sc_deg_volcano_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "sc_deg_volcano_save_dpi",
+  shiny::observeEvent(input$sc_deg_volcano_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_deg_volcano_save_dpi",
                                  width_name = "deg_volcano_width",
                                  height_name = "deg_volcano_height",
                                  width_value=13, height_value=15,
                                  action_button_name = "sc_deg_volcano_save_start"))
   })
-  observeEvent(input$sc_deg_volcano_save_start, {
+  shiny::observeEvent(input$sc_deg_volcano_save_start, {
     shinybusy::show_modal_spinner()
     try({if (input$sc_check_deg_subset){
       grDevices::png(file.path(global$datapath,input$output_folder_name,
@@ -3479,18 +3449,18 @@ server <- function(input,output,session){
       print(v$volcano)
       grDevices::dev.off()})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
   # Enrich plot
-  observeEvent(input$sc_deg_enrich_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "sc_deg_enrich_save_dpi",
+  shiny::observeEvent(input$sc_deg_enrich_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_deg_enrich_save_dpi",
                                  width_name = "deg_enrich_width",
                                  height_name = "deg_enrich_height",
                                  width_value=38, height_value=11,
                                  action_button_name = "sc_deg_enrich_save_start"))
   })
-  observeEvent(input$sc_deg_enrich_save_start, {
+  shiny::observeEvent(input$sc_deg_enrich_save_start, {
     shinybusy::show_modal_spinner()
     try({if (input$sc_check_deg_subset){
       grDevices::png(file.path(global$datapath,input$output_folder_name,
@@ -3514,21 +3484,21 @@ server <- function(input,output,session){
                      bg = "white")
     }
       print(v$dotplot)
-      grDevices:dev.off()})
+      grDevices::dev.off()})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
   # Quantitation
-  observeEvent(input$quantitation_save, {
-    showModal(save_plot_wh_Modal(slider_input_name = "quantitation_save_dpi",
+  shiny::observeEvent(input$quantitation_save, {
+    shiny::showModal(save_plot_wh_Modal(slider_input_name = "quantitation_save_dpi",
                                  width_name = "quantitation_width",
                                  height_name = "quantitation_height",
                                  width_value=input$quantitation_img_width/28.35,
                                  height_value=input$quantitation_img_height/28.35,
                                  action_button_name = "quantitation_save_start"))
   })
-  observeEvent(input$quantitation_save_start, {
+  shiny::observeEvent(input$quantitation_save_start, {
     shinybusy::show_modal_spinner()
     v$quantitation_result[[1]]
 
@@ -3538,7 +3508,7 @@ server <- function(input,output,session){
       quantitation_cellf <- input$quantitation_cellf2
     }
     try({if (input$quantitation_agg_mode){
-      ggsave(file.path(global$datapath,input$output_folder_name,
+      ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
                        'data_files',
                        paste0('Regional_quantplot_',
                               input$quantitation_mode,'_of_',
@@ -3550,7 +3520,7 @@ server <- function(input,output,session){
              height = input$quantitation_height, units = c("cm"),
              dpi = input$quantitation_save_dpi, bg = "white")
     } else {
-      ggsave(file.path(global$datapath,input$output_folder_name,
+      ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
                        'data_files',
                        paste0('Regional_quantplot_',
                               input$quantitation_mode,'_of_',
@@ -3563,45 +3533,45 @@ server <- function(input,output,session){
              dpi = input$quantitation_save_dpi, bg = "white")
     }})
     shinybusy::remove_modal_spinner()
-    removeModal()
+    shiny::removeModal()
   })
 
 
   # Saving processed single-cell or spatial dataset
-  observeEvent(input$data_save, {
+  shiny::observeEvent(input$data_save, {
     if (input$save_radio=="Single-cell"){
-      showModal(save_files_Modal(text="single-cell", text_input_name="sc_save_file_name",
+      shiny::showModal(save_files_Modal(text="single-cell", text_input_name="sc_save_file_name",
                                  file_save_name="sc_data", action_button_name = "ok_sc"))
     } else if (input$save_radio=="Spatial"){
-      showModal(save_files_Modal(text="spatial", text_input_name="sp_save_file_name",
+      shiny::showModal(save_files_Modal(text="spatial", text_input_name="sp_save_file_name",
                                  file_save_name="sp_data", action_button_name = "ok_sp"))
     } else if (input$save_radio=="Genes: stored"){
-      showModal(save_files_Modal(text="stored gene list", text_input_name="sp_save_stored_gene",
+      shiny::showModal(save_files_Modal(text="stored gene list", text_input_name="sp_save_stored_gene",
                                  file_save_name="stored_gene_list", action_button_name = "ok_stored_gene"))
     } else if (input$save_radio=="Genes: abundance"){
-      showModal(save_files_Modal(text="abundance gene list", text_input_name="sp_save_ab_gene",
+      shiny::showModal(save_files_Modal(text="abundance gene list", text_input_name="sp_save_ab_gene",
                                  file_save_name="ab_gene_list", action_button_name = "ok_ab_gene"))
     }
   })
-  observeEvent(input$ok_sc, {
+  shiny::observeEvent(input$ok_sc, {
     shinybusy::show_modal_spinner()
     try({saveRDS(v$sc_data, file.path(global$datapath,input$output_folder_name,
                                       paste0(input$sc_save_file_name,'.rds')))})
     shinybusy::remove_modal_spinner()
-    removeModal()
-    output$cmd <- renderText({paste0('The single-cell data was saved as RDS in ',
+    shiny::removeModal()
+    output$cmd <- shiny::renderText({paste0('The single-cell data was saved as RDS in ',
                                      file.path(global$datapath,input$output_folder_name))})
   })
-  observeEvent(input$ok_sp, {
+  shiny::observeEvent(input$ok_sp, {
     shinybusy::show_modal_spinner()
     try({saveRDS(v$sp_data, file.path(global$datapath,input$output_folder_name,
                                       paste0(input$sp_save_file_name,'.rds')))})
     shinybusy::remove_modal_spinner()
-    removeModal()
-    output$cmd <- renderText({paste0('The spatial data was saved as RDS in ',
+    shiny::removeModal()
+    output$cmd <- shiny::renderText({paste0('The spatial data was saved as RDS in ',
                                      file.path(global$datapath,input$output_folder_name))})
   })
-  observeEvent(input$ok_stored_gene, {
+  shiny::observeEvent(input$ok_stored_gene, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$gene_upload)){
       try({utils::write.table(t(plyr::ldply(v$gene_upload, rbind)),
@@ -3610,11 +3580,11 @@ server <- function(input,output,session){
                               sep=',', col.names=FALSE)})
     }
     shinybusy::remove_modal_spinner()
-    removeModal()
-    output$cmd <- renderText({paste0('The gene lists were saved as csv in ',
+    shiny::removeModal()
+    output$cmd <- shiny::renderText({paste0('The gene lists were saved as csv in ',
                                      file.path(global$datapath,input$output_folder_name))})
   })
-  observeEvent(input$ok_ab_gene, {
+  shiny::observeEvent(input$ok_ab_gene, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$sc_gene_list)&!is.null(v$sp_gene_list)){
       try({utils::write.table(t(plyr::ldply(list("Single.cell.top3000"=v$sc_gene_list,
@@ -3632,8 +3602,8 @@ server <- function(input,output,session){
                                       paste0(input$sp_save_ab_gene,'.csv')), col.names = T)})
     }
     shinybusy::remove_modal_spinner()
-    removeModal()
-    output$cmd <- renderText({paste0('The abundance list was saved as csv in ',
+    shiny::removeModal()
+    output$cmd <- shiny::renderText({paste0('The abundance list was saved as csv in ',
                                      file.path(global$datapath,input$output_folder_name))})
   })
 
@@ -3643,9 +3613,9 @@ server <- function(input,output,session){
                   roots = c(home = '/home/nmadmin', wd ='.'),
                   filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad"))
 
-  data_load <- reactive(input$data_load)
+  data_load <- shiny::reactive(input$data_load)
 
-  observeEvent(input$data_load, {
+  shiny::observeEvent(input$data_load, {
     next_step <- FALSE
     if (is.null(names(data_load()))){
     } else if (data_load()$root[[1]]=='wd'){
@@ -3662,35 +3632,35 @@ server <- function(input,output,session){
         shinybusy::show_modal_spinner()
         v$sc_data <- readRDS(load_path)
         shinybusy::remove_modal_spinner()
-        output$cmd <- renderText({paste0("'",load_path,"' was loaded")})
+        output$cmd <- shiny::renderText({paste0("'",load_path,"' was loaded")})
       } else if (input$save_radio=="Spatial"){
         shinybusy::show_modal_spinner()
         v$sp_data <- readRDS(load_path)
         shinybusy::remove_modal_spinner()
-        output$cmd <- renderText({paste0("'",load_path,"' was loaded")})
+        output$cmd <- shiny::renderText({paste0("'",load_path,"' was loaded")})
       } else if (input$save_radio=="Genes: stored"){
         if (!is.null(v$sp_gene_list)){
           load_list <- lapply(as.list(utils::read.csv(load_path)), FUN = function(x) intersect(x, v$sp_gene_list))
           if (!is.null(v$sc_gene_list)){load_list <- lapply(load_list, FUN = function(x) intersect(x, v$sc_gene_list))}
-          output$cmd <- renderText({paste0("'",load_path,"' was loaded")})
+          output$cmd <- shiny::renderText({paste0("'",load_path,"' was loaded")})
         } else if (!is.null(v$sc_gene_list)){
           load_list <- lapply(as.list(utils::read.csv(load_path)), FUN = function(x) intersect(x, v$sc_gene_list))
-          output$cmd <- renderText({paste0("'",load_path,"' was loaded")})
+          output$cmd <- shiny::renderText({paste0("'",load_path,"' was loaded")})
         } else {
           load_list <- list()
-          output$cmd <- renderText({paste0("Neither spatial nor single-cell data have been uploaded\nEmpty gene list.")})
+          output$cmd <- shiny::renderText({paste0("Neither spatial nor single-cell data have been uploaded\nEmpty gene list.")})
         }
         v$gene_upload <- c(v$gene_upload, load_list)
       } else {
-        output$cmd <- renderText({paste0("Loading is possible when 'single-cell', 'spatial', or 'Genes: stored' are selected")})
+        output$cmd <- shiny::renderText({paste0("Loading is possible when 'single-cell', 'spatial', or 'Genes: stored' are selected")})
       }
     }
   }
   )
 
   ## Convert file to 10Xformat
-  observeEvent(input$convert_file_to_sparse, {
-    showModal(load_files_Modal(input=input, output=output, session=session,
+  shiny::observeEvent(input$convert_file_to_sparse, {
+    shiny::showModal(load_files_Modal(input=input, output=output, session=session,
                                text="csv or txt",
                                text_for_purpose="Will you convert the ",text_for_add=" file?",
                                text_input_name="file_load_name",
@@ -3718,10 +3688,10 @@ server <- function(input,output,session){
                   roots = c(home = '/home/nmadmin', wd ='.'),
                   filetypes = c('',"txt","csv"))
 
-  choose_file_to_convert <- reactive(input$choose_file_to_convert)
+  choose_file_to_convert <- shiny::reactive(input$choose_file_to_convert)
 
   # Check the table contents
-  observeEvent(input$check_load_file, {
+  shiny::observeEvent(input$check_load_file, {
     next_step <- F
     if (is.null(names(choose_file_to_convert()))){
     } else if (choose_file_to_convert()$root[[1]]=='wd'){
@@ -3772,7 +3742,7 @@ server <- function(input,output,session){
   })
 
   ## Convert to 10X format
-  observeEvent(input$convert_file_ok, {
+  shiny::observeEvent(input$convert_file_ok, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$load_path)){
       read_total <- data.table::fread(v$load_path,
@@ -3803,23 +3773,23 @@ server <- function(input,output,session){
                                      "sparse_matrix.rds"))){
             saveRDS(read_total,
                     file = file.path(save_path, "sparse_matrix.rds"))
-            output$cmd <- renderText({paste0("'",file.path(save_path,
+            output$cmd <- shiny::renderText({paste0("'",file.path(save_path,
                                                            "sparse_matrix.rds"),"' was generated")})
           } else {
-            output$cmd <- renderText({paste0("'",file.path(save_path,
+            output$cmd <- shiny::renderText({paste0("'",file.path(save_path,
                                                            "sparse_matrix.rds"),"' already exists")})
           }
         })
       }
     }
-    removeModal()
+    shiny::removeModal()
     shinybusy::remove_modal_spinner()
   })
 
 
   # Stop shiny after closing the page
-  observeEvent(input$close, {
-    js$closeWindow()
+  shiny::observeEvent(input$close, {
+    shinyjs::js$closeWindow()
     shiny::stopApp()
   })
 }

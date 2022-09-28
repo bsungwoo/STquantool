@@ -1,5 +1,4 @@
 library(shiny)
-library(ggpubr)
 library(dplyr)
 
 #' Internal Modal function to flip the image
@@ -7,10 +6,10 @@ library(dplyr)
 #' @keywords internal
 flipModal <- function(text="vertically", input_name="ok_vertical") {
   shiny::modalDialog(
-    shiny::div(tags$b(paste0("Will you ",text," flip the image?"), style = "color: black;")),
+    shiny::div(shiny::tags$b(paste0("Will you ",text," flip the image?"), style = "color: black;")),
     footer = shiny::tagList(
-      modalButton("Cancel"),
-      actionButton(input_name, "OK")
+      shiny::modalButton("Cancel"),
+      shiny::actionButton(input_name, "OK")
     )
   )
 }
@@ -84,13 +83,13 @@ vertical_flip <- function(file_dir_vector){
 #' @keywords internal
 save_plot_Modal <- function(slider_input_name="save_dpi", action_button_name = "save_start") {
   shiny::modalDialog(
-    shiny::div(tags$b("Options for saving a plot"), style = "color: blue;"),
+    shiny::div(shiny::tags$b("Options for saving a plot"), style = "color: blue;"),
     shiny::wellPanel(
       shiny::sliderInput(inputId = slider_input_name,
                          label = "dpi to save image",
                          value = 100, min = 0, max=500, step=10)
     ),
-    footer = tagList(
+    footer = shiny::tagList(
       shiny::modalButton("Cancel"),
       shiny::actionButton(action_button_name, "Save")
     )
@@ -104,7 +103,7 @@ save_plot_wh_Modal <- function(slider_input_name="save_dpi", width_name = "deg_w
                                height_name = "deg_height", width_value=13, height_value=15,
                                action_button_name = "save_start") {
   shiny::modalDialog(
-    shiny::div(tags$b("Options for saving a plot"), style = "color: blue;"),
+    shiny::div(shiny::tags$b("Options for saving a plot"), style = "color: blue;"),
     shiny::wellPanel(
       shiny::sliderInput(inputId = slider_input_name,
                          label = "dpi to save image",
@@ -136,7 +135,7 @@ save_files_Modal <- function(text="single-cell",
                              add_text_input_explain='Name of the file',
                              add_file_save_name="sc_data", action_button_name = "ok_sc") {
   shiny::modalDialog(
-    shiny::div(tags$b(paste0(text_for_purpose,text,text_for_add), style = "color: black;")),
+    shiny::div(shiny::tags$b(paste0(text_for_purpose,text,text_for_add), style = "color: black;")),
     shiny::wellPanel(
       shiny::textInput(inputId = text_input_name,
                        label = text_input_explain,
@@ -178,7 +177,7 @@ load_files_Modal <- function(input, output, session, text="csv or txt",
                              action_button_name2 = "ok_load",
                              result_table = "table_check") {
   shiny::modalDialog(
-    shiny::div(tags$b(paste0(text_for_purpose,text,text_for_add), style = "color: black;")),
+    shiny::div(shiny::tags$b(paste0(text_for_purpose,text,text_for_add), style = "color: black;")),
     shiny::wellPanel(
       shiny::textInput(inputId = text_input_name,
                        label = text_input_explain,
@@ -220,7 +219,7 @@ save_gene_list_Modal <- function(text_for_purpose='Will you save the given gene 
                                  file_save_name="Gene list",
                                  action_button_name = "ok_gene") {
   shiny::modalDialog(
-    shiny::div(tags$b(paste0(text_for_purpose), style = "color: black;")),
+    shiny::div(shiny::tags$b(paste0(text_for_purpose), style = "color: black;")),
     shiny::wellPanel(
       shiny::textInput(inputId = text_input_name,
                        label = text_input_explain,
@@ -673,10 +672,10 @@ spatial_cluster_plot <- function(object,grp=NULL,
     Seurat::Idents(object_subset) <- eval(parse(text=paste0('object_subset$',cluster_name)))
     subset_levels <- levels(Seurat::Idents(object_subset))
 
-    b[[i]] <- b[[i]] + ggtitle(grp[i]) +
-      fill_palette(unlist(cluster_colors[subset_levels])) +
-      theme(plot.title=element_text(size=title_size,face=face,hjust=0.5)) +
-      ggtitle(slide_title[i]) + NoLegend()
+    b[[i]] <- b[[i]] + ggplot2::ggtitle(grp[i]) +
+      ggpubr::fill_palette(unlist(cluster_colors[subset_levels])) +
+      ggplot2::theme(plot.title=ggplot2::element_text(size=title_size,face=face,hjust=0.5)) +
+      ggplot2::ggtitle(slide_title[i]) + Seurat::NoLegend()
 
   }
   patchwork::wrap_plots(b, ncol=ncol)
@@ -741,43 +740,43 @@ frequency_boxplot <- function(object,grp=NULL,
                            group_of_interest,
                            ') %>% dplyr::count(',cluster_name,
                            ') %>%', 'dplyr::mutate(ratio=scales::percent(n/sum(n),accuracy=0.1))')))
-    p <- ggplot(object@meta.data,
-                eval(parse(text=paste0('aes(',
-                                       group_of_interest,',fill=',cluster_name,')')))) +
-      geom_bar(position='fill') +
-      geom_text(data=percentData, aes(y=n, label=ratio),
-                position=position_fill(vjust=0.5), size=freq.text.size) +
-      fill_palette(unlist(cluster_colors)) +
-      theme_classic() +
-      xlab(x.axis.title) + ylab(y.axis.title) + labs(fill=legend.title) +
-      theme(axis.title.x = element_text(size = x.axis.title.size),
-            axis.title.y = element_text(size = y.axis.title.size),
-            axis.text.x = element_text(size = x.axis.text.size,
-                                       angle = x.axis.text.angle),
-            axis.text.y = element_text(size = y.axis.text.size),
-            legend.title = element_text(size = legend.title.size),
-            legend.text = element_text(size = legend.text.size)) +
-      scale_x_discrete(labels=cluster_info)
+    p <- ggplot2::ggplot(object@meta.data,
+                         eval(parse(text=paste0('ggplot2::aes(',
+                                                group_of_interest,',fill=',cluster_name,')')))) +
+      ggplot2::geom_bar(position='fill') +
+      ggplot2::geom_text(data=percentData, ggplot2::aes(y=n, label=ratio),
+                         position=ggplot2::position_fill(vjust=0.5), size=freq.text.size) +
+      ggpubr::fill_palette(unlist(cluster_colors)) +
+      ggplot2::theme_classic() +
+      ggplot2::xlab(x.axis.title) + ggplot2::ylab(y.axis.title) + ggplot2::labs(fill=legend.title) +
+      ggplot2::theme(axis.title.x = ggplot2::element_text(size = x.axis.title.size),
+                     axis.title.y = ggplot2::element_text(size = y.axis.title.size),
+                     axis.text.x = ggplot2::element_text(size = x.axis.text.size,
+                                                         angle = x.axis.text.angle),
+                     axis.text.y = ggplot2::element_text(size = y.axis.text.size),
+                     legend.title = ggplot2::element_text(size = legend.title.size),
+                     legend.text = ggplot2::element_text(size = legend.text.size)) +
+      ggplot2::scale_x_discrete(labels=cluster_info)
     if (freq.stats){
       return(list(p, percentData))
     } else {
       return(list(p))
     }
   } else {
-    p <- ggplot(object@meta.data,
-                eval(parse(text=paste0('aes(',
-                                       group_of_interest,',fill=',cluster_name,')')))) +
-      geom_bar(position='fill') + fill_palette(unlist(cluster_colors)) +
-      theme_classic() +
-      xlab(x.axis.title) + ylab(y.axis.title) + labs(fill=legend.title) +
-      theme(axis.title.x = element_text(size = x.axis.title.size),
-            axis.title.y = element_text(size = y.axis.title.size),
-            axis.text.x = element_text(size = x.axis.text.size,
-                                       angle = x.axis.text.angle),
-            axis.text.y = element_text(size = y.axis.text.size),
-            legend.title = element_text(size = legend.title.size),
-            legend.text = element_text(size = legend.text.size)) +
-      scale_x_discrete(labels=cluster_info) # change the name of groups to visualize
+    p <- ggplot2::ggplot(object@meta.data,
+                         eval(parse(text=paste0('ggplot2::aes(',
+                                                group_of_interest,',fill=',cluster_name,')')))) +
+      ggplot2::geom_bar(position='fill') + ggpubr::fill_palette(unlist(cluster_colors)) +
+      ggplot2::theme_classic() +
+      ggplot2::xlab(x.axis.title) + ggplot2::ylab(y.axis.title) + ggplot2::labs(fill=legend.title) +
+      ggplot2::theme(axis.title.x = ggplot2::element_text(size = x.axis.title.size),
+                     axis.title.y = ggplot2::element_text(size = y.axis.title.size),
+                     axis.text.x = ggplot2::element_text(size = x.axis.text.size,
+                                                         angle = x.axis.text.angle),
+                     axis.text.y = ggplot2::element_text(size = y.axis.text.size),
+                     legend.title = ggplot2::element_text(size = legend.title.size),
+                     legend.text = ggplot2::element_text(size = legend.text.size)) +
+      ggplot2::scale_x_discrete(labels=cluster_info) # change the name of groups to visualize
     if (freq.stats){
       eval(parse(text=paste0('percentData <- object@meta.data %>% dplyr::group_by(',
                              group_of_interest,
@@ -915,23 +914,23 @@ spatial_feat_plot_groups <- function(object,feat,grp=NULL,
   # Plot for all groups
   for (i in 1:length(plot)){
     if (is.null(palette_color)){
-      plot[[i]] <- plot[[i]] + theme(legend.position=color_bar_loc) +
+      plot[[i]] <- plot[[i]] + ggplot2::theme(legend.position=color_bar_loc) +
         ggplot2::scale_fill_gradientn(colours = Seurat:::SpatialColors(n=100),
                                       limits = c(min,max))
     } else{
-      plot[[i]] <- plot[[i]] + theme(legend.position=color_bar_loc) +
+      plot[[i]] <- plot[[i]] + ggplot2::theme(legend.position=color_bar_loc) +
         ggplot2::scale_fill_gradientn(colours = mapal, limits = c(min,max))
     }
-    plot[[i]] <- plot[[i]] + ggtitle(grp_mod[i]) +
-      theme(plot.title=element_text(size=title_size,face=face,hjust = 0.5)) +
-      ggtitle(grp_mod[i])
+    plot[[i]] <- plot[[i]] + ggplot2::ggtitle(grp_mod[i]) +
+      ggplot2::theme(plot.title=ggplot2::element_text(size=title_size,face=face,hjust = 0.5)) +
+      ggplot2::ggtitle(grp_mod[i])
   }
 
   if (color_bar_mode=='default'){
     patchwork::wrap_plots(plot, ncol=ncol)
   } else if (color_bar_mode=='combined'){
     patchwork::wrap_plots(plot, ncol=ncol) + patchwork::plot_layout(guides = "collect") &
-      theme(legend.title=element_blank(), legend.position=color_bar_loc)
+      ggplot2::theme(legend.title=ggplot2::element_blank(), legend.position=color_bar_loc)
   }
 }
 
@@ -1024,8 +1023,8 @@ save_feat_plot_by_n <- function(object,feats_of_interest,grp=NULL,
                                  cluster_name=cluster_name,
                                  spot.cluster.highlight=spot.cluster.highlight)
 
-        ggsave(file.path(save_path, paste0(file_name,'_',i,'_',j,'.png')),
-               height=height, width=width, dpi=dpi, bg = "white", units = "cm")
+        ggplot2::ggsave(file.path(save_path, paste0(file_name,'_',i,'_',j,'.png')),
+                        height=height, width=width, dpi=dpi, bg = "white", units = "cm")
       }
     } else {
       spatial_feat_plot_groups(object,tmp_grp,
@@ -1039,8 +1038,8 @@ save_feat_plot_by_n <- function(object,feats_of_interest,grp=NULL,
                                cluster_name=cluster_name,
                                spot.cluster.highlight=spot.cluster.highlight)
 
-      ggsave(file.path(save_path, paste0(file_name,'_',i,'.png')),
-             height=height, width=width, dpi=dpi, bg = "white", units = "cm")
+      ggplot2::ggsave(file.path(save_path, paste0(file_name,'_',i,'.png')),
+                      height=height, width=width, dpi=dpi, bg = "white", units = "cm")
     }
   }
 }
@@ -1099,21 +1098,21 @@ RidgePlot_mod <- function(object,feat,groups='seurat_clusters',
   p <- list()
   for (i in 1:length(feat)){
     p[[i]] <- ggplot2::ggplot(ridge_data,
-                              eval(parse(text=paste0("aes(x=`",feat[i],"`,y=",groups,
+                              eval(parse(text=paste0("ggplot2::aes(x=`",feat[i],"`,y=",groups,
                                                      ',color=',groups,')')))) +
       ggridges::geom_density_ridges(scale = 4, size = 1, alpha = alpha) +
-      scale_x_continuous(expand = c(0, 0)) +
-      scale_y_discrete(expand = c(0, 0)) +
+      ggplot2::scale_x_continuous(expand = c(0, 0)) +
+      ggplot2::scale_y_discrete(expand = c(0, 0)) +
       coord_cartesian(clip = "off") +
-      theme_minimal(base_size = 14) +
-      xlim(lim) + ggtitle(feat[i]) +
-      xlab(x.axis.title) + ylab(y.axis.title) +
-      theme(plot.title = element_text(size = title_size, hjust=0.5, face='bold'),
-            axis.title.x = element_text(size = x.axis.title.size),
-            axis.title.y = element_text(size = y.axis.title.size),
-            axis.text.x = element_text(size = x.axis.text.size),
-            axis.text.y = element_text(size = y.axis.text.size),
-            legend.position = "none")
+      ggplot2::theme_minimal(base_size = 14) +
+      ggplot2::xlim(lim) + ggplot2::ggtitle(feat[i]) +
+      ggplot2::xlab(x.axis.title) + ggplot2::ylab(y.axis.title) +
+      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size, hjust=0.5, face='bold'),
+                     axis.title.x = ggplot2::element_text(size = x.axis.title.size),
+                     axis.title.y = ggplot2::element_text(size = y.axis.title.size),
+                     axis.text.x = ggplot2::element_text(size = x.axis.text.size),
+                     axis.text.y = ggplot2::element_text(size = y.axis.text.size),
+                     legend.position = "none")
 
   }
   patchwork::wrap_plots(p, ncol=ncol)
@@ -1329,18 +1328,18 @@ quantitation_plot <- function(object,
     p <- ggpubr::ggboxplot(df_total, "Recode", "Values",
                            color = "Recode", palette = cluster_colors, add="point") +
       ggplot2::facet_grid(Names ~ Models) +
-      xlab(x.axis.title) + ylab(paste0(y_axis_name, y.axis.title)) +
-      theme(axis.title.x = element_text(size = x.axis.title.size),
-            axis.title.y = element_text(size = y.axis.title.size),
-            axis.text.x = element_text(size = x.axis.text.size,
-                                       angle = x.axis.text.angle, hjust=1),
-            axis.text.y = element_text(size = y.axis.text.size),
-            legend.title = element_text(size = legend.title.size),
-            legend.text = element_text(size = legend.text.size))
+      ggplot2::xlab(x.axis.title) + ggplot2::ylab(paste0(y_axis_name, y.axis.title)) +
+      ggplot2::theme(axis.title.x = ggplot2::element_text(size = x.axis.title.size),
+                     axis.title.y = ggplot2::element_text(size = y.axis.title.size),
+                     axis.text.x = ggplot2::element_text(size = x.axis.text.size,
+                                                         angle = x.axis.text.angle, hjust=1),
+                     axis.text.y = ggplot2::element_text(size = y.axis.text.size),
+                     legend.title = ggplot2::element_text(size = legend.title.size),
+                     legend.text = ggplot2::element_text(size = legend.text.size))
     if (length(levels(factor(total_number_facet_group$Recode))) > 2){
       p <- p + ggpubr::stat_compare_means(method = 'kruskal.test',
-                                          aes(label = ifelse(p<1.e-3,sprintf("p < 0.001"),
-                                                             sprintf("p = %4.3f",as.numeric(..p.format..)))),
+                                          ggplot2::aes(label = ifelse(p<1.e-3,sprintf("p < 0.001"),
+                                                                      sprintf("p = %4.3f",as.numeric(..p.format..)))),
                                           size=3.5)
     }
     if (!is.null(pairwise.comp.stats)){
@@ -1352,7 +1351,7 @@ quantitation_plot <- function(object,
           rstatix::add_significance() %>% rstatix::add_xy_position(x = "Recode", dodge = 0.8)
         p <- p + ggpubr::stat_pvalue_manual(temp, label = "p.adj.signif", tip.length = 0.01,
                                             hide.ns=TRUE) +
-          ggplot2::scale_y_continuous(expand = expansion(mult = c(0.01, 0.1)))
+          ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.01, 0.1)))
       } else {
         stop("Incorrect method name for p-value adjustment")
       }
@@ -1363,25 +1362,25 @@ quantitation_plot <- function(object,
                              fill = "Names", color = "Names", palette = cluster_colors,
                              label = vis.value.text, lab.size = value.text.size) +
         ggplot2::facet_wrap(.~ Groups, ncol=plot_ncol) +
-        xlab(x.axis.title) + ylab(paste0(y_axis_name, y.axis.title)) +
-        theme(axis.title.x = element_text(size = x.axis.title.size),
-              axis.title.y = element_text(size = y.axis.title.size),
-              axis.text.x = element_text(size = x.axis.text.size, angle = x.axis.text.angle, hjust=1),
-              axis.text.y = element_text(size = y.axis.text.size),
-              legend.title = element_text(size = legend.title.size),
-              legend.text = element_text(size = legend.text.size))
+        ggplot2::xlab(x.axis.title) + ggplot2::ylab(paste0(y_axis_name, y.axis.title)) +
+        ggplot2::theme(axis.title.x = ggplot2::element_text(size = x.axis.title.size),
+                       axis.title.y = ggplot2::element_text(size = y.axis.title.size),
+                       axis.text.x = ggplot2::element_text(size = x.axis.text.size, angle = x.axis.text.angle, hjust=1),
+                       axis.text.y = ggplot2::element_text(size = y.axis.text.size),
+                       legend.title = ggplot2::element_text(size = legend.title.size),
+                       legend.text = ggplot2::element_text(size = legend.text.size))
     } else {
       p <- ggpubr::ggboxplot(df_total, "Models", "Values",
                              color = "Names", palette = cluster_colors) +
         ggplot2::facet_wrap(.~ Groups, ncol=plot_ncol) +
-        xlab(x.axis.title) + ylab(y.axis.title) +
-        theme(axis.title.x = element_text(size = x.axis.title.size),
-              axis.title.y = element_text(size = y.axis.title.size),
-              axis.text.x = element_text(size = x.axis.text.size,
-                                         angle = x.axis.text.angle, hjust=1),
-              axis.text.y = element_text(size = y.axis.text.size),
-              legend.title = element_text(size = legend.title.size),
-              legend.text = element_text(size = legend.text.size))
+        ggplot2::xlab(x.axis.title) + ggplot2::ylab(y.axis.title) +
+        ggplot2::theme(axis.title.x = ggplot2::element_text(size = x.axis.title.size),
+                       axis.title.y = ggplot2::element_text(size = y.axis.title.size),
+                       axis.text.x = ggplot2::element_text(size = x.axis.text.size,
+                                                           angle = x.axis.text.angle, hjust=1),
+                       axis.text.y = ggplot2::element_text(size = y.axis.text.size),
+                       legend.title = ggplot2::element_text(size = legend.title.size),
+                       legend.text = ggplot2::element_text(size = legend.text.size))
     }
   }
 
@@ -1390,25 +1389,25 @@ quantitation_plot <- function(object,
       p <- p + ggpubr::ggline(df_total, "Models", "Numbers",
                               color = "Recode", palette = cluster_colors) +
         ggplot2::facet_wrap(.~ Names, ncol=plot_ncol) +
-        xlab(x.axis.title) + ylab('Total number of spots') +
-        theme(axis.title.x = element_text(size = x.axis.title.size),
-              axis.title.y = element_text(size = y.axis.title.size),
-              axis.text.x = element_text(size = x.axis.text.size,
-                                         angle = x.axis.text.angle, hjust=1),
-              axis.text.y = element_text(size = y.axis.text.size),
-              legend.title = element_text(size = legend.title.size),
-              legend.text = element_text(size = legend.text.size))
+        ggplot2::xlab(x.axis.title) + ggplot2::ylab('Total number of spots') +
+        ggplot2::theme(axis.title.x = ggplot2::element_text(size = x.axis.title.size),
+                       axis.title.y = ggplot2::element_text(size = y.axis.title.size),
+                       axis.text.x = ggplot2::element_text(size = x.axis.text.size,
+                                                           angle = x.axis.text.angle, hjust=1),
+                       axis.text.y = ggplot2::element_text(size = y.axis.text.size),
+                       legend.title = ggplot2::element_text(size = legend.title.size),
+                       legend.text = ggplot2::element_text(size = legend.text.size))
     } else {
       p <- p + ggpubr::ggline(df_total, "Models", "Numbers") +
         ggplot2::facet_wrap(.~ Groups, ncol=plot_ncol) +
-        xlab(x.axis.title) + ylab('Total number of spots') +
-        theme(axis.title.x = element_text(size = x.axis.title.size),
-              axis.title.y = element_text(size = y.axis.title.size),
-              axis.text.x = element_text(size = x.axis.text.size,
-                                         angle = x.axis.text.angle, hjust=1),
-              axis.text.y = element_text(size = y.axis.text.size),
-              legend.title = element_text(size = legend.title.size),
-              legend.text = element_text(size = legend.text.size))
+        ggplot2::xlab(x.axis.title) + ggplot2::ylab('Total number of spots') +
+        ggplot2::theme(axis.title.x = ggplot2::element_text(size = x.axis.title.size),
+                       axis.title.y = ggplot2::element_text(size = y.axis.title.size),
+                       axis.text.x = ggplot2::element_text(size = x.axis.text.size,
+                                                           angle = x.axis.text.angle, hjust=1),
+                       axis.text.y = ggplot2::element_text(size = y.axis.text.size),
+                       legend.title = ggplot2::element_text(size = legend.title.size),
+                       legend.text = ggplot2::element_text(size = legend.text.size))
     }
   }
 
