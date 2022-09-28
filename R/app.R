@@ -5,6 +5,7 @@ library(shinybusy)
 library(shinymanager)
 library(shinyjs)
 library(shinythemes)
+library(dplyr)
 
 options(shiny.maxRequestSize = 50*1024*1024^2)
 
@@ -147,23 +148,23 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                             mainPanel(
                               conditionalPanel(
                                 condition = "input.qc_tabset=='Directory' & input.qc_data_type=='Single-cell'",
-                                plotOutput("sc_qc_vlnplot") %>% withSpinner(color="#0000FF")
+                                plotOutput("sc_qc_vlnplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                               ),
                               conditionalPanel(
                                 condition = "input.qc_tabset=='Directory' & input.qc_data_type=='Spatial'",
-                                plotOutput("sp_qc_vlnplot") %>% withSpinner(color="#0000FF")
+                                plotOutput("sp_qc_vlnplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                               ),
                               conditionalPanel(
                                 condition = "input.qc_tabset=='Single-cell' & input.qc_data_type=='Single-cell'",
-                                plotOutput("sc_feat_scatter") %>% withSpinner(color="#0000FF"),
-                                plotOutput("sc_hist") %>% withSpinner(color="#0000FF")
+                                plotOutput("sc_feat_scatter") %>% shinycssloaders::withSpinner(color="#0000FF"),
+                                plotOutput("sc_hist") %>% shinycssloaders::withSpinner(color="#0000FF")
                               ),
                               conditionalPanel(
                                 condition = "input.qc_tabset=='Spatial' & input.qc_data_type=='Spatial'",
                                 tabsetPanel(
-                                  tabPanel("Plot", plotOutput("sp_feat_scatter") %>% withSpinner(color="#0000FF"),
-                                           plotOutput("sp_hist") %>% withSpinner(color="#0000FF")),
-                                  tabPanel("Tissue", plotOutput("sp_tissue") %>% withSpinner(color="#0000FF")
+                                  tabPanel("Plot", plotOutput("sp_feat_scatter") %>% shinycssloaders::withSpinner(color="#0000FF"),
+                                           plotOutput("sp_hist") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                  tabPanel("Tissue", plotOutput("sp_tissue") %>% shinycssloaders::withSpinner(color="#0000FF")
                                   )
                                 )
                               )
@@ -307,13 +308,13 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                        mainPanel(
                                          conditionalPanel(
                                            condition = "input.cluster_tabset == 'Dimplot'",
-                                           plotOutput("sc_dimplot") %>% withSpinner(color="#0000FF")
+                                           plotOutput("sc_dimplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                          ),
                                          conditionalPanel(
                                            condition = "input.cluster_tabset == 'Freq'",
                                            tabsetPanel(
-                                             tabPanel("Plot", plotOutput("sc_freqplot") %>% withSpinner(color="#0000FF")),
-                                             tabPanel("Table", dataTableOutput("sc_freqstats") %>% withSpinner(color="#0000FF"))
+                                             tabPanel("Plot", plotOutput("sc_freqplot") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                             tabPanel("Table", dataTableOutput("sc_freqstats") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                            )
                                          )
                                        )
@@ -356,7 +357,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                          actionButton("sc_feat_save","Save")
                                        ),
                                        mainPanel(
-                                         plotOutput("sc_featplot") %>% withSpinner(color="#0000FF")
+                                         plotOutput("sc_featplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
@@ -425,7 +426,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                          actionButton("sp_cluster_save","Save")
                                        ),
                                        mainPanel(
-                                         plotOutput("sp_clusterplot") %>% withSpinner(color="#0000FF")
+                                         plotOutput("sp_clusterplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
@@ -472,7 +473,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                              selectInput(inputId = "sp_feat_color",
                                                          label = "Color palette",
                                                          choices = c(rownames(RColorBrewer::brewer.pal.info),
-                                                                     names(colormaps)),
+                                                                     names(colormap::colormaps)),
                                                          selected= "RdPu"),
                                              radioButtons("sp_color_bar_mode","Colorbar mode",
                                                           choices = list("default","combined"),
@@ -519,7 +520,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                        ),
                                        mainPanel(
                                          tabsetPanel(
-                                           tabPanel("Plot", plotOutput("sp_featplot") %>% withSpinner(color="#0000FF")),
+                                           tabPanel("Plot", plotOutput("sp_featplot") %>% shinycssloaders::withSpinner(color="#0000FF")),
                                            tabPanel("Save multiple",
                                                     wellPanel(
                                                       wellPanel(
@@ -550,7 +551,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                       actionButton("sp_feat_upload","Save gene list")
                                                     ),
                                                     wellPanel(
-                                                      dataTableOutput("sp_csv_table") %>% withSpinner(color="#0000FF")
+                                                      dataTableOutput("sp_csv_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                                     )
                                            )
                                          )
@@ -611,7 +612,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                          actionButton("vln_save","Save")
                                        ),
                                        mainPanel(
-                                         plotOutput("vlnplot") %>% withSpinner(color="#0000FF")
+                                         plotOutput("vlnplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
@@ -668,7 +669,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                          actionButton("ridge_save","Save")
                                        ),
                                        mainPanel(
-                                         plotOutput("ridgeplot") %>% withSpinner(color="#0000FF")
+                                         plotOutput("ridgeplot") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             )
@@ -722,7 +723,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                          actionButton(inputId = "sc_marker_upload", label = "Save genes")
                                        ),
                                        mainPanel(
-                                         dataTableOutput("sc_marker_table") %>% withSpinner(color="#0000FF")
+                                         dataTableOutput("sc_marker_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
@@ -766,7 +767,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                          actionButton(inputId = "sc_deg_upload", label = "Save genes")
                                        ),
                                        mainPanel(
-                                         dataTableOutput("sc_deg_table") %>% withSpinner(color="#0000FF")
+                                         dataTableOutput("sc_deg_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
@@ -789,8 +790,8 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                        ),
                                        mainPanel(
                                          tabsetPanel(
-                                           tabPanel("Plot", plotOutput("sc_deg_volcano") %>% withSpinner(color="#0000FF")),
-                                           tabPanel("Table", dataTableOutput("sc_deg_filter_table") %>% withSpinner(color="#0000FF"))
+                                           tabPanel("Plot", plotOutput("sc_deg_volcano") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                           tabPanel("Table", dataTableOutput("sc_deg_filter_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                          )
                                        )
                                      )
@@ -824,8 +825,8 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                        ),
                                        mainPanel(
                                          tabsetPanel(
-                                           tabPanel("Plot", plotOutput("sc_deg_enrich") %>% withSpinner(color="#0000FF")),
-                                           tabPanel("Table", dataTableOutput("sc_deg_enrich_table") %>% withSpinner(color="#0000FF"))
+                                           tabPanel("Plot", plotOutput("sc_deg_enrich") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                           tabPanel("Table", dataTableOutput("sc_deg_enrich_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                          )
                                        )
                                      )
@@ -901,7 +902,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                          actionButton(inputId = "module_score_start", label = "Generate")
                                        ),
                                        mainPanel(
-                                         dataTableOutput("module_score_table") %>% withSpinner(color="#0000FF")
+                                         dataTableOutput("module_score_table") %>% shinycssloaders::withSpinner(color="#0000FF")
                                        )
                                      )
                             ),
@@ -1020,8 +1021,8 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                        ),
                                        mainPanel(
                                          tabsetPanel(
-                                           tabPanel("Plot", plotOutput("quantitation_plot") %>% withSpinner(color="#0000FF")),
-                                           tabPanel("Table", dataTableOutput("quantitation_table") %>% withSpinner(color="#0000FF"))
+                                           tabPanel("Plot", plotOutput("quantitation_plot") %>% shinycssloaders::withSpinner(color="#0000FF")),
+                                           tabPanel("Table", dataTableOutput("quantitation_table") %>% shinycssloaders::withSpinner(color="#0000FF"))
                                          )
                                        )
                                      )
