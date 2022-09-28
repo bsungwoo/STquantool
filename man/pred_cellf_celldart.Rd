@@ -26,7 +26,53 @@ pred_cellf_celldart(
   init_train_epoch = 10
 )
 }
+\arguments{
+\item{sp_data}{spatial data (Seurat object) to be used in predicting cell fraction: non-normalized raw data should be in 'counts' slot}
+
+\item{sc_data}{single-cell data (Seurat object) to be used in making pseudospots: non-normalized raw data should be in 'counts' slot}
+
+\item{outdir}{the directory to save output files (models and results) (default = '.')}
+
+\item{sp_subset}{whether to subset spatial data and calculate for specific spot cluster (default = FALSE)}
+
+\item{spot.cluster.name}{group name of the cluster used for subsetting spatial data (default: 'seurat_clusters')}
+
+\item{spot.cluster.of.interest}{name of each spot clusters to be used (default: NULL)}
+
+\item{conda.env.name}{name of the conda environment to use for CellDART analysis (default: 'CellDART')}
+
+\item{gpu}{check whether to use gpu (True) or not (False) (default = True)}
+
+\item{metadata_celltype}{column name for single-cell annotation data in metadata (default: 'celltype')}
+
+\item{num_markers}{number of selected marker genes in each cell-type (default = 20)}
+
+\item{seed_num}{seed to be used in random sampling (default = 0)}
+
+\item{nmix}{the number of cells sampled from single-cell data when making a pseudospot (default = 10)}
+
+\item{npseudo}{a total number of pseudospots (default = 20000)}
+
+\item{alpha}{loss weights of domain classifier to the source classifier (default = 0.6)}
+
+\item{alpha_lr}{learning rate for the domain classifier (alpha_lr*0.001, default = 5)}
+
+\item{emb_dim}{output size of dimensions for feature extractor (default = 64)}
+
+\item{batch_size}{minibatch size for pseudospots and spatial data during the training (default = 512)}
+
+\item{n_iterations}{iteration number for the adversarial learning (default = 3000)}
+
+\item{init_train_epoch}{iteration number for the pre-training process (default = 10)}
+}
+\value{
+spatial data (Seurat object) with predicted cell fraction in metadata (meta.data)
+}
 \description{
 Predict spatial cell composition using CellDART
 }
-\keyword{internal}
+\references{
+Sungwoo Bae, Kwon Joong Na, Jaemoon Koh, Dong Soo Lee, Hongyoon Choi, Young Tae Kim, CellDART: cell type inference by domain adaptation of single-cell and spatial transcriptomic data, Nucleic Acids Research, Volume 50, Issue 10, 10 June 2022, Page e57, https://doi.org/10.1093/nar/gkac084
+
+https://github.com/mexchy1000/CellDART
+}

@@ -1,7 +1,15 @@
+library(Seurat)
+library(dplyr)
+library(shiny)
+library(shinycssloaders)
+library(shinyjs)
+
+library(ggpubr)
+library(dplyr)
+
 #' Internal Modal function to flip the image
 #' @description Flip the image
 #' @keywords internal
-#' @export
 flipModal <- function(text="vertically", input_name="ok_vertical") {
   modalDialog(
     div(tags$b(paste0("Will you ",text," flip the image?"), style = "color: black;")),
@@ -14,7 +22,7 @@ flipModal <- function(text="vertically", input_name="ok_vertical") {
 
 #' Horizontally flip the image
 #' @description Horizontally flip the image
-#' @keywords internal
+#' @param file_dir_vector 'spatial' directory for the 10X Visium-formatted file
 #' @export
 horizontal_flip <- function(file_dir_vector){
 
@@ -23,30 +31,30 @@ horizontal_flip <- function(file_dir_vector){
                         'tissue_positions_list.csv','scalefactors_json.json')
 
     for (x in orig_file_name[1:2]){
-      img_orig <- image_read(paste0(file_dir,'/spatial/',x))
+      img_orig <- magick::image_read(paste0(file_dir,'/spatial/',x))
       file.rename(paste0(file_dir,'/spatial/',x),
                   paste0(file_dir,'/spatial/',
                          strsplit(x,'[.]')[[1]][1],'_orig.png'))
-      img_mod <- image_flop(img_orig)
-      if (x == orig_file_name[1]){width_hires <- image_info(img_mod)[[2]]}
-      image_write(img_mod, paste0(file_dir,'/spatial/',x))
+      img_mod <- magick::image_flop(img_orig)
+      if (x == orig_file_name[1]){width_hires <- magick::image_info(img_mod)[[2]]}
+      magick::image_write(img_mod, paste0(file_dir,'/spatial/',x))
     }
 
-    coord <- read.csv(paste0(file_dir,'/spatial/',orig_file_name[3]),
-                      header=FALSE)
+    coord <- utils::read.csv(paste0(file_dir,'/spatial/',orig_file_name[3]),
+                             header=FALSE)
     file.rename(paste0(file_dir,'/spatial/',orig_file_name[3]),
                 paste0(file_dir,'/spatial/',
                        strsplit(orig_file_name[3],'[.]')[[1]][1],'_orig.csv'))
-    scale_factor <- fromJSON(file = paste0(file_dir,'/spatial/',orig_file_name[4]))
+    scale_factor <- rjson::fromJSON(file = paste0(file_dir,'/spatial/',orig_file_name[4]))
     coord_mod <- coord %>% dplyr::mutate(V4=127-V4, V6=width_hires/(scale_factor[[2]])-V6)
-    write.table(coord_mod, paste0(file_dir,'/spatial/',orig_file_name[3]),
-                row.names = FALSE, col.names = FALSE, sep = ',')
+    utils::write.table(coord_mod, paste0(file_dir,'/spatial/',orig_file_name[3]),
+                       row.names = FALSE, col.names = FALSE, sep = ',')
   }
 }
 
 #' Vertically flip the image
 #' @description Vertically flip the image
-#' @keywords internal
+#' @param file_dir_vector 'spatial' directory for the 10X Visium-formatted file
 #' @export
 vertical_flip <- function(file_dir_vector){
 
@@ -55,31 +63,30 @@ vertical_flip <- function(file_dir_vector){
                         'tissue_positions_list.csv','scalefactors_json.json')
 
     for (x in orig_file_name[1:2]){
-      img_orig <- image_read(paste0(file_dir,'/spatial/',x))
+      img_orig <- magick::image_read(paste0(file_dir,'/spatial/',x))
       file.rename(paste0(file_dir,'/spatial/',x),
                   paste0(file_dir,'/spatial/',
                          strsplit(x,'[.]')[[1]][1],'_orig.png'))
-      img_mod <- image_flip(img_orig)
-      if (x == orig_file_name[1]){height_hires <- image_info(img_mod)[[3]]}
-      image_write(img_mod, paste0(file_dir,'/spatial/',x))
+      img_mod <- magick::image_flip(img_orig)
+      if (x == orig_file_name[1]){height_hires <- magick::image_info(img_mod)[[3]]}
+      magick::image_write(img_mod, paste0(file_dir,'/spatial/',x))
     }
 
-    coord <- read.csv(paste0(file_dir,'/spatial/',orig_file_name[3]),
-                      header=FALSE)
+    coord <- utils::read.csv(paste0(file_dir,'/spatial/',orig_file_name[3]),
+                             header=FALSE)
     file.rename(paste0(file_dir,'/spatial/',orig_file_name[3]),
                 paste0(file_dir,'/spatial/',
                        strsplit(orig_file_name[3],'[.]')[[1]][1],'_orig.csv'))
-    scale_factor <- fromJSON(file = paste0(file_dir,'/spatial/',orig_file_name[4]))
+    scale_factor <- rjson::fromJSON(file = paste0(file_dir,'/spatial/',orig_file_name[4]))
     coord_mod <- coord %>% dplyr::mutate(V3=77-V3, V5=height_hires/(scale_factor[[2]])-V5)
-    write.table(coord_mod, paste0(file_dir,'/spatial/',orig_file_name[3]),
-                row.names = FALSE, col.names = FALSE, sep = ',')
+    utils::write.table(coord_mod, paste0(file_dir,'/spatial/',orig_file_name[3]),
+                       row.names = FALSE, col.names = FALSE, sep = ',')
   }
 }
 
 #' Save the images
 #' @description Save the images
 #' @keywords internal
-#' @export
 save_plot_Modal <- function(slider_input_name="save_dpi", action_button_name = "save_start") {
   modalDialog(
     div(tags$b("Options for saving a plot"), style = "color: blue;"),
@@ -98,10 +105,9 @@ save_plot_Modal <- function(slider_input_name="save_dpi", action_button_name = "
 #' Modal to save the deg output plot files
 #' @description Save the deg output plot files
 #' @keywords internal
-#' @export
 save_plot_wh_Modal <- function(slider_input_name="save_dpi", width_name = "deg_width",
-                           height_name = "deg_height", width_value=13, height_value=15,
-                           action_button_name = "save_start") {
+                               height_name = "deg_height", width_value=13, height_value=15,
+                               action_button_name = "save_start") {
   modalDialog(
     div(tags$b("Options for saving a plot"), style = "color: blue;"),
     wellPanel(
@@ -122,11 +128,9 @@ save_plot_wh_Modal <- function(slider_input_name="save_dpi", width_name = "deg_w
   )
 }
 
-
 #' Modal to save the rds files
 #' @description Modal to save the rds files
 #' @keywords internal
-#' @export
 save_files_Modal <- function(text="single-cell",
                              text_for_purpose="Will you save the ",text_for_add=" data?",
                              text_input_name="sc_save_name",
@@ -155,11 +159,9 @@ save_files_Modal <- function(text="single-cell",
   )
 }
 
-
 #' Modal to load csv or txt files
 #' @description Modal to load csv or txt files
 #' @keywords internal
-#' @export
 load_files_Modal <- function(input, output, session, text="csv or txt",
                              text_for_purpose="Will you load the ",text_for_add=" file?",
                              text_input_name="file_load_name",
@@ -217,7 +219,6 @@ load_files_Modal <- function(input, output, session, text="csv or txt",
 #' Modal to save gene list
 #' @description Modal to load csv or txt files
 #' @keywords internal
-#' @export
 save_gene_list_Modal <- function(text_for_purpose='Will you save the given gene list?',
                                  text_input_name="gene_save_name",
                                  text_input_explain = "Name of the gene list",
@@ -240,7 +241,21 @@ save_gene_list_Modal <- function(text_for_purpose='Will you save the given gene 
 
 #' Simple preprocess data
 #' @description Simple preprocess data
-#' @keywords internal
+#' @param data_dir vector for the directories to load the single-cell data
+#' @param grp group name to assigned to each single-cell data
+#' @param data_type type of data to integrate (single-cell or spatial)
+#' @param filter_nfeature_RNA each element is the lower threshold for total number of detected genes in each single-cell data provided
+#' @param filter_percent_mt each element is the upper threshold for fraction of mitochondrial genes in each single-cell data provided
+#' @param reference_index vector for index number of the reference single-cell dataset in grp vector (default: NULL)
+#' \itemize{
+#' \item if input is c(1,5) it means that we will use first to fifth element of group as a reference
+#' \item if input is NULL it means that we will use all pairwise anchors for integration
+#' }
+#' @param n_var_features number of variable genes to be included in each single-cell dataset (default: 2000)
+#' @param cluster_dim PC dimension to be used for clustering of the spots (default: 30)
+#' @param cluster_resolution resolution during the clustering process (default: 0.5)
+#' @param maximum_size maximum size allowed for the analysis (default: 6GB)
+#' @return Seurat object with a preprocessed dataset
 #' @export
 preprocess_data <- function(data_dir, grp, data_type="Single-cell",
                             filter_nfeature_RNA=NULL,filter_percent_mt=NULL,
@@ -248,87 +263,87 @@ preprocess_data <- function(data_dir, grp, data_type="Single-cell",
                             n_var_features=2000,
                             cluster_dim=30, cluster_resolution=0.5,
                             maximum_size=6000 * 1024^2){
-    # Create a Progress object
-    progress <- shiny::Progress$new()
-    # Make sure it closes when we exit this reactive, even if there's an error
-    on.exit(progress$close())
+  # Create a Progress object
+  progress <- shiny::Progress$new()
+  # Make sure it closes when we exit this reactive, even if there's an error
+  on.exit(progress$close())
 
-    progress$set(message = "Simple processing", value = 0)
+  progress$set(message = "Simple processing", value = 0)
 
-    # Set maximum size to 6 GB
-    options(future.globals.maxSize=maximum_size)
+  # Set maximum size to 6 GB
+  options(future.globals.maxSize=maximum_size)
 
-    # Preprocess for each of the datasets
-    # Increment the progress bar, and update the detail text.
-    progress$inc(1/8, detail="Loading data")
+  # Preprocess for each of the datasets
+  # Increment the progress bar, and update the detail text.
+  progress$inc(1/8, detail="Loading data")
 
 
-    if (data_type=="Single-cell") {
-      if ("filtered_feature_bc_matrix" %in% list.files(data_dir)){
-        counts <- Read10X(data.dir = file.path(data_dir,'filtered_feature_bc_matrix'))
-      } else if ("filtered_feature_bc_matrix.h5" %in% list.files(data_dir)){
-        counts <- Read10X_h5(file.path(data_dir, 'filtered_feature_bc_matrix.h5'))
-      } else if ("sc_sparse_matrix.rds" %in% list.files(data_dir)) {
-        counts <- readRDS(file.path(data_dir, 'sc_sparse_matrix.rds'))
-      } else {
-        stop("Single-cell data cannot be read")
-      }
-      brain_data <- CreateSeuratObject(counts, project = grp)
-      brain_data$orig.ident <- grp
-      brain_data[['percent.mito']] <- PercentageFeatureSet(brain_data,
-                                                           pattern = "^mt-")
-      if (!is.null(filter_nfeature_RNA)){
-        brain_data <- eval(parse(text=paste0('subset(brain_data,subset=nFeature_RNA>',
-                                             filter_nfeature_RNA,')')))
-      }
-      if (!is.null(filter_percent_mt)){
-        brain_data <- eval(parse(text=paste0('subset(brain_data,subset=percent.mito<',
-                                             filter_percent_mt,')')))
-      }
-    } else if (data_type=='Spatial'){
-      brain_data <- Load10X_Spatial(data_dir, slice=grp)
-      brain_data$orig.ident <- grp
-      brain_data[['percent.mito']] <- PercentageFeatureSet(brain_data,pattern = "^mt-")
+  if (data_type=="Single-cell") {
+    if ("filtered_feature_bc_matrix" %in% list.files(data_dir)){
+      counts <- Seurat::Read10X(data.dir = file.path(data_dir,'filtered_feature_bc_matrix'))
+    } else if ("filtered_feature_bc_matrix.h5" %in% list.files(data_dir)){
+      counts <- Seurat::Read10X_h5(file.path(data_dir, 'filtered_feature_bc_matrix.h5'))
+    } else if ("sc_sparse_matrix.rds" %in% list.files(data_dir)) {
+      counts <- readRDS(file.path(data_dir, 'sc_sparse_matrix.rds'))
+    } else {
+      stop("Single-cell data cannot be read")
     }
-
-    progress$inc(1/8, detail="Normalizing data")
-    brain_data <- NormalizeData(brain_data,
-                               normalization.method = "LogNormalize",
-                               scale.factor = 1e4)
-    brain_data <- FindVariableFeatures(brain_data,
-                                      selection.method = "vst",
-                                      nfeatures=n_var_features)
-
-    progress$inc(1/8, detail="Scaling data")
-    if (data_type=="Single-cell") {
-      brain_data <- ScaleData(brain_data, vars.to.regress = c("nCount_RNA","percent.mito"))
-    } else if (data_type=="Spatial"){
-      brain_data <- ScaleData(brain_data, vars.to.regress = c("nCount_Spatial"))
+    brain_data <- Seurat::CreateSeuratObject(counts, project = grp)
+    brain_data$orig.ident <- grp
+    brain_data[['percent.mito']] <- Seurat::PercentageFeatureSet(brain_data,
+                                                                 pattern = "^mt-")
+    if (!is.null(filter_nfeature_RNA)){
+      brain_data <- eval(parse(text=paste0('subset(brain_data,subset=nFeature_RNA>',
+                                           filter_nfeature_RNA,')')))
     }
+    if (!is.null(filter_percent_mt)){
+      brain_data <- eval(parse(text=paste0('subset(brain_data,subset=percent.mito<',
+                                           filter_percent_mt,')')))
+    }
+  } else if (data_type=='Spatial'){
+    brain_data <- Seurat::Load10X_Spatial(data_dir, slice=grp)
+    brain_data$orig.ident <- grp
+    brain_data[['percent.mito']] <- Seurat::PercentageFeatureSet(brain_data,pattern = "^mt-")
+  }
 
-    progress$inc(1/8, detail="Running PCA")
-    brain_data <- RunPCA(brain_data, verbose = FALSE)
+  progress$inc(1/8, detail="Normalizing data")
+  brain_data <- Seurat::NormalizeData(brain_data,
+                                      normalization.method = "LogNormalize",
+                                      scale.factor = 1e4)
+  brain_data <- Seurat::FindVariableFeatures(brain_data,
+                                             selection.method = "vst",
+                                             nfeatures=n_var_features)
+
+  progress$inc(1/8, detail="Scaling data")
+  if (data_type=="Single-cell") {
+    brain_data <- Seurat::ScaleData(brain_data, vars.to.regress = c("nCount_RNA","percent.mito"))
+  } else if (data_type=="Spatial"){
+    brain_data <- Seurat::ScaleData(brain_data, vars.to.regress = c("nCount_Spatial"))
+  }
+
+  progress$inc(1/8, detail="Running PCA")
+  brain_data <- Seurat::RunPCA(brain_data, verbose = FALSE)
 
 
-    progress$inc(1/8, detail="Finding neighbors")
-    brain_data <- FindNeighbors(brain_data, dims = 1:cluster_dim)
+  progress$inc(1/8, detail="Finding neighbors")
+  brain_data <- Seurat::FindNeighbors(brain_data, dims = 1:cluster_dim)
 
-    # Change resolution -> different spot cluster numbers
-    progress$inc(1/8, detail="Finding clusters")
-    brain_data <- FindClusters(brain_data, resolution=cluster_resolution)
+  # Change resolution -> different spot cluster numbers
+  progress$inc(1/8, detail="Finding clusters")
+  brain_data <- Seurat::FindClusters(brain_data, resolution=cluster_resolution)
 
-    progress$inc(1/8, detail="Running UMAP")
-    brain_data <- RunUMAP(brain_data, dims = 1:cluster_dim)
+  progress$inc(1/8, detail="Running UMAP")
+  brain_data <- Seurat::RunUMAP(brain_data, dims = 1:cluster_dim)
 
-    progress$inc(1/8, detail="Finishing")
-    brain_data$orig.ident <- factor(brain_data$orig.ident, levels=grp)
+  progress$inc(1/8, detail="Finishing")
+  brain_data$orig.ident <- factor(brain_data$orig.ident, levels=grp)
 
-    return(brain_data)
+  return(brain_data)
 
 }
 
 
-#' Simple preprocess data
+#' Integrate datasets using reciprocal PCA in Seurat
 #' @description Integrating single-cell or spatial datasets (Reciprocal PCA and Anchor finding)
 #' @param data_type type of data to integrate (single-cell or spatial)
 #' @param data_dir vector for the directories to load the single-cell data
@@ -346,7 +361,7 @@ preprocess_data <- function(data_dir, grp, data_type="Single-cell",
 #' @param cluster_dim PC dimension to be used for clustering of the spots (default: 30)
 #' @param cluster_resolution resolution during the clustering process (default: 0.5)
 #' @param maximum_size maximum size allowed for the analysis (default: 6GB)
-#' @keywords internal
+#' @return Seurat object with multiple integrated datasets
 #' @export
 preprocess_data_integ_rpca <- function(data_dir, grp, data_type='Single-cell',
                                        filter_nfeature_RNA=NULL,filter_percent_mt=NULL,
@@ -355,116 +370,115 @@ preprocess_data_integ_rpca <- function(data_dir, grp, data_type='Single-cell',
                                        integ_dim=50,
                                        cluster_dim=30, cluster_resolution=0.5,
                                        maximum_size=6000 * 1024^2){
-    # Create a Progress object
-    progress <- shiny::Progress$new()
-    # Make sure it closes when we exit this reactive, even if there's an error
-    on.exit(progress$close())
+  # Create a Progress object
+  progress <- shiny::Progress$new()
+  # Make sure it closes when we exit this reactive, even if there's an error
+  on.exit(progress$close())
 
-    progress$set(message = "Integration", value = 0)
+  progress$set(message = "Integration", value = 0)
 
-    # Set maximum size to 6 GB
-    options(future.globals.maxSize=maximum_size)
+  # Set maximum size to 6 GB
+  options(future.globals.maxSize=maximum_size)
 
-    object_list <- list()
-    # Preprocess for each of the spatial datasets
-    for (i in 1:length(data_dir)){
-      # Increment the progress bar, and update the detail text.
-      progress$inc(1/(2*length(data_dir)+8), detail=paste("Normalizing data", i))
+  object_list <- list()
+  # Preprocess for each of the spatial datasets
+  for (i in 1:length(data_dir)){
+    # Increment the progress bar, and update the detail text.
+    progress$inc(1/(2*length(data_dir)+8), detail=paste("Normalizing data", i))
 
-      if (data_type=="Single-cell") {
-        if ("filtered_feature_bc_matrix" %in% list.files(data_dir[i])){
-          counts <- Read10X(data.dir = file.path(data_dir[i],'filtered_feature_bc_matrix'))
-        } else if ("filtered_feature_bc_matrix.h5" %in% list.files(data_dir[i])){
-          counts <- Read10X_h5(file.path(data_dir[i], 'filtered_feature_bc_matrix.h5'))
-        } else if ("sc_sparse_matrix.rds" %in% list.files(data_dir[i])) {
-          counts <- readRDS(file.path(data_dir[i], 'sc_sparse_matrix.rds'))
-        } else {
-          stop("Single-cell data cannot be read")
-        }
-        object_list[[i]] <- CreateSeuratObject(counts, project = grp[i])
-        object_list[[i]]$orig.ident <- grp[i]
-        object_list[[i]][['percent.mito']] <- PercentageFeatureSet(object_list[[i]],
-                                                                   pattern = "^mt-")
-        if (!is.null(filter_nfeature_RNA[i])){
-          object_list[[i]] <- eval(parse(text=paste0('subset(object_list[[i]],subset=nFeature_RNA>',
-                                                     filter_nfeature_RNA[i],')')))
-        }
-        if (!is.null(filter_percent_mt[i])){
-          object_list[[i]] <- eval(parse(text=paste0('subset(object_list[[i]],subset=percent.mito<',
-                                                     filter_percent_mt[i],')')))
-        }
-      } else if (data_type=="Spatial"){
-        object_list[[i]] <- Load10X_Spatial(data_dir[i], slice=grp[i])
-        object_list[[i]]$orig.ident <- grp[i]
-        object_list[[i]][['percent.mito']] <- PercentageFeatureSet(object_list[[i]],
-                                                                   pattern = "^mt-")
-      }
-
-      object_list[[i]] <- NormalizeData(object_list[[i]],
-                                        normalization.method = "LogNormalize",
-                                        scale.factor = 1e4)
-      object_list[[i]] <- FindVariableFeatures(object_list[[i]],
-                                               selection.method = "vst",
-                                               nfeatures=n_var_features)
-      Sys.sleep(0.1)
-    }
-
-    brain.features <- SelectIntegrationFeatures(object_list,
-                                                nfeatures=n_integ_features)
-
-    for (i in 1:length(data_dir)){
-      progress$inc(1/(2*length(data_dir)+8), detail=paste("Scaling & PCA for data", i))
-      if (data_type=="Single-cell") {
-        object_list[[i]] <- ScaleData(object_list[[i]], features = brain.features,
-                                      vars.to.regress = c("nCount_RNA","percent.mito"))
-      } else if (data_type=="Spatial"){
-        object_list[[i]] <- ScaleData(object_list[[i]], features = brain.features,
-                                      vars.to.regress = c("nCount_Spatial"))
-      }
-      object_list[[i]] <- RunPCA(object_list[[i]], features = brain.features, verbose = FALSE)
-      Sys.sleep(0.1)
-    }
-
-    progress$inc(1/(2*length(data_dir)+8), detail="Find integration anchors")
-
-    anchors <- FindIntegrationAnchors(object_list, reference = reference_index,
-                                      anchor.features = brain.features,
-                                      reduction = 'rpca', dims = 1:integ_dim)
-
-    progress$inc(1/(2*length(data_dir)+8), detail="Integating data")
-    brain.merge <- IntegrateData(anchorset=anchors, dims=1:integ_dim)
-
-    progress$inc(1/(2*length(data_dir)+8), detail="Scaling integrated data")
-    brain.merge <- ScaleData(brain.merge, verbose=FALSE)
-
-    progress$inc(1/(2*length(data_dir)+8), detail="Running PCA")
-    brain.merge <- RunPCA(brain.merge, verbose=FALSE)
-
-    progress$inc(1/(2*length(data_dir)+8), detail="Finding neighbors")
-    brain.merge <- FindNeighbors(brain.merge, dims = 1:cluster_dim)
-
-    # Change resolution -> different spot cluster numbers
-    progress$inc(1/(2*length(data_dir)+8), detail="Finding clusters")
-    brain.merge <- FindClusters(brain.merge, resolution=cluster_resolution)
-
-    progress$inc(1/(2*length(data_dir)+8), detail="Running UMAP")
-    brain.merge <- RunUMAP(brain.merge, dims = 1:cluster_dim)
-
-    progress$inc(1/(2*length(data_dir)+8), detail="Finishing")
     if (data_type=="Single-cell") {
-      DefaultAssay(object = brain.merge) <- "RNA"
+      if ("filtered_feature_bc_matrix" %in% list.files(data_dir[i])){
+        counts <- Seurat::Read10X(data.dir = file.path(data_dir[i],'filtered_feature_bc_matrix'))
+      } else if ("filtered_feature_bc_matrix.h5" %in% list.files(data_dir[i])){
+        counts <- Seurat::Read10X_h5(file.path(data_dir[i], 'filtered_feature_bc_matrix.h5'))
+      } else if ("sc_sparse_matrix.rds" %in% list.files(data_dir[i])) {
+        counts <- readRDS(file.path(data_dir[i], 'sc_sparse_matrix.rds'))
+      } else {
+        stop("Single-cell data cannot be read")
+      }
+      object_list[[i]] <- Seurat::CreateSeuratObject(counts, project = grp[i])
+      object_list[[i]]$orig.ident <- grp[i]
+      object_list[[i]][['percent.mito']] <- Seurat::PercentageFeatureSet(object_list[[i]],
+                                                                         pattern = "^mt-")
+      if (!is.null(filter_nfeature_RNA[i])){
+        object_list[[i]] <- eval(parse(text=paste0('subset(object_list[[i]],subset=nFeature_RNA>',
+                                                   filter_nfeature_RNA[i],')')))
+      }
+      if (!is.null(filter_percent_mt[i])){
+        object_list[[i]] <- eval(parse(text=paste0('subset(object_list[[i]],subset=percent.mito<',
+                                                   filter_percent_mt[i],')')))
+      }
     } else if (data_type=="Spatial"){
-      DefaultAssay(object = brain.merge) <- "Spatial"
+      object_list[[i]] <- Seurat::Load10X_Spatial(data_dir[i], slice=grp[i])
+      object_list[[i]]$orig.ident <- grp[i]
+      object_list[[i]][['percent.mito']] <- Seurat::PercentageFeatureSet(object_list[[i]],
+                                                                         pattern = "^mt-")
     }
-    brain.merge$orig.ident <- factor(brain.merge$orig.ident, levels=grp)
 
-    return(brain.merge)
+    object_list[[i]] <- Seurat::NormalizeData(object_list[[i]],
+                                              normalization.method = "LogNormalize",
+                                              scale.factor = 1e4)
+    object_list[[i]] <- Seurat::FindVariableFeatures(object_list[[i]],
+                                                     selection.method = "vst",
+                                                     nfeatures=n_var_features)
+    Sys.sleep(0.1)
+  }
+
+  brain.features <- Seurat::SelectIntegrationFeatures(object_list,
+                                                      nfeatures=n_integ_features)
+
+  for (i in 1:length(data_dir)){
+    progress$inc(1/(2*length(data_dir)+8), detail=paste("Scaling & PCA for data", i))
+    if (data_type=="Single-cell") {
+      object_list[[i]] <- Seurat::ScaleData(object_list[[i]], features = brain.features,
+                                            vars.to.regress = c("nCount_RNA","percent.mito"))
+    } else if (data_type=="Spatial"){
+      object_list[[i]] <- Seurat::ScaleData(object_list[[i]], features = brain.features,
+                                            vars.to.regress = c("nCount_Spatial"))
+    }
+    object_list[[i]] <- Seurat::RunPCA(object_list[[i]], features = brain.features, verbose = FALSE)
+    Sys.sleep(0.1)
+  }
+
+  progress$inc(1/(2*length(data_dir)+8), detail="Find integration anchors")
+
+  anchors <- Seurat::FindIntegrationAnchors(object_list, reference = reference_index,
+                                            anchor.features = brain.features,
+                                            reduction = 'rpca', dims = 1:integ_dim)
+
+  progress$inc(1/(2*length(data_dir)+8), detail="Integating data")
+  brain.merge <- Seurat::IntegrateData(anchorset=anchors, dims=1:integ_dim)
+
+  progress$inc(1/(2*length(data_dir)+8), detail="Scaling integrated data")
+  brain.merge <- Seurat::ScaleData(brain.merge, verbose=FALSE)
+
+  progress$inc(1/(2*length(data_dir)+8), detail="Running PCA")
+  brain.merge <- Seurat::RunPCA(brain.merge, verbose=FALSE)
+
+  progress$inc(1/(2*length(data_dir)+8), detail="Finding neighbors")
+  brain.merge <- Seurat::FindNeighbors(brain.merge, dims = 1:cluster_dim)
+
+  # Change resolution -> different spot cluster numbers
+  progress$inc(1/(2*length(data_dir)+8), detail="Finding clusters")
+  brain.merge <- Seurat::FindClusters(brain.merge, resolution=cluster_resolution)
+
+  progress$inc(1/(2*length(data_dir)+8), detail="Running UMAP")
+  brain.merge <- Seurat::RunUMAP(brain.merge, dims = 1:cluster_dim)
+
+  progress$inc(1/(2*length(data_dir)+8), detail="Finishing")
+  if (data_type=="Single-cell") {
+    Seurat::DefaultAssay(object = brain.merge) <- "RNA"
+  } else if (data_type=="Spatial"){
+    Seurat::DefaultAssay(object = brain.merge) <- "Spatial"
+  }
+  brain.merge$orig.ident <- factor(brain.merge$orig.ident, levels=grp)
+
+  return(brain.merge)
 }
 
-
-
 #' Recluster the dataset
-#' @param data single-cell or sptial data to recluster
+#' @param data single-cell or spatial data to recluster
+#' @param split.by name of the clusters to split the single-cell or spatial data
 #' @param data_type type of data to integrate (single-cell or spatial)
 #' @param n_var_features number of variable genes to be included in each single-cell dataset (default: 2000)
 #' @param n_integ_features number of genes to be utilized for integration (default: 2000)
@@ -472,7 +486,7 @@ preprocess_data_integ_rpca <- function(data_dir, grp, data_type='Single-cell',
 #' @param cluster_dim PC dimension to be used for clustering of the spots (default: 30)
 #' @param cluster_resolution resolution during the clustering process (default: 0.5)
 #' @param maximum_size maximum size allowed for the analysis (default: 6GB)
-#' @keywords internal
+#' @return reclustered Seurat object
 #' @export
 recluster_dataset_rpca <- function(data, split.by = "orig.ident", data_type='Single-cell',
                                    n_var_features=2000, n_integ_features=2000,
@@ -493,74 +507,73 @@ recluster_dataset_rpca <- function(data, split.by = "orig.ident", data_type='Sin
   progress$inc(1/(2*length(grp_levels)+9), detail="Splitting object")
 
   if (data_type=="Single-cell") {
-    DefaultAssay(data) <- "RNA"
+    Seurat::DefaultAssay(data) <- "RNA"
   } else if (data_type=="Spatial"){
-    DefaultAssay(data) <- "Spatial"
+    Seurat::DefaultAssay(data) <- "Spatial"
   }
-  object_list <- SplitObject(data, split.by = split.by)
+  object_list <- Seurat::SplitObject(data, split.by = split.by)
 
   # Preprocess for each of the spatial datasets
   for (i in 1:length(object_list)){
     # Increment the progress bar, and update the detail text.
     progress$inc(1/(2*length(object_list)+9), detail=paste("Find variable genes", i))
 
-    object_list[[i]] <- FindVariableFeatures(object_list[[i]],
-                                             selection.method = "vst",
-                                             nfeatures=n_var_features)
+    object_list[[i]] <- Seurat::FindVariableFeatures(object_list[[i]],
+                                                     selection.method = "vst",
+                                                     nfeatures=n_var_features)
     Sys.sleep(0.1)
   }
 
-  brain.features <- SelectIntegrationFeatures(object_list,
-                                              nfeatures=n_integ_features)
+  brain.features <- Seurat::SelectIntegrationFeatures(object_list,
+                                                      nfeatures=n_integ_features)
 
   for (i in 1:length(object_list)){
     progress$inc(1/(2*length(object_list)+9), detail=paste("Scaling & PCA for data", i))
     if (data_type=="Single-cell") {
-      object_list[[i]] <- ScaleData(object_list[[i]], features = brain.features,
-                                    vars.to.regress = c("nCount_RNA","percent.mito"))
+      object_list[[i]] <- Seurat::ScaleData(object_list[[i]], features = brain.features,
+                                            vars.to.regress = c("nCount_RNA","percent.mito"))
     } else if (data_type=="Spatial"){
-      object_list[[i]] <- ScaleData(object_list[[i]], features = brain.features,
-                                    vars.to.regress = c("nCount_Spatial"))
+      object_list[[i]] <- Seurat::ScaleData(object_list[[i]], features = brain.features,
+                                            vars.to.regress = c("nCount_Spatial"))
     }
-    object_list[[i]] <- RunPCA(object_list[[i]], features = brain.features, verbose = FALSE)
+    object_list[[i]] <- Seurat::RunPCA(object_list[[i]], features = brain.features, verbose = FALSE)
     Sys.sleep(0.1)
   }
 
   progress$inc(1/(2*length(object_list)+9), detail="Find integration anchors")
 
-  anchors <- FindIntegrationAnchors(object_list, reference = NULL,
-                                    anchor.features = brain.features,
-                                    reduction = 'rpca', dims = 1:integ_dim)
+  anchors <- Seurat::FindIntegrationAnchors(object_list, reference = NULL,
+                                            anchor.features = brain.features,
+                                            reduction = 'rpca', dims = 1:integ_dim)
 
   progress$inc(1/(2*length(object_list)+9), detail="Integating data")
-  brain.merge <- IntegrateData(anchorset=anchors, dims=1:integ_dim)
+  brain.merge <- Seurat::IntegrateData(anchorset=anchors, dims=1:integ_dim)
 
   progress$inc(1/(2*length(object_list)+9), detail="Scaling integrated data")
-  brain.merge <- ScaleData(brain.merge, verbose=FALSE)
+  brain.merge <- Seurat::ScaleData(brain.merge, verbose=FALSE)
 
   progress$inc(1/(2*length(object_list)+9), detail="Running PCA")
-  brain.merge <- RunPCA(brain.merge, verbose=FALSE)
+  brain.merge <- Seurat::RunPCA(brain.merge, verbose=FALSE)
 
   progress$inc(1/(2*length(object_list)+9), detail="Finding neighbors")
-  brain.merge <- FindNeighbors(brain.merge, dims = 1:cluster_dim)
+  brain.merge <- Seurat::FindNeighbors(brain.merge, dims = 1:cluster_dim)
 
   # Change resolution -> different spot cluster numbers
   progress$inc(1/(2*length(object_list)+9), detail="Finding clusters")
-  brain.merge <- FindClusters(brain.merge, resolution=cluster_resolution)
+  brain.merge <- Seurat::FindClusters(brain.merge, resolution=cluster_resolution)
 
   progress$inc(1/(2*length(object_list)+9), detail="Running UMAP")
-  brain.merge <- RunUMAP(brain.merge, dims = 1:cluster_dim)
+  brain.merge <- Seurat::RunUMAP(brain.merge, dims = 1:cluster_dim)
 
   progress$inc(1/(2*length(object_list)+9), detail="Finishing")
   if (data_type=="Single-cell") {
-    DefaultAssay(object = brain.merge) <- "RNA"
+    Seurat::DefaultAssay(object = brain.merge) <- "RNA"
   } else if (data_type=="Spatial"){
-    DefaultAssay(object = brain.merge) <- "Spatial"
+    Seurat::DefaultAssay(object = brain.merge) <- "Spatial"
   }
 
   return(brain.merge)
 }
-
 
 #' Visualizing the spot clusters: spatial mapping with labels
 #' @param object the seurat object to visualize the clusters
@@ -569,6 +582,8 @@ recluster_dataset_rpca <- function(data, split.by = "orig.ident", data_type='Sin
 #' @param cluster_name name of the clusters to visualize
 #' @param crop whether to crop the image: default = TRUE
 #' @param alpha transparency of the color spot on the tissue: default: c(0,1)
+#' @param image.alpha transparency of the tissue image (default 0.6)
+#' @param pt.size.factor size of the spot visualized on the tissue
 #' @param title_size size of the title for each spatial plot
 #' @param face the type of the text on the plot
 #' @param label whether to label the spot cluster
@@ -576,7 +591,6 @@ recluster_dataset_rpca <- function(data, split.by = "orig.ident", data_type='Sin
 #' @param ncol column numbers for the plot (number of slides in the column)
 #' @param slide.to.visualize vector representing number of slide to visualize: eg: c(1,3)
 #' @param spot.cluster.highlight vector of spot cluster name to be highlighted
-#' @keywords internal
 #' @export
 spatial_cluster_plot <- function(object,grp=NULL,
                                  slide_title=grp,
@@ -607,7 +621,7 @@ spatial_cluster_plot <- function(object,grp=NULL,
   }
 
   if (!is.null(slide.to.visualize)){
-    Idents(object) <- object$orig.ident
+    Seurat::Idents(object) <- object$orig.ident
     if (is.numeric(slide.to.visualize)){
       object <- subset(object, idents=grp[slide.to.visualize])
       spatial_image <- names(object@images)
@@ -639,30 +653,30 @@ spatial_cluster_plot <- function(object,grp=NULL,
 
   if (num_cluster>length(cluster_colors)){
     cluster_colors <- rep(cluster_colors, length.out=num_cluster)
-    } else {
-      cluster_colors <- cluster_colors[1:num_cluster]
-    }
+  } else {
+    cluster_colors <- cluster_colors[1:num_cluster]
+  }
 
   names(cluster_colors) <- cluster_levels
-  Idents(object) <- cluster_info
+  Seurat::Idents(object) <- cluster_info
 
   if (!is.null(spot.cluster.highlight)){
     object <- subset(object, idents = spot.cluster.highlight)
   }
 
-  b <- SpatialPlot(object, alpha=alpha, image.alpha=image.alpha,
-                   label=label, crop=crop, pt.size.factor=pt.size.factor,
-                   label.size = label.size, repel=TRUE,
-                   combine=FALSE)
+  b <- Seurat::SpatialPlot(object, alpha=alpha, image.alpha=image.alpha,
+                           label=label, crop=crop, pt.size.factor=pt.size.factor,
+                           label.size = label.size, repel=TRUE,
+                           combine=FALSE)
 
-  Idents(object) <- object$orig.ident
+  Seurat::Idents(object) <- object$orig.ident
   if (slide_null){slide_title <- grp}
 
   for (i in 1:length(b)){
     if (!(grp[i] %in% object$orig.ident)){next}
     object_subset <- subset(object, idents=grp[i])
-    Idents(object_subset) <- eval(parse(text=paste0('object_subset$',cluster_name)))
-    subset_levels <- levels(Idents(object_subset))
+    Seurat::Idents(object_subset) <- eval(parse(text=paste0('object_subset$',cluster_name)))
+    subset_levels <- levels(Seurat::Idents(object_subset))
 
     b[[i]] <- b[[i]] + ggtitle(grp[i]) +
       fill_palette(unlist(cluster_colors[subset_levels])) +
@@ -670,10 +684,8 @@ spatial_cluster_plot <- function(object,grp=NULL,
       ggtitle(slide_title[i]) + NoLegend()
 
   }
-  wrap_plots(b, ncol=ncol)
+  patchwork::wrap_plots(b, ncol=ncol)
 }
-
-
 
 #' Draw the frequency boxplot for spots
 #' @param object the seurat object to visualize the clusters
@@ -682,16 +694,20 @@ spatial_cluster_plot <- function(object,grp=NULL,
 #' @param group_of_interest group name to visualize frequency of clusters (default: orig.ident)
 #' @param cluster_name cluster name to evaluate frequency in each group (default: seurat_clusters)
 #' @param cluster_colors the colors used to visualize each cluster
-#' @param x.axis.title x axis title, y.axis.title: y axis title
+#' @param x.axis.title x axis title
+#' @param y.axis.title y.axis.title
 #' @param legend.title title of the legend
-#' @param x.axis.title.size x axis title size, y.axis.title.size: y axis title size
-#' @param x.axis.text.size x axis text size, y.axis.text.size: y axis text size
+#' @param x.axis.title.size x axis title size
+#' @param y.axis.title.size y axis title size
+#' @param x.axis.text.size x axis text size
+#' @param y.axis.text.size y axis text size
 #' @param x.axis.text.angle x axis text angle (default: 0)
-#' @param legend.title.size legend title size, legend.text.size: legend text size
+#' @param legend.title.size legend title size
+#' @param legend.text.size legend text size
 #' @param vis.freq.text visualize frequency inside of the boxplot
 #' @param freq.text.size size of the frequency text inside of the boxplot
 #' @param freq.stats whether to return frequency statistics
-#' @keywords internal
+#' @returns plot object and dataframe containing summarized statistics (when freq.stats=TRUE)
 #' @export
 frequency_boxplot <- function(object,grp=NULL,
                               slide_title=grp,
@@ -731,8 +747,8 @@ frequency_boxplot <- function(object,grp=NULL,
                            ') %>% dplyr::count(',cluster_name,
                            ') %>%', 'dplyr::mutate(ratio=scales::percent(n/sum(n),accuracy=0.1))')))
     p <- ggplot(object@meta.data,
-           eval(parse(text=paste0('aes(',
-                                  group_of_interest,',fill=',cluster_name,')')))) +
+                eval(parse(text=paste0('aes(',
+                                       group_of_interest,',fill=',cluster_name,')')))) +
       geom_bar(position='fill') +
       geom_text(data=percentData, aes(y=n, label=ratio),
                 position=position_fill(vjust=0.5), size=freq.text.size) +
@@ -754,8 +770,8 @@ frequency_boxplot <- function(object,grp=NULL,
     }
   } else {
     p <- ggplot(object@meta.data,
-          eval(parse(text=paste0('aes(',
-                                  group_of_interest,',fill=',cluster_name,')')))) +
+                eval(parse(text=paste0('aes(',
+                                       group_of_interest,',fill=',cluster_name,')')))) +
       geom_bar(position='fill') + fill_palette(unlist(cluster_colors)) +
       theme_classic() +
       xlab(x.axis.title) + ylab(y.axis.title) + labs(fill=legend.title) +
@@ -766,7 +782,7 @@ frequency_boxplot <- function(object,grp=NULL,
             axis.text.y = element_text(size = y.axis.text.size),
             legend.title = element_text(size = legend.title.size),
             legend.text = element_text(size = legend.text.size)) +
-     scale_x_discrete(labels=cluster_info) # change the name of groups to visualize
+      scale_x_discrete(labels=cluster_info) # change the name of groups to visualize
     if (freq.stats){
       eval(parse(text=paste0('percentData <- object@meta.data %>% dplyr::group_by(',
                              group_of_interest,
@@ -778,8 +794,6 @@ frequency_boxplot <- function(object,grp=NULL,
     }
   }
 }
-
-
 
 #' Visualizing spatial gene expression
 #' @param object the seurat object to visualize the clusters
@@ -805,7 +819,6 @@ frequency_boxplot <- function(object,grp=NULL,
 #' @param cluster_name group name of a specific spot cluster to be visualized
 #' @param spot.cluster.highlight vector of spot cluster name to be highlighted
 #' @references https://wilkelab.org/cowplot/articles/shared_legends.html
-#' @keywords internal
 #' @export
 spatial_feat_plot_groups <- function(object,feat,grp=NULL,
                                      slide_title=grp,min=NA,max=NA,crop=TRUE,
@@ -837,7 +850,7 @@ spatial_feat_plot_groups <- function(object,feat,grp=NULL,
   }
 
   if (!is.null(slide.to.visualize)){
-    Idents(object) <- object$orig.ident
+    Seurat::Idents(object) <- object$orig.ident
     if (is.numeric(slide.to.visualize)){
       object <- subset(object, idents=grp[slide.to.visualize])
       spatial_image <- names(object@images)
@@ -856,27 +869,26 @@ spatial_feat_plot_groups <- function(object,feat,grp=NULL,
     }
   }
 
-  Idents(object) <- eval(parse(text=paste0('object$',cluster_name)))
+  Seurat::Idents(object) <- eval(parse(text=paste0('object$',cluster_name)))
   if (!is.null(spot.cluster.highlight)){
     object <- subset(object, idents = spot.cluster.highlight)
   }
 
-  plot <- SpatialPlot(object, features=feat,
-                      min.cutoff=min, max.cutoff=max, crop=crop,
-                      pt.size.factor=pt.size.factor,alpha=alpha,
-                      image.alpha=image.alpha,
-                      combine=FALSE)
+  plot <- Seurat::SpatialPlot(object, features=feat,
+                              min.cutoff=min, max.cutoff=max, crop=crop,
+                              pt.size.factor=pt.size.factor,alpha=alpha,
+                              image.alpha=image.alpha,
+                              combine=FALSE)
 
-  library(colormap)
   if (is.vector(palette_color)&!is.list(palette_color)){
     if (length(palette_color)>1){
       mapal <- palette_color
     } else if (palette_color %in% rownames(RColorBrewer::brewer.pal.info)){
       num <- RColorBrewer::brewer.pal.info[palette_color,'maxcolors']
-      mapal <- colorRampPalette(RColorBrewer::brewer.pal(num,palette_color))(256)
-    } else if (palette_color %in% names(colormaps)){
-      mapal <- colormap(eval(parse(text=paste0('colormap=colormaps$',palette_color))),
-                        nshades=256)
+      mapal <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(num,palette_color))(256)
+    } else if (palette_color %in% names(colormap::colormaps)){
+      mapal <- colormap::colormap(eval(parse(text=paste0('colormap=colormap::colormaps$',palette_color))),
+                                  nshades=256)
     }
   } else if (is.null(palette_color)){
   } else {
@@ -921,18 +933,16 @@ spatial_feat_plot_groups <- function(object,feat,grp=NULL,
   }
 
   if (color_bar_mode=='default'){
-    wrap_plots(plot, ncol=ncol)
+    patchwork::wrap_plots(plot, ncol=ncol)
   } else if (color_bar_mode=='combined'){
-    wrap_plots(plot, ncol=ncol) + plot_layout(guides = "collect") &
+    patchwork::wrap_plots(plot, ncol=ncol) + patchwork::plot_layout(guides = "collect") &
       theme(legend.title=element_blank(), legend.position=color_bar_loc)
   }
 }
 
-
-
 #' Automatically saving spatial feature plot by n
 #' @param object the seurat object to visualize the clusters
-#' @param feat_of_interest feature to be visualized (genes, module scores...)
+#' @param feats_of_interest feature to be visualized (genes, module scores...)
 #' @param grp assigned group name
 #' @param slide_title change the group title in each plot
 #' @param by_n the number of the features to be visualized in each plot
@@ -952,12 +962,16 @@ spatial_feat_plot_groups <- function(object,feat,grp=NULL,
 #' }
 #' @param color_bar_loc location of the colorbar: bottom, top, left, right
 #' @param slide.to.visualize vector representing number of slide to visualize: eg: c(1,3)
+#' @param cluster_name group name of a specific spot cluster to be visualized
+#' @param spot.cluster.highlight vector of spot cluster name to be highlighted
 #' @param height height of the printed image (by inch)
 #' @param width width of the printed image (by inch)
 #' @param dpi dpi of the image to be saved
 #' @param save_path the path to save the file
 #' @param file_name header name of the image files to save
-#' @keywords internal
+#' @param sort.by.expression sort the given feature according the the average expression in whole tissue
+#' @param assay assay of the data to use for calculation of average expression
+#' @param slot name of the slot to use in the given Seurat object
 #' @export
 save_feat_plot_by_n <- function(object,feats_of_interest,grp=NULL,
                                 slide_title=grp,by_n=3,min=NA,max=NA,crop=TRUE,
@@ -977,13 +991,13 @@ save_feat_plot_by_n <- function(object,feats_of_interest,grp=NULL,
   # Sort by the expression level
   if (sort.by.expression){
     if (!is.null(spot.cluster.highlight)){
-      Idents(object) <- object[[cluster_name]]
+      Seurat::Idents(object) <- object[[cluster_name]]
       object_subset <- subset(object, idents = spot.cluster.highlight)
-      Idents(object) <- "Total"
+      Seurat::Idents(object) <- "Total"
       total_exp_data <- Seurat::AverageExpression(object_subset, features = feats_of_interest,
                                                   assay='Spatial', slot='data')[[1]]
     } else {
-      Idents(object) <- "Total"
+      Seurat::Idents(object) <- "Total"
       total_exp_data <- Seurat::AverageExpression(object, features = feats_of_interest,
                                                   assay='Spatial', slot='data')[[1]]
     }
@@ -1039,41 +1053,43 @@ save_feat_plot_by_n <- function(object,feats_of_interest,grp=NULL,
 
 
 #' Modified featureplot
+#' @description modified feature plot to fix the min-max values
 #' @param object the seurat object to visualize the clusters
 #' @param feat feature to be visualized (genes, module scores...)
 #' @param min mininum value to be visualized with colorbar
 #' @param max maximum value to be visualized with colorbar
 #' @param palette_color color palette used for coloring spots (default: blue)
 #' @param ncol column numbers for the plot (number of slides in the column)
-#' @keywords internal
 #' @export
 FeaturePlot_mod <- function(object,feat,min=NA,max=NA,palette_color="blue",
                             ncol=length(feat)){
-  p <- FeaturePlot(object, features = feat,
-                   max.cutoff=max, min.cutoff=min,
-                   combine = FALSE)
+  p <- Seurat::FeaturePlot(object, features = feat,
+                           max.cutoff=max, min.cutoff=min,
+                           combine = FALSE)
   for (i in 1:length(p)){
     p[[i]] <- p[[i]] +
       ggplot2::scale_colour_gradientn(colours =c("lightgrey",palette_color),
                                       limits = c(min,max))
   }
-  wrap_plots(p, ncol=ncol)
+  patchwork::wrap_plots(p, ncol=ncol)
 }
 
 
-
 #' Modified ridgeplot
+#' @description modified ridgeplot to fix min-max values
 #' @param object the seurat object to visualize the clusters
 #' @param feat feature to be visualized (genes, module scores...)
 #' @param groups groups to visualize with ridgeplot with
 #' @param lim minimum and maximum expression value to be visualized with colorbar
 #' @param alpha transparency of the ridgeplot (default=0)
 #' @param title_size size of the title in each plot
-#' @param x.axis.title x axis title, y.axis.title: y axis title
-#' @param x.axis.title.size x axis title size, y.axis.title.size: y axis title size
-#' @param x.axis.text.size x axis text size, y.axis.text.size: y axis text size
+#' @param x.axis.title x axis title
+#' @param y.axis.title y.axis.title
+#' @param x.axis.title.size x axis title size
+#' @param y.axis.title.size y.axis.title.size
+#' @param x.axis.text.size x axis text size
+#' @param y.axis.text.size y.axis.text.size
 #' @param ncol column numbers for the plot (number of plots in the column)
-#' @keywords internal
 #' @export
 RidgePlot_mod <- function(object,feat,groups='seurat_clusters',
                           lim=c(-0.5,6),alpha=0, title_size = 20,
@@ -1082,17 +1098,15 @@ RidgePlot_mod <- function(object,feat,groups='seurat_clusters',
                           x.axis.text.size=12,y.axis.text.size=12,
                           ncol=length(feat)){
 
-  library(ggridges)
-
   n_groups <- length(levels(eval(parse(text=paste0('object$',groups)))))
-  ridge_data <- FetchData(object, vars=c(feat,groups),slot='data')
+  ridge_data <- Seurat::FetchData(object, vars=c(feat,groups),slot='data')
 
   p <- list()
   for (i in 1:length(feat)){
-    p[[i]] <- ggplot(ridge_data,
-                     eval(parse(text=paste0("aes(x=`",feat[i],"`,y=",groups,
-                                            ',color=',groups,')')))) +
-      geom_density_ridges(scale = 4, size = 1, alpha = alpha) +
+    p[[i]] <- ggplot2::ggplot(ridge_data,
+                              eval(parse(text=paste0("aes(x=`",feat[i],"`,y=",groups,
+                                                     ',color=',groups,')')))) +
+      ggridges::geom_density_ridges(scale = 4, size = 1, alpha = alpha) +
       scale_x_continuous(expand = c(0, 0)) +
       scale_y_discrete(expand = c(0, 0)) +
       coord_cartesian(clip = "off") +
@@ -1107,13 +1121,40 @@ RidgePlot_mod <- function(object,feat,groups='seurat_clusters',
             legend.position = "none")
 
   }
-  wrap_plots(p, ncol=ncol)
+  patchwork::wrap_plots(p, ncol=ncol)
 }
 
-
-
-#' Quantitation of the data
+#' Quantitation of the regional values
 #' @keywords internal
+#' @param object Seurat object to use during the analysis
+#' @param data.to.use values to use for the quantitation (it can be gene lists or metadata lists, however the two cannot be given together)
+#' @param group.to.compare group to compare between: x axis of the plot
+#' @param group.to.facet group to facet the plot
+#' @param agg.to.boxplot whether to aggregate all the data points included in each group.to.compare group and split and recode
+#' @param group.to.split group to split the aggregated plot with
+#' @param group.to.recode group to recode the 'group.to.split'
+#' \itemize{
+#' \item if the split group is orig.ident and is composed of "3mo_WT","7mo_WT","3mo_TG","7mo_TG", the recode group can be defined by reclassifying the each of element to "WT","WT","TG","TG"
+#' \item if the recode group is saved in object as 'cluster' then group.to.recode='cluster'
+#' }
+#' @param calculate_mode values to calculate in each group ('mean','sum', or 'boxplot')
+#' @param pairwise.comp.stats whether to calculate pairwise wilcoxon test and visualize p-value on top of each group
+#' @param cluster_colors the colors the use for the visualization
+#' @param plot_ncol the number of the facets in the column
+#' @param x.axis.title x axis title (default: '')
+#' @param y.axis.title y axis title (default: 'cell fraction')
+#' @param x.axis.title.size x axis title size (default: 20)
+#' @param y.axis.title.size y axis title size (default: 20)
+#' @param x.axis.text.size x axis text size (default: 10)
+#' @param y.axis.text.size y axis text size (default: 12)
+#' @param x.axis.text.angle x axis text angle (default: 90)
+#' @param lengend.title.size size of the legend title (default: 12)
+#' @param legened.text.size size of the legend text(default: 12)
+#' @param vis.value.text whether to visualize the values on the barplot
+#' @param value.text.size size of the value text (y-axis)
+#' @param return.stats whether to return the statistics along with a plot
+#' @param spot.total.num.stats whether to calculate and return total number of spots in each group
+#' @returns plot object and dataframe containing summarized statistics (when return.stats=TRUE)
 #' @export
 quantitation_plot <- function(object,
                               data.to.use=NULL,
@@ -1130,9 +1171,9 @@ quantitation_plot <- function(object,
                               x.axis.title.size=20,y.axis.title.size=20,
                               x.axis.text.size=10,y.axis.text.size=12,
                               x.axis.text.angle=90,
-                              legend.title.size=12,legend.text.size=12,
-                              vis.cellf.text=FALSE, cellf.text.size=3.5,
-                              cellf.stats=FALSE, spot.total.num.stats=FALSE){
+                              legend.title.size=12, legend.text.size=12,
+                              vis.value.text=FALSE, value.text.size=3.5,
+                              return.stats=FALSE, spot.total.num.stats=FALSE){
 
   # Check if orig.ident is factor with levels and if not, define as a factor
   if (is.null(levels(object$orig.ident))){
@@ -1161,7 +1202,7 @@ quantitation_plot <- function(object,
     if (identical(setdiff(data.to.use, colnames(sp_metadata)),character(0))){
       sp_metadata_mod <- sp_metadata[data.to.use]
     } else {
-      sp_metadata_mod <- expm1(FetchData(object, vars = data.to.use))
+      sp_metadata_mod <- expm1(Seurat::FetchData(object, vars = data.to.use))
       # Expm1 and calculate normalized count (reverse log transform)
     }
   }
@@ -1213,10 +1254,6 @@ quantitation_plot <- function(object,
                            'dplyr::select(-c(',group.to.compare,'))')))
 
     index <- (length(colnames(sp_metadata_mod_group))-1)
-
-    # Example code for using average expression value
-    # x <- Seurat::AverageExpression(brain.merge, features = c("Mbp","Olig1"), group.by = c("orig.ident","seurat_clusters"))
-    # t(x[[1]]) %>% as.data.frame %>% tibble::rownames_to_column(var="group")
 
     for (i in 1:index){
       # Calculate total number of spots per group
@@ -1290,13 +1327,13 @@ quantitation_plot <- function(object,
 
   # Check if all the data is genes
   if (!identical(setdiff(data.to.use, colnames(sp_metadata)),character(0))){
-    df_total[["Values"]] <- log1p(df_total[["Values"]])
+    df_total[["Values"]] <- log1p((df_total[["Values"]]))
   }
 
   if (agg.to.boxplot){
-    p <- ggboxplot(df_total, "Recode", "Values",
-                   color = "Recode", palette = cluster_colors, add="point") +
-      facet_grid(Names ~ Models) +
+    p <- ggpubr::ggboxplot(df_total, "Recode", "Values",
+                           color = "Recode", palette = cluster_colors, add="point") +
+      ggplot2::facet_grid(Names ~ Models) +
       xlab(x.axis.title) + ylab(paste0(y_axis_name, y.axis.title)) +
       theme(axis.title.x = element_text(size = x.axis.title.size),
             axis.title.y = element_text(size = y.axis.title.size),
@@ -1306,10 +1343,10 @@ quantitation_plot <- function(object,
             legend.title = element_text(size = legend.title.size),
             legend.text = element_text(size = legend.text.size))
     if (length(levels(factor(total_number_facet_group$Recode))) > 2){
-      p <- p + stat_compare_means(method = 'kruskal.test',
-                         aes(label = ifelse(p<1.e-3,sprintf("p < 0.001"),
-                                            sprintf("p = %4.3f",as.numeric(..p.format..)))),
-                         size=3.5)
+      p <- p + ggpubr::stat_compare_means(method = 'kruskal.test',
+                                          aes(label = ifelse(p<1.e-3,sprintf("p < 0.001"),
+                                                             sprintf("p = %4.3f",as.numeric(..p.format..)))),
+                                          size=3.5)
     }
     if (!is.null(pairwise.comp.stats)){
       if (pairwise.comp.stats %in% c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")){
@@ -1317,20 +1354,20 @@ quantitation_plot <- function(object,
                                'group_by(Models, Names) %>% ',
                                'rstatix::wilcox_test(Values~Recode)')))
         temp <- temp %>% rstatix::adjust_pvalue(method = pairwise.comp.stats) %>%
-          add_significance() %>% add_xy_position(x = "Recode", dodge = 0.8)
-        p <- p + stat_pvalue_manual(temp, label = "p.adj.signif", tip.length = 0.01,
-                                    hide.ns=TRUE) +
-          scale_y_continuous(expand = expansion(mult = c(0.01, 0.1)))
+          rstatix::add_significance() %>% rstatix::add_xy_position(x = "Recode", dodge = 0.8)
+        p <- p + ggpubr::stat_pvalue_manual(temp, label = "p.adj.signif", tip.length = 0.01,
+                                            hide.ns=TRUE) +
+          ggplot2::scale_y_continuous(expand = expansion(mult = c(0.01, 0.1)))
       } else {
         stop("Incorrect method name for p-value adjustment")
       }
     }
   } else {
     if (!(calculate_mode=='boxplot')){
-      p <- ggbarplot(df_total, "Models", "Values",
-                     fill = "Names", color = "Names", palette = cluster_colors,
-                     label = vis.cellf.text, lab.size = cellf.text.size) +
-        facet_wrap(.~ Groups, ncol=plot_ncol) +
+      p <- ggpubr::ggbarplot(df_total, "Models", "Values",
+                             fill = "Names", color = "Names", palette = cluster_colors,
+                             label = vis.value.text, lab.size = value.text.size) +
+        ggplot2::facet_wrap(.~ Groups, ncol=plot_ncol) +
         xlab(x.axis.title) + ylab(paste0(y_axis_name, y.axis.title)) +
         theme(axis.title.x = element_text(size = x.axis.title.size),
               axis.title.y = element_text(size = y.axis.title.size),
@@ -1339,9 +1376,9 @@ quantitation_plot <- function(object,
               legend.title = element_text(size = legend.title.size),
               legend.text = element_text(size = legend.text.size))
     } else {
-      p <- ggboxplot(df_total, "Models", "Values",
-                     color = "Names", palette = cluster_colors) +
-        facet_wrap(.~ Groups, ncol=plot_ncol) +
+      p <- ggpubr::ggboxplot(df_total, "Models", "Values",
+                             color = "Names", palette = cluster_colors) +
+        ggplot2::facet_wrap(.~ Groups, ncol=plot_ncol) +
         xlab(x.axis.title) + ylab(y.axis.title) +
         theme(axis.title.x = element_text(size = x.axis.title.size),
               axis.title.y = element_text(size = y.axis.title.size),
@@ -1355,9 +1392,9 @@ quantitation_plot <- function(object,
 
   if (spot.total.num.stats) {
     if (agg.to.boxplot){
-      p <- p + ggline(df_total, "Models", "Numbers",
-                      color = "Recode", palette = cluster_colors) +
-        facet_wrap(.~ Names, ncol=plot_ncol) +
+      p <- p + ggpubr::ggline(df_total, "Models", "Numbers",
+                              color = "Recode", palette = cluster_colors) +
+        ggplot2::facet_wrap(.~ Names, ncol=plot_ncol) +
         xlab(x.axis.title) + ylab('Total number of spots') +
         theme(axis.title.x = element_text(size = x.axis.title.size),
               axis.title.y = element_text(size = y.axis.title.size),
@@ -1367,8 +1404,8 @@ quantitation_plot <- function(object,
               legend.title = element_text(size = legend.title.size),
               legend.text = element_text(size = legend.text.size))
     } else {
-      p <- p + ggline(df_total, "Models", "Numbers") +
-        facet_wrap(.~ Groups, ncol=plot_ncol) +
+      p <- p + ggpubr::ggline(df_total, "Models", "Numbers") +
+        ggplot2::facet_wrap(.~ Groups, ncol=plot_ncol) +
         xlab(x.axis.title) + ylab('Total number of spots') +
         theme(axis.title.x = element_text(size = x.axis.title.size),
               axis.title.y = element_text(size = y.axis.title.size),
@@ -1380,30 +1417,30 @@ quantitation_plot <- function(object,
     }
   }
 
-  if (cellf.stats){
+  if (return.stats){
     return(list(p, df_total))
   } else {
     return(list(p))
   }
 }
 
-
 #' R wrapper for NSForest
 #' @param object Seurat object for the analysis
 #' @param assay name of the assay for the analysis
 #' @param slot name of the data slot for the analysis
-#' @param NSForest.dir R wrapper python file for the NSForest analysis
 #' @param outdir file directory to save the model and result
 #' @param rfTrees Number of trees
 #' @param clusterLabelcolumnHeader name of the column where cluster assignments reside.
 #' @param Median_Expression_Level median expression level for removing negative markers
 #' @param Genes_to_testing How many ranked genes by binary score will be evaluated in permutations by fbeta-score
 #' @param betaValue Set values for fbeta weighting. 1 is default f-measure.
-#' @param conda.evn.name name of the conda environemt (already installed with Anaconda) to use for CellDART analysis (default: 'CellDART')
-#' @keywords internal
+#' @param conda.env.name name of the conda environemt (already installed with Anaconda) to use for CellDART analysis (default: 'CellDART')
+#' @return dataframe containing optimal combination of marker genes in each cluster
+#' @references Aevermann B, Zhang Y, Novotny M, Keshk M, Bakken T, Miller J, Hodge R, Lelieveldt B, Lein E, Scheuermann RH. A machine learning method for the discovery of minimum marker gene combinations for cell type identification from single-cell RNA sequencing. Genome Res. 2021 Oct;31(10):1767-1780. doi: 10.1101/gr.275569.121.
+#' @references https://github.com/JCVenterInstitute/NSForest
 #' @export
 NS_Forest_R <- function(object,assay="RNA",slot="data",
-                        NSForest_dir='./',outdir='./',
+                        outdir='./',
                         clusterLabelcolumnHeader="louvain",
                         rfTrees=1000,Median_Expression_Level=0, Genes_to_testing=6,
                         betaValue=0.5,
@@ -1423,11 +1460,12 @@ NS_Forest_R <- function(object,assay="RNA",slot="data",
   # Setting virtual environment with reticulate
   if (!(conda.env.name %in% reticulate::conda_list()[['name']])){
 
-    reticulate::conda_create(envname = conda.env.name, python_version = '3.6.5')
+    reticulate::conda_create(envname = conda.env.name, python_version = '3.8.12')
     # Create conda env and install dependencies
-    reticulate::conda_install(conda.env.name, ignore_installed=T, pip=T,
-                              packages = c("numpy", "pandas", "scikit-learn",
-                                           "graphviz", "numexpr", "scanpy"))
+    reticulate::conda_install(conda.env.name, ignore_installed=T,
+                              pip = T, "git+https://github.com/mexchy1000/CellDART.git")
+    reticulate::conda_install(conda.env.name, ignore_installed=T,
+                              packages = c("graphviz", "numexpr"), pip=T)
   }
   reticulate::use_condaenv(conda.env.name, required = T)
 
@@ -1436,6 +1474,7 @@ NS_Forest_R <- function(object,assay="RNA",slot="data",
   scanpy_data <- reticulate::import('anndata', convert = FALSE)
 
   ## Import python function
+  NSForest_dir <- system.file("python", "NSForest_v3.py", package="STquantool")
   reticulate::source_python(NSForest_dir)
 
   # Define count matrix
@@ -1471,36 +1510,37 @@ NS_Forest_R <- function(object,assay="RNA",slot="data",
   return(result)
 }
 
-
-
-
 #' Find markers for the cell type based on Seurat FindAllMarkers
 #' @description Calculate markers for the cell type based on Seurat FindAllMarkers. Instead, the column containing average expression in each cluster was added
-#' @keywords internal
+#' @param object Seurat object to find markers
+#' @param purpose purpose of the function: marker discovery or differentially expressed genes finding
+#' @param group.to.find identity of the group to find markers within
+#' @param others refer to Seurat::FindMarkers
+#' @return dataframe with average log fold change, percentage of cells detected in each group (ident.1 and ident.2), adjusted p-value and average feature value in each group
 #' @export
 FindMarkers_mod <- function(object, purpose="marker",
                             group.to.find='seurat_clusters',
                             logfc.threshold=0.25, test.use = "wilcox",
                             ident.1=NULL, ident.2=NULL,
-                            slot = "data", assay = NULL, min.pct = 0.1, min.lognorm.count=0,
+                            slot = "data", assay = NULL, min.pct = 0.1,
                             only.pos = FALSE, latent.vars = NULL,
                             min.cells.group = 3){
-  Idents(object) <- object[[group.to.find]]
+  Seurat::Idents(object) <- object[[group.to.find]]
 
   if (purpose=="marker"){
-    df <- FindAllMarkers(object, logfc.threshold=logfc.threshold,
-                         test.use = test.use, slot = slot, min.pct = min.pct,
-                         only.pos = only.pos, latent.vars = latent.vars,
-                         assay = assay,
-                         min.cells.group = min.cells.group)
+    df <- Seurat::FindAllMarkers(object, logfc.threshold=logfc.threshold,
+                                 test.use = test.use, slot = slot, min.pct = min.pct,
+                                 only.pos = only.pos, latent.vars = latent.vars,
+                                 assay = assay,
+                                 min.cells.group = min.cells.group)
   } else if (purpose=="DEG"){
     if (sum(is.null(ident.1),is.null(ident.2))==0){
-      df <- FindMarkers(object, logfc.threshold=logfc.threshold,
-                        test.use = test.use, slot = slot, min.pct = min.pct,
-                        ident.1 = ident.1, ident.2 = ident.2,
-                        only.pos = only.pos, latent.vars = latent.vars,
-                        assay = assay,
-                        min.cells.group = min.cells.group)
+      df <- Seurat::FindMarkers(object, logfc.threshold=logfc.threshold,
+                                test.use = test.use, slot = slot, min.pct = min.pct,
+                                ident.1 = ident.1, ident.2 = ident.2,
+                                only.pos = only.pos, latent.vars = latent.vars,
+                                assay = assay,
+                                min.cells.group = min.cells.group)
       df[['gene']] <- rownames(df)
     } else {
       stop("Both 'ident.1' and 'ident.2' should be provided for DEG")
@@ -1511,18 +1551,18 @@ FindMarkers_mod <- function(object, purpose="marker",
 
   df_append <- data.frame()
   if (purpose=="marker"){
-    total_exp_data <- log1p(Seurat::AverageExpression(object, assays=assay, slot=slot,
-                                                      group.by = group.to.find)[[1]])
+    total_exp_data <- log1p((Seurat::AverageExpression(object, assays=assay, slot=slot,
+                                                       group.by = group.to.find)[[1]]))
     for (i in levels(df[['cluster']])){
       df_tmp <- as.data.frame(total_exp_data[df[df['cluster']==i,][['gene']], i])
       df_append <- rbind(df_append, df_tmp)
     }
     colnames(df_append) <- "avg_exp_clust"
   } else {
-    Idents(object) <- object[[group.to.find]]
+    Seurat::Idents(object) <- object[[group.to.find]]
     total_exp_data <- Seurat::GetAssayData(object, assay=assay, slot=slot)
     exp_data1 <- Matrix::rowMeans(expm1(total_exp_data[df[['gene']],
-                                                      Seurat::WhichCells(object, idents=ident.1)])) %>%
+                                                       Seurat::WhichCells(object, idents=ident.1)])) %>%
       log1p() %>% as.data.frame()
     exp_data2 <- Matrix::rowMeans(expm1(total_exp_data[df[['gene']],
                                                        Seurat::WhichCells(object, idents=ident.2)])) %>%
@@ -1539,7 +1579,29 @@ FindMarkers_mod <- function(object, purpose="marker",
 
 #' Predict spatial cell composition
 #' @description Predict spatial cell composition using CellDART
-#' @keywords internal
+#' @param sp_data spatial data (Seurat object) to be used in predicting cell fraction: non-normalized raw data should be in 'counts' slot
+#' @param sc_data single-cell data (Seurat object) to be used in making pseudospots: non-normalized raw data should be in 'counts' slot
+#' @param outdir the directory to save output files (models and results) (default = '.')
+#' @param sp_subset whether to subset spatial data and calculate for specific spot cluster (default = FALSE)
+#' @param spot.cluster.name group name of the cluster used for subsetting spatial data (default: 'seurat_clusters')
+#' @param spot.cluster.of.interest name of each spot clusters to be used (default: NULL)
+#' @param metadata_celltype column name for single-cell annotation data in metadata (default: 'celltype')
+#' @param conda.env.name name of the conda environment to use for CellDART analysis (default: 'CellDART')
+#' @param gpu check whether to use gpu (True) or not (False) (default = True)
+#' @param metadata_celltype column name for single-cell annotation data in metadata (default: 'celltype')
+#' @param num_markers number of selected marker genes in each cell-type (default = 20)
+#' @param seed_num seed to be used in random sampling (default = 0)
+#' @param nmix the number of cells sampled from single-cell data when making a pseudospot (default = 10)
+#' @param npseudo a total number of pseudospots (default = 20000)
+#' @param alpha loss weights of domain classifier to the source classifier (default = 0.6)
+#' @param alpha_lr learning rate for the domain classifier (alpha_lr*0.001, default = 5)
+#' @param emb_dim output size of dimensions for feature extractor (default = 64)
+#' @param batch_size minibatch size for pseudospots and spatial data during the training (default = 512)
+#' @param n_iterations iteration number for the adversarial learning (default = 3000)
+#' @param init_train_epoch iteration number for the pre-training process (default = 10)
+#' @return spatial data (Seurat object) with predicted cell fraction in metadata (meta.data)
+#' @references Sungwoo Bae, Kwon Joong Na, Jaemoon Koh, Dong Soo Lee, Hongyoon Choi, Young Tae Kim, CellDART: cell type inference by domain adaptation of single-cell and spatial transcriptomic data, Nucleic Acids Research, Volume 50, Issue 10, 10 June 2022, Page e57, https://doi.org/10.1093/nar/gkac084
+#' @references https://github.com/mexchy1000/CellDART
 #' @export
 pred_cellf_celldart <- function(sp_data, sc_data, outdir='.',
                                 sp_subset=FALSE, spot.cluster.name='seurat_clusters',
@@ -1569,6 +1631,8 @@ pred_cellf_celldart <- function(sp_data, sc_data, outdir='.',
     # Create conda env and install dependencies
     reticulate::conda_install(conda.env.name, ignore_installed=T,
                               pip = T, "git+https://github.com/mexchy1000/CellDART.git")
+    reticulate::conda_install(conda.env.name, ignore_installed=T,
+                              packages = c("graphviz", "numexpr"), pip=T)
   }
   reticulate::use_condaenv(conda.env.name, required = T)
 
@@ -1604,13 +1668,13 @@ pred_cellf_celldart <- function(sp_data, sc_data, outdir='.',
   progress$inc(1/6, detail="Converting spatial data")
   ## 2. Subsetting spatial data and save in anndata format
   if (sp_subset){
-    cluster_info <- sp_data[[spot.cluster.name]]
+    cluster_info <- sp_data[[spot.cluster.name]][,1]
     Seurat::Idents(sp_data) <- spot.cluster.name
   }
 
   if (is.null(spot.cluster.of.interest)){
     sp_data_sub <- sp_data
-  } else if (sum(spot.cluster.of.interest%in%levels(cluster_info))==length(spot.cluster.of.interest)){
+  } else if (sum(spot.cluster.of.interest%in%levels(factor(cluster_info)))==length(spot.cluster.of.interest)){
     sp_data_sub <- subset(sp_data, idents=spot.cluster.of.interest)
   } else {
     stop("'spot.cluster.of.interest' should be among the levels of 'spot.cluster.name' provided")

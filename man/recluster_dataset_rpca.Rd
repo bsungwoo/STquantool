@@ -17,7 +17,9 @@ recluster_dataset_rpca(
 )
 }
 \arguments{
-\item{data}{single-cell or sptial data to recluster}
+\item{data}{single-cell or spatial data to recluster}
+
+\item{split.by}{name of the clusters to split the single-cell or spatial data}
 
 \item{data_type}{type of data to integrate (single-cell or spatial)}
 
@@ -33,7 +35,9 @@ recluster_dataset_rpca(
 
 \item{maximum_size}{maximum size allowed for the analysis (default: 6GB)}
 }
+\value{
+reclustered Seurat object
+}
 \description{
 Recluster the dataset
 }
-\keyword{internal}

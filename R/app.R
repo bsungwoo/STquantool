@@ -5,6 +5,8 @@ library(shinybusy)
 library(shinymanager)
 library(shinyjs)
 library(shinythemes)
+
+library(DT)
 library(dplyr)
 
 options(shiny.maxRequestSize = 50*1024*1024^2)
@@ -59,7 +61,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                actionButton("data_save", "Data save"),
                                                shinyFilesButton("data_load", "Data load", "Search", FALSE),
                                                br(),br(),
-                                               h4("Convert file to 10X format"),
+                                               h4("Convert file to sparse matrix (.rds)"),
                                                actionButton("convert_file_to_sparse", "Convert")
 
                                      )
@@ -1209,18 +1211,18 @@ server <- function(input,output,session){
           data_path <- file.path(qc_path(), "filtered_feature_bc_matrix")
           if (sum(c("barcodes.tsv.gz","features.tsv.gz","matrix.mtx.gz") %in%
                   list.files(data_path))==3){
-            counts <- Read10X(data.dir = file.path(qc_path(), 'filtered_feature_bc_matrix'))
-            v$sc_qc_data <- CreateSeuratObject(counts)
-            v$sc_qc_data <- PercentageFeatureSet(v$sc_qc_data, pattern = "^mt-", col.name = "percent.mt")
+            counts <- Seurat::Read10X(data.dir = file.path(qc_path(), 'filtered_feature_bc_matrix'))
+            v$sc_qc_data <- Seurat::CreateSeuratObject(counts)
+            v$sc_qc_data <- Seurat::PercentageFeatureSet(v$sc_qc_data, pattern = "^mt-", col.name = "percent.mt")
           }
         } else if ("filtered_feature_bc_matrix.h5" %in% list.files(qc_path())){
-          counts <- Read10X_h5(file.path(qc_path(), 'filtered_feature_bc_matrix.h5'))
-          v$sc_qc_data <- CreateSeuratObject(counts)
-          v$sc_qc_data <- PercentageFeatureSet(v$sc_qc_data, pattern = "^mt-", col.name = "percent.mt")
+          counts <- Seurat::Read10X_h5(file.path(qc_path(), 'filtered_feature_bc_matrix.h5'))
+          v$sc_qc_data <- Seurat::CreateSeuratObject(counts)
+          v$sc_qc_data <- Seurat::PercentageFeatureSet(v$sc_qc_data, pattern = "^mt-", col.name = "percent.mt")
         } else if ("sparse_matrix.rds" %in% list.files(qc_path())){
           counts <- readRDS(file.path(qc_path(), 'sparse_matrix.rds'))
-          v$sc_qc_data <- CreateSeuratObject(counts)
-          v$sc_qc_data <- PercentageFeatureSet(v$sc_qc_data, pattern = "^mt-", col.name = "percent.mt")
+          v$sc_qc_data <- Seurat::CreateSeuratObject(counts)
+          v$sc_qc_data <- Seurat::PercentageFeatureSet(v$sc_qc_data, pattern = "^mt-", col.name = "percent.mt")
         }
       } else if (input$qc_data_type=='Spatial'){
         data_path_sp <- file.path(qc_path(), "spatial")
@@ -1228,8 +1230,8 @@ server <- function(input,output,session){
                   "scalefactors_json.json","tissue_positions_list.csv") %in%
                 list.files(data_path_sp))==4 &
             'filtered_feature_bc_matrix.h5' %in% list.files(qc_path())){
-          v$sp_qc_data <- Load10X_Spatial(data.dir = file.path(qc_path()))
-          v$sp_qc_data <- PercentageFeatureSet(v$sp_qc_data, pattern = "^mt-", col.name = "percent.mt")
+          v$sp_qc_data <- Seurat::Load10X_Spatial(data.dir = file.path(qc_path()))
+          v$sp_qc_data <- Seurat::PercentageFeatureSet(v$sp_qc_data, pattern = "^mt-", col.name = "percent.mt")
         }
       }
       remove_modal_spinner()
@@ -1239,9 +1241,9 @@ server <- function(input,output,session){
   # single-cell QC plot
   output$sc_qc_vlnplot <- renderPlot({
     if (!is.null(v$sc_qc_data)){
-      v$sc_qc_vlnplot <- VlnPlot(v$sc_qc_data,
-                                 features = c("nFeature_RNA","nCount_RNA","percent.mt"),
-                                 ncol = 3)
+      v$sc_qc_vlnplot <- Seurat::VlnPlot(v$sc_qc_data,
+                                         features = c("nFeature_RNA","nCount_RNA","percent.mt"),
+                                         ncol = 3)
       v$sc_qc_vlnplot
     }
   })
@@ -1249,9 +1251,9 @@ server <- function(input,output,session){
   # spatial QC plot
   output$sp_qc_vlnplot <- renderPlot({
     if (!is.null(v$sp_qc_data)){
-      v$sp_qc_vlnplot <- VlnPlot(v$sp_qc_data,
-                                 features = c("nFeature_Spatial","nCount_Spatial","percent.mt"),
-                                 ncol = 3)
+      v$sp_qc_vlnplot <- Seurat::VlnPlot(v$sp_qc_data,
+                                         features = c("nFeature_Spatial","nCount_Spatial","percent.mt"),
+                                         ncol = 3)
       v$sp_qc_vlnplot
     }
   })
@@ -1266,9 +1268,9 @@ server <- function(input,output,session){
   output$sc_feat_scatter <- renderPlot({
     if (!is.null(qc_list_sc()[[7]])){
       temp <- qc_list_sc()[[7]]
-      v$p1 <- FeatureScatter(temp, feature1 = "nCount_RNA", feature2 = "percent.mt") +
+      v$p1 <- Seurat::FeatureScatter(temp, feature1 = "nCount_RNA", feature2 = "percent.mt") +
         geom_hline(yintercept = qc_list_sc()[[2]]) + geom_vline(xintercept = qc_list_sc()[[1]])
-      v$p2 <- FeatureScatter(temp, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") +
+      v$p2 <- Seurat::FeatureScatter(temp, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") +
         geom_hline(yintercept = qc_list_sc()[[3]]) + geom_vline(xintercept = qc_list_sc()[[1]])
       v$p1 + v$p2
     }
@@ -1315,9 +1317,9 @@ server <- function(input,output,session){
   output$sp_feat_scatter <- renderPlot({
     if (!is.null(qc_list_sp()[[8]])){
       temp <- qc_list_sp()[[8]]
-      v$p1 <- FeatureScatter(temp, feature1 = "nCount_Spatial", feature2 = "percent.mt") +
+      v$p1 <- Seurat::FeatureScatter(temp, feature1 = "nCount_Spatial", feature2 = "percent.mt") +
         geom_hline(yintercept = qc_list_sp()[[2]]) + geom_vline(xintercept = qc_list_sp()[[1]])
-      v$p2 <- FeatureScatter(temp, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial") +
+      v$p2 <- Seurat::FeatureScatter(temp, feature1 = "nCount_Spatial", feature2 = "nFeature_Spatial") +
         geom_hline(yintercept = qc_list_sp()[[3]]) + geom_vline(xintercept = qc_list_sp()[[1]])
       v$p1 + v$p2
     }
@@ -1345,8 +1347,8 @@ server <- function(input,output,session){
     if (!is.null(qc_list_sp()[[8]])){
       temp <- qc_list_sp()[[8]]
       # Draw histogram for total count, nFeature_RNA, and percent mitochondrial genes
-      SpatialFeaturePlot(temp, features = qc_list_sp()[[6]],
-                         min.cutoff = qc_list_sp()[[7]][1], max.cutoff = qc_list_sp()[[7]][2])
+      Seurat::SpatialFeaturePlot(temp, features = qc_list_sp()[[6]],
+                                 min.cutoff = qc_list_sp()[[7]][1], max.cutoff = qc_list_sp()[[7]][2])
     }
   })
 
@@ -1424,8 +1426,7 @@ server <- function(input,output,session){
         }
       }
     }
-    library(purrr)
-    unlist(compact(data_dir))
+    unlist(plyr::compact(data_dir))
   })
 
   output$dir_list <- renderText({paste(dir_list(), collapse='\n')})
@@ -1662,7 +1663,7 @@ server <- function(input,output,session){
       temp <- v$sp_data
     }
     if (!is.null(temp)){
-      Idents(temp) <- eval(parse(text=paste0('temp$',input$sc_group_var)))
+      Seurat::Idents(temp) <- eval(parse(text=paste0('temp$',input$sc_group_var)))
     }
     list(input$sc_vis_label, input$sc_group_var,
          input$sc_label_size, input$sc_vis_title, input$sc_cell_high,
@@ -1675,33 +1676,33 @@ server <- function(input,output,session){
       if (sc_dimplot_list()[[5]]){
         p <- list()
 
-        v$dimplot <- DimPlot(sc_dimplot_list()[[8]], label = sc_dimplot_list()[[1]],
-                             repel = TRUE, group.by = sc_dimplot_list()[[2]],
-                             label.size = sc_dimplot_list()[[3]],
-                             cells.highlight = WhichCells(sc_dimplot_list()[[8]], idents=sc_dimplot_list()[[7]]),
-                             cols.highlight = sc_dimplot_list()[[6]],
-                             pt.size = sc_dimplot_list()[[9]],
-                             cols = c("#56ebd3", "#1c5e39", "#1fa198", "#7aed7b", "#36a620", "#cadba5",
-                                      "#33547a", "#24a5f7", "#3337a6", "#d678ef", "#9d0d6c", "#b090d4",
-                                      "#740ece", "#ef3df3", "#69345e", "#829499", "#809b31", "#f8ba7c",
-                                      "#683c00", "#d9dc22", "#992a13", "#ec102f", "#df6e78", "#fa7922",
-                                      "#ae783e", "#7fdc64", "#6f2b6e", "#56cac1", "#1b511d", "#ec9fe7",
-                                      "#214a65", "#b3d9fa", "#1932bf", "#34f50e")) +
+        v$dimplot <- Seurat::DimPlot(sc_dimplot_list()[[8]], label = sc_dimplot_list()[[1]],
+                                     repel = TRUE, group.by = sc_dimplot_list()[[2]],
+                                     label.size = sc_dimplot_list()[[3]],
+                                     cells.highlight = Seurat::WhichCells(sc_dimplot_list()[[8]], idents=sc_dimplot_list()[[7]]),
+                                     cols.highlight = sc_dimplot_list()[[6]],
+                                     pt.size = sc_dimplot_list()[[9]],
+                                     cols = c("#56ebd3", "#1c5e39", "#1fa198", "#7aed7b", "#36a620", "#cadba5",
+                                              "#33547a", "#24a5f7", "#3337a6", "#d678ef", "#9d0d6c", "#b090d4",
+                                              "#740ece", "#ef3df3", "#69345e", "#829499", "#809b31", "#f8ba7c",
+                                              "#683c00", "#d9dc22", "#992a13", "#ec102f", "#df6e78", "#fa7922",
+                                              "#ae783e", "#7fdc64", "#6f2b6e", "#56cac1", "#1b511d", "#ec9fe7",
+                                              "#214a65", "#b3d9fa", "#1932bf", "#34f50e")) +
           ggtitle(sc_dimplot_list()[[4]]) +
           theme(plot.title=element_text(size=14,face='bold',hjust=0.5))
         v$dimplot
 
       } else {
-        v$dimplot <- DimPlot(sc_dimplot_list()[[8]], label = sc_dimplot_list()[[1]],
-                             repel = TRUE, group.by = sc_dimplot_list()[[2]],
-                             label.size = sc_dimplot_list()[[3]],
-                             pt.size = sc_dimplot_list()[[9]],
-                             cols = c("#56ebd3", "#1c5e39", "#1fa198", "#7aed7b", "#36a620", "#cadba5",
-                                      "#33547a", "#24a5f7", "#3337a6", "#d678ef", "#9d0d6c", "#b090d4",
-                                      "#740ece", "#ef3df3", "#69345e", "#829499", "#809b31", "#f8ba7c",
-                                      "#683c00", "#d9dc22", "#992a13", "#ec102f", "#df6e78", "#fa7922",
-                                      "#ae783e", "#7fdc64", "#6f2b6e", "#56cac1", "#1b511d", "#ec9fe7",
-                                      "#214a65", "#b3d9fa", "#1932bf", "#34f50e")) +
+        v$dimplot <- Seurat::DimPlot(sc_dimplot_list()[[8]], label = sc_dimplot_list()[[1]],
+                                     repel = TRUE, group.by = sc_dimplot_list()[[2]],
+                                     label.size = sc_dimplot_list()[[3]],
+                                     pt.size = sc_dimplot_list()[[9]],
+                                     cols = c("#56ebd3", "#1c5e39", "#1fa198", "#7aed7b", "#36a620", "#cadba5",
+                                              "#33547a", "#24a5f7", "#3337a6", "#d678ef", "#9d0d6c", "#b090d4",
+                                              "#740ece", "#ef3df3", "#69345e", "#829499", "#809b31", "#f8ba7c",
+                                              "#683c00", "#d9dc22", "#992a13", "#ec102f", "#df6e78", "#fa7922",
+                                              "#ae783e", "#7fdc64", "#6f2b6e", "#56cac1", "#1b511d", "#ec9fe7",
+                                              "#214a65", "#b3d9fa", "#1932bf", "#34f50e")) +
           ggtitle(sc_dimplot_list()[[4]]) +
           theme(plot.title=element_text(size=14,face='bold',hjust=0.5))
         v$dimplot
@@ -1726,12 +1727,12 @@ server <- function(input,output,session){
                                           vis.freq.text=input$sc_freq_label, freq.stats=TRUE,
                                           x.axis.text.angle=input$sc_freq_x_angle,
                                           x.axis.text.size=input$sc_freq_x_size)
-      try({write.csv(v$freq_boxplot[[2]], file.path(global$datapath,input$output_folder_name,
-                                                    'data_files',
-                                                    paste0(input$freqplot_radio,
-                                                           '_freq_plot_',
-                                                           input$sc_group_var_freq,'_',
-                                                           input$sc_cluster_var_freq,'.csv')))})
+      try({utils::write.csv(v$freq_boxplot[[2]], file.path(global$datapath,input$output_folder_name,
+                                                           'data_files',
+                                                           paste0(input$freqplot_radio,
+                                                                  '_freq_plot_',
+                                                                  input$sc_group_var_freq,'_',
+                                                                  input$sc_cluster_var_freq,'.csv')))})
     }
   })
 
@@ -2065,7 +2066,7 @@ server <- function(input,output,session){
     inFile <- input$sp_upload_csv
     if (is.null(inFile))
       return(NULL)
-    v$sp_csv_table <- read.csv(inFile$datapath, header = input$sp_header_check)
+    v$sp_csv_table <- utils::read.csv(inFile$datapath, header = input$sp_header_check)
     DT::datatable(v$sp_csv_table,
                   options=list(lengthMenu=c(5,10,20,40,80),pageLength=5))
   })
@@ -2195,8 +2196,8 @@ server <- function(input,output,session){
       temp <- vlnplot_list()[[7]]
 
       val_color <- eval(parse(text=paste0('temp$',vlnplot_list()[[4]])))
-      pal <- colormap(colormap=c('#FFFFFF','#FF0000'),
-                      nshades = length(levels(factor(val_color))), reverse = TRUE)
+      pal <- colormap::colormap(colormap=c('#FFFFFF','#FF0000'),
+                                nshades = length(levels(factor(val_color))), reverse = TRUE)
 
       plot_tmp <- list()
       # Check whether to facet the violin plot
@@ -2204,10 +2205,10 @@ server <- function(input,output,session){
         val_facet <- eval(parse(text=paste0('.~temp$',vlnplot_list()[[5]])))
 
         for (i in 1:length(v$vlnplot_feat_list)){
-          plot_tmp[[i]] <- VlnPlot(temp, features=v$vlnplot_feat_list[i],
-                                   group.by=vlnplot_list()[[4]], pt.size=0) +
-            facet_grid(val_facet) +
-            stat_compare_means(method = "kruskal.test", label='p') +
+          plot_tmp[[i]] <- Seurat::VlnPlot(temp, features=v$vlnplot_feat_list[i],
+                                           group.by=vlnplot_list()[[4]], pt.size=0) +
+            ggplot2::facet_grid(val_facet) +
+            ggpubr::stat_compare_means(method = "kruskal.test", label='p') +
             xlab('') +
             scale_fill_manual(values = pal) +
             theme(axis.title.y = element_text(size = 12),
@@ -2218,9 +2219,9 @@ server <- function(input,output,session){
         }
       } else {
         for (i in 1:length(v$vlnplot_feat_list)){
-          plot_tmp[[i]] <- VlnPlot(temp, features=v$vlnplot_feat_list[i],
-                                   group.by=vlnplot_list()[[4]], pt.size=0) +
-            stat_compare_means(method = "kruskal.test", label='p') +
+          plot_tmp[[i]] <- Seurat::VlnPlot(temp, features=v$vlnplot_feat_list[i],
+                                           group.by=vlnplot_list()[[4]], pt.size=0) +
+            ggpubr::stat_compare_means(method = "kruskal.test", label='p') +
             xlab('') +
             scale_fill_manual(values = pal) +
             theme(axis.title.y = element_text(size = 12),
@@ -2231,7 +2232,7 @@ server <- function(input,output,session){
         }
       }
       v$vlnplot <- plot_tmp
-      wrap_plots(plot_tmp, ncol = vlnplot_list()[[6]])
+      patchwork::wrap_plots(plot_tmp, ncol = vlnplot_list()[[6]])
     }
 
   }, width = reactive({input$vln_img_width}),
@@ -2428,7 +2429,7 @@ server <- function(input,output,session){
 
     if (!is.na(as.numeric(input$sc_marker_logfc_thres))&
         !is.na(as.numeric(input$sc_marker_exp_thres))){
-      Idents(temp) <- eval(parse(text=paste0('temp$',input$sc_marker_group)))
+      Seurat::Idents(temp) <- eval(parse(text=paste0('temp$',input$sc_marker_group)))
       list(input$sc_marker_group, input$sc_marker_logfc_thres,
            input$sc_marker_posonly, temp,
            input$check_marker_mode,
@@ -2445,11 +2446,11 @@ server <- function(input,output,session){
       temp <- v$sp_data
     }
 
-    Idents(temp) <- eval(parse(text=paste0('temp$',input$sc_deg_group)))
+    Seurat::Idents(temp) <- eval(parse(text=paste0('temp$',input$sc_deg_group)))
 
     if (input$sc_check_deg_subset){
       temp <- subset(temp, idents=input$sc_deg_subset_sel)
-      Idents(temp) <- eval(parse(text=paste0('temp$',input$sc_deg_subset_group)))
+      Seurat::Idents(temp) <- eval(parse(text=paste0('temp$',input$sc_deg_subset_group)))
     } else {
     }
     if (!is.na(as.numeric(input$sc_deg_logfc_thres))&
@@ -2473,9 +2474,9 @@ server <- function(input,output,session){
 
       v$sc_marker <- temp %>% dplyr::filter(avg_exp_clust > as.numeric(sc_marker_list()[[10]])) %>%
         dplyr::group_by(cluster) %>% dplyr::arrange(desc(avg_exp_clust), .by_group = TRUE)
-      try({write.csv(v$sc_marker, file.path(global$datapath,input$output_folder_name,
-                                            'data_files',paste0(input$marker_radio,'_marker_',
-                                                                sc_marker_list()[[1]],'.csv')))})
+      try({utils::write.csv(v$sc_marker, file.path(global$datapath,input$output_folder_name,
+                                                   'data_files',paste0(input$marker_radio,'_marker_',
+                                                                       sc_marker_list()[[1]],'.csv')))})
     } else if (sc_marker_list()[[5]]=='NSForest') {
       assay_type <- ifelse(input$marker_radio=='Single-cell', 'RNA',
                            ifelse(input$marker_radio=='Spatial','Spatial', NULL))
@@ -2487,15 +2488,14 @@ server <- function(input,output,session){
         dir.create(outdir_ns)
       }
 
-      v$sc_marker <- NS_Forest_R(sc_marker_list()[[4]], assay=assay_type, slot="data",
-                                 NSForest_dir=file.path(v$orig_wd,'NSForest_v3.py'),
+      v$sc_marker <- NS_Forest_R(object=sc_marker_list()[[4]], assay=assay_type, slot="data",
                                  outdir=outdir_ns,
                                  clusterLabelcolumnHeader=sc_marker_list()[[1]],
                                  rfTrees=sc_marker_list()[[6]],
                                  Median_Expression_Level=sc_marker_list()[[7]],
                                  Genes_to_testing=sc_marker_list()[[8]],
                                  betaValue=sc_marker_list()[[9]],
-                                 python_path=NULL,virtual.env.name='NSForest')
+                                 conda.env.name='STquantool')
     }
 
     DT::datatable(v$sc_marker,
@@ -2549,12 +2549,12 @@ server <- function(input,output,session){
         dplyr::arrange(desc(avg_exp_ident.1)) %>% dplyr::arrange(desc(sign)) %>%
         dplyr::select(-sign)
 
-      try({write.csv(v$DEG, file.path(global$datapath,input$output_folder_name,
-                                      'data_files',
-                                      paste0(input$DEG_radio,'_DEG_subset_',
-                                             paste(sc_deg_list()[[5]],collapse="_"),'_btw_',
-                                             paste(sc_deg_list()[[7]],collapse="."),'_',
-                                             paste(sc_deg_list()[[8]],collapse="."),'.csv')))})
+      try({utils::write.csv(v$DEG, file.path(global$datapath,input$output_folder_name,
+                                             'data_files',
+                                             paste0(input$DEG_radio,'_DEG_subset_',
+                                                    paste(sc_deg_list()[[5]],collapse="_"),'_btw_',
+                                                    paste(sc_deg_list()[[7]],collapse="."),'_',
+                                                    paste(sc_deg_list()[[8]],collapse="."),'.csv')))})
       DT::datatable(v$DEG,
                     options=list(lengthMenu=c(5,10,20,40,80), pageLength=5))
     } else {
@@ -2569,13 +2569,13 @@ server <- function(input,output,session){
         dplyr::arrange(desc(avg_exp_ident.1)) %>% dplyr::arrange(desc(sign)) %>%
         dplyr::select(-sign)
 
-      try({write.csv(v$DEG, file.path(global$datapath,input$output_folder_name,
-                                      'data_files',
-                                      paste0(input$DEG_radio,'_DEG_',
-                                             paste(sc_deg_list()[[3]],collapse="."),
-                                             '_',
-                                             paste(sc_deg_list()[[4]],collapse="."),
-                                             '.csv')))})
+      try({utils::write.csv(v$DEG, file.path(global$datapath,input$output_folder_name,
+                                             'data_files',
+                                             paste0(input$DEG_radio,'_DEG_',
+                                                    paste(sc_deg_list()[[3]],collapse="."),
+                                                    '_',
+                                                    paste(sc_deg_list()[[4]],collapse="."),
+                                                    '.csv')))})
       DT::datatable(v$DEG,
                     options=list(lengthMenu=c(5,10,20,40,80), pageLength = 5))
     }
@@ -2706,36 +2706,38 @@ server <- function(input,output,session){
 
   output$sc_deg_enrich <- renderPlot({
     if (sc_deg_enrich_plot()[[2]]=="Mouse"){
+      library(org.Mm.eg.db)
       species_go <- "org.Mm.eg.db"
       species_kegg <- "mmu"
     } else if (sc_deg_enrich_plot()[[2]]=="Human") {
+      library(org.Hs.eg.db)
       species_go <- "org.Hs.eg.db"
       species_kegg <- "hsa"
     }
 
     if(!is.null(v$DEG)){
-      gene.list <- bitr(rownames(v$deg_enrich_subset), fromType = "SYMBOL",
-                        toType = c("ENSEMBL", "SYMBOL","ENTREZID"),
-                        OrgDb = species_go)
+      gene.list <- clusterProfiler::bitr(rownames(v$deg_enrich_subset), fromType = "SYMBOL",
+                                         toType = c("ENSEMBL", "SYMBOL","ENTREZID"),
+                                         OrgDb = species_go)
 
       if (sc_deg_enrich_plot()[[1]]=="GO"){
-        v$go <- enrichGO(gene          = gene.list$ENSEMBL,
-                         OrgDb         = species_go,
-                         keyType       = 'ENSEMBL',
-                         ont = sc_deg_enrich_plot()[[6]],
-                         pAdjustMethod = 'BH',
-                         pvalueCutoff  = 0.05,
-                         qvalueCutoff  = 0.2)
-        v$dotplot <- dotplot(v$go, showCategory=sc_deg_enrich_plot()[[5]]) + ggtitle('GO analysis')
+        v$go <- clusterProfiler::enrichGO(gene          = gene.list$ENSEMBL,
+                                          OrgDb         = species_go,
+                                          keyType       = 'ENSEMBL',
+                                          ont = sc_deg_enrich_plot()[[6]],
+                                          pAdjustMethod = 'BH',
+                                          pvalueCutoff  = 0.05,
+                                          qvalueCutoff  = 0.2)
+        v$dotplot <- clusterProfiler::dotplot(v$go, showCategory=sc_deg_enrich_plot()[[5]]) + ggtitle('GO analysis')
         v$dotplot
 
       } else if (sc_deg_enrich_plot()[[1]]=="KEGG") {
-        v$kegg <- enrichKEGG(gene          = gene.list$ENTREZID,
-                             organism         = species_kegg,
-                             pAdjustMethod = "BH",
-                             pvalueCutoff = 0.05,
-                             qvalueCutoff = 0.2)
-        v$dotplot <- dotplot(v$kegg, showCategory=sc_deg_enrich_plot()[[5]]) + ggtitle('KEGG analysis')
+        v$kegg <- clusterProfiler::enrichKEGG(gene          = gene.list$ENTREZID,
+                                              organism         = species_kegg,
+                                              pAdjustMethod = "BH",
+                                              pvalueCutoff = 0.05,
+                                              qvalueCutoff = 0.2)
+        v$dotplot <- clusterProfiler::dotplot(v$kegg, showCategory=sc_deg_enrich_plot()[[5]]) + ggtitle('KEGG analysis')
         v$dotplot
       }
     }
@@ -2813,15 +2815,15 @@ server <- function(input,output,session){
         }})
       }
 
-      Idents(temp) <- eval(parse(text=paste0('temp$',
-                                             input$annotation_group)))
+      Seurat::Idents(temp) <- eval(parse(text=paste0('temp$',
+                                                     input$annotation_group)))
       new.cluster.ids <- sapply(strsplit(input$annotation_labels, ",")[[1]],
                                 function(x){as.character(x)})
       if (length(levels(temp))==length(new.cluster.ids)){
         names(new.cluster.ids) <- levels(temp)
-        temp <- RenameIdents(temp, new.cluster.ids)
+        temp <- Seurat::RenameIdents(temp, new.cluster.ids)
 
-        eval(parse(text=paste0('temp$',input$new_group_name,'<- Idents(temp)')))
+        eval(parse(text=paste0('temp$',input$new_group_name,'<- Seurat::Idents(temp)')))
 
         if (input$cluster_annotate_recode){
           v[['annotate_recode']][[input$annotation_group]] <- c(input$new_group_name,
@@ -2881,9 +2883,9 @@ server <- function(input,output,session){
         feature_list <- input$module_score_list
       }
       if (!is.null(feature_list)){
-        temp <- AddModuleScore(temp,
-                               features = list(feature_list),
-                               name = input$module_score_name)
+        temp <- Seurat::AddModuleScore(temp,
+                                       features = list(feature_list),
+                                       name = input$module_score_name)
         if (input$module_score_radio=="Single-cell"){
           v$sc_data <- temp
         } else if (input$module_score_radio=="Spatial"){
@@ -2899,7 +2901,7 @@ server <- function(input,output,session){
     inFile <- input$module_score_csv
     if (is.null(inFile))
       return(NULL)
-    v$module_table <- read.csv(inFile$datapath, header = input$module_score_header)
+    v$module_table <- utils::read.csv(inFile$datapath, header = input$module_score_header)
     DT::datatable(v$module_table,
                   options=list(lengthMenu=c(5,10,20,40,80),pageLength=5))
   })
@@ -2993,7 +2995,7 @@ server <- function(input,output,session){
     }
     if (!is.null(temp)){
       group_members <- eval(parse(text=paste0('temp$',input$subset_group)))
-      Idents(temp) <- group_members
+      Seurat::Idents(temp) <- group_members
       temp <- subset(temp, idents=input$subset_list)
 
       if (input$subset_radio=="Single-cell"){
@@ -3165,30 +3167,30 @@ server <- function(input,output,session){
                                                    x.axis.text.size=10,y.axis.text.size=12,
                                                    x.axis.text.angle=90,
                                                    legend.title.size=12,legend.text.size=12,
-                                                   vis.cellf.text=input$quantitation_vis_cellf,
-                                                   cellf.text.size=3.5,
-                                                   cellf.stats=TRUE,
+                                                   vis.value.text=input$quantitation_vis_cellf,
+                                                   value.text.size=3.5,
+                                                   return.stats=TRUE,
                                                    plot_ncol = input$quantitation_feat_ncol,
                                                    spot.total.num.stats = input$spot_total_number)
         quantitation_name_list <- quantitation_cellf[1:min(5, length(quantitation_cellf))]
         if (input$quantitation_agg_mode){
-          try({write.csv(v$quantitation_result[[2]], file.path(global$datapath,input$output_folder_name,
-                                                               'data_files',
-                                                               paste0('Regional_quant_table_',
-                                                                      input$quantitation_mode,'_of_',
-                                                                      paste(quantitation_name_list, collapse="."),'_by_',
-                                                                      input$quantitation_recode_group,'_across_',
-                                                                      input$quantitation_comp_group,'_with_spot_number_',
-                                                                      input$spot_total_number,'.csv')))})
+          try({utils::write.csv(v$quantitation_result[[2]], file.path(global$datapath,input$output_folder_name,
+                                                                      'data_files',
+                                                                      paste0('Regional_quant_table_',
+                                                                             input$quantitation_mode,'_of_',
+                                                                             paste(quantitation_name_list, collapse="."),'_by_',
+                                                                             input$quantitation_recode_group,'_across_',
+                                                                             input$quantitation_comp_group,'_with_spot_number_',
+                                                                             input$spot_total_number,'.csv')))})
         } else {
-          try({write.csv(v$quantitation_result[[2]], file.path(global$datapath,input$output_folder_name,
-                                                               'data_files',
-                                                               paste0('Regional_quant_table_',
-                                                                      input$quantitation_mode,'_of_',
-                                                                      paste(quantitation_name_list, collapse="."),'_by_',
-                                                                      input$quantitation_facet_group,'_across_',
-                                                                      input$quantitation_comp_group,'_with_spot_number_',
-                                                                      input$spot_total_number,'.csv')))})
+          try({utils::write.csv(v$quantitation_result[[2]], file.path(global$datapath,input$output_folder_name,
+                                                                      'data_files',
+                                                                      paste0('Regional_quant_table_',
+                                                                             input$quantitation_mode,'_of_',
+                                                                             paste(quantitation_name_list, collapse="."),'_by_',
+                                                                             input$quantitation_facet_group,'_across_',
+                                                                             input$quantitation_comp_group,'_with_spot_number_',
+                                                                             input$spot_total_number,'.csv')))})
         }
       }
     }
@@ -3235,7 +3237,7 @@ server <- function(input,output,session){
                                        spot.cluster.name=input$celldart_group,
                                        spot.cluster.of.interest=input$celldart_group_sel,
                                        metadata_celltype=input$celldart_metadata_celltype,
-                                       conda.env.name='CellDART',gpu=TRUE,
+                                       conda.env.name='STquantool',gpu=TRUE,
                                        num_markers=input$celldart_num_markers,
                                        seed_num=0,
                                        nmix=input$celldart_nmix, npseudo=input$celldart_npseudo,
@@ -3384,7 +3386,7 @@ server <- function(input,output,session){
   observeEvent(input$vln_save_start, {
     show_modal_spinner()
     if (!is.null(v$vlnplot)){
-      wrap_plots(v$vlnplot, ncol=input$vln_ncol)
+      patchwork::wrap_plots(v$vlnplot, ncol=input$vln_ncol)
     }
     try({ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
@@ -3432,26 +3434,26 @@ server <- function(input,output,session){
   observeEvent(input$sc_deg_volcano_save_start, {
     show_modal_spinner()
     try({if (input$sc_check_deg_subset){
-      png(file.path(global$datapath,input$output_folder_name,
-                    'data_files',
-                    paste0(input$DEG_radio,'_volcanoplot_subset_',
-                           paste(input$sc_deg_subset_sel,collapse="_"),'_btw_',
-                           input$sc_deg_subset_int,'_',input$sc_deg_subset_ref,'.png')),
-          width = input$deg_volcano_width, height = input$deg_volcano_height,
-          units = 'cm', res = input$sc_deg_volcano_save_dpi,
-          bg = "white")
+      grDevices::png(file.path(global$datapath,input$output_folder_name,
+                               'data_files',
+                               paste0(input$DEG_radio,'_volcanoplot_subset_',
+                                      paste(input$sc_deg_subset_sel,collapse="_"),'_btw_',
+                                      input$sc_deg_subset_int,'_',input$sc_deg_subset_ref,'.png')),
+                     width = input$deg_volcano_width, height = input$deg_volcano_height,
+                     units = 'cm', res = input$sc_deg_volcano_save_dpi,
+                     bg = "white")
     } else {
-      png(file.path(global$datapath,input$output_folder_name,
-                    'data_files',
-                    paste0(input$DEG_radio,'_volcanoplot_',
-                           paste0(input$sc_deg_int,'_',
-                                  input$sc_deg_ref),'.png')),
-          width = input$deg_volcano_width, height = input$deg_volcano_height,
-          units = 'cm', res = input$sc_deg_volcano_save_dpi,
-          bg = "white")
+      grDevices::png(file.path(global$datapath,input$output_folder_name,
+                               'data_files',
+                               paste0(input$DEG_radio,'_volcanoplot_',
+                                      paste0(input$sc_deg_int,'_',
+                                             input$sc_deg_ref),'.png')),
+                     width = input$deg_volcano_width, height = input$deg_volcano_height,
+                     units = 'cm', res = input$sc_deg_volcano_save_dpi,
+                     bg = "white")
     }
       print(v$volcano)
-      dev.off()})
+      grDevices::dev.off()})
     remove_modal_spinner()
     removeModal()
   })
@@ -3467,28 +3469,28 @@ server <- function(input,output,session){
   observeEvent(input$sc_deg_enrich_save_start, {
     show_modal_spinner()
     try({if (input$sc_check_deg_subset){
-      png(file.path(global$datapath,input$output_folder_name,
-                    'data_files',
-                    paste0(input$DEG_radio,'_',input$sc_deg_enrich_type,'_',
-                           input$sc_deg_enrich_species,'_enrichplot_subset_',
-                           paste(input$sc_deg_subset_sel,collapse="_"),'_btw_',
-                           input$sc_deg_subset_int,'_',input$sc_deg_subset_ref,'.png')),
-          width = input$deg_enrich_width, height = input$deg_enrich_height, units = 'cm',
-          res = input$sc_deg_enrich_save_dpi,
-          bg = "white")
+      grDevices::png(file.path(global$datapath,input$output_folder_name,
+                               'data_files',
+                               paste0(input$DEG_radio,'_',input$sc_deg_enrich_type,'_',
+                                      input$sc_deg_enrich_species,'_enrichplot_subset_',
+                                      paste(input$sc_deg_subset_sel,collapse="_"),'_btw_',
+                                      input$sc_deg_subset_int,'_',input$sc_deg_subset_ref,'.png')),
+                     width = input$deg_enrich_width, height = input$deg_enrich_height, units = 'cm',
+                     res = input$sc_deg_enrich_save_dpi,
+                     bg = "white")
     } else {
-      png(file.path(global$datapath,input$output_folder_name,
-                    'data_files',
-                    paste0(input$DEG_radio,'_',input$sc_deg_enrich_type,'_',
-                           input$sc_deg_enrich_species,'_enrichplot_',
-                           paste0(input$sc_deg_int,'_',
-                                  input$sc_deg_ref),'.png')),
-          width = input$deg_enrich_width, height = input$deg_enrich_height, units = 'cm',
-          res = input$sc_deg_enrich_save_dpi,
-          bg = "white")
+      grDevices::png(file.path(global$datapath,input$output_folder_name,
+                               'data_files',
+                               paste0(input$DEG_radio,'_',input$sc_deg_enrich_type,'_',
+                                      input$sc_deg_enrich_species,'_enrichplot_',
+                                      paste0(input$sc_deg_int,'_',
+                                             input$sc_deg_ref),'.png')),
+                     width = input$deg_enrich_width, height = input$deg_enrich_height, units = 'cm',
+                     res = input$sc_deg_enrich_save_dpi,
+                     bg = "white")
     }
       print(v$dotplot)
-      dev.off()})
+      grDevices:dev.off()})
     remove_modal_spinner()
     removeModal()
   })
@@ -3578,11 +3580,10 @@ server <- function(input,output,session){
   observeEvent(input$ok_stored_gene, {
     show_modal_spinner()
     if (!is.null(v$gene_upload)){
-      print(v$gene_upload)
-      try({write.table(t(plyr::ldply(v$gene_upload, rbind)),
-                       file = file.path(global$datapath,input$output_folder_name,
-                                        paste0(input$sp_save_stored_gene,'.csv')),
-                       sep=',', col.names=FALSE)})
+      try({utils::write.table(t(plyr::ldply(v$gene_upload, rbind)),
+                              file = file.path(global$datapath,input$output_folder_name,
+                                               paste0(input$sp_save_stored_gene,'.csv')),
+                              sep=',', col.names=FALSE)})
     }
     remove_modal_spinner()
     removeModal()
@@ -3592,19 +3593,19 @@ server <- function(input,output,session){
   observeEvent(input$ok_ab_gene, {
     show_modal_spinner()
     if (!is.null(v$sc_gene_list)&!is.null(v$sp_gene_list)){
-      try({write.table(t(plyr::ldply(list("Single.cell.top3000"=v$sc_gene_list,
-                                          "Spatial.top3000"=v$sp_gene_list), rbind)),
-                       file.path(global$datapath,input$output_folder_name,
-                                 paste0(input$sp_save_ab_gene,'.csv')), sep=',',
-                       col.names=FALSE)})
+      try({utils::write.table(t(plyr::ldply(list("Single.cell.top3000"=v$sc_gene_list,
+                                                 "Spatial.top3000"=v$sp_gene_list), rbind)),
+                              file.path(global$datapath,input$output_folder_name,
+                                        paste0(input$sp_save_ab_gene,'.csv')), sep=',',
+                              col.names=FALSE)})
     } else if (!is.null(v$sc_gene_list)&is.null(v$sp_gene_list)){
-      try({write.csv(data.frame("Single.cell.top3000"=v$sc_gene_list),
-                     file.path(global$datapath,input$output_folder_name,
-                               paste0(input$sp_save_ab_gene,'.csv')), col.names = T)})
+      try({utils::write.csv(data.frame("Single.cell.top3000"=v$sc_gene_list),
+                            file.path(global$datapath,input$output_folder_name,
+                                      paste0(input$sp_save_ab_gene,'.csv')), col.names = T)})
     } else if (is.null(v$sc_gene_list)&!is.null(v$sp_gene_list)){
-      try({write.csv(data.frame("Spatial.top3000"=v$sp_gene_list),
-                     file.path(global$datapath,input$output_folder_name,
-                               paste0(input$sp_save_ab_gene,'.csv')), col.names = T)})
+      try({utils::write.csv(data.frame("Spatial.top3000"=v$sp_gene_list),
+                            file.path(global$datapath,input$output_folder_name,
+                                      paste0(input$sp_save_ab_gene,'.csv')), col.names = T)})
     }
     remove_modal_spinner()
     removeModal()
@@ -3645,11 +3646,11 @@ server <- function(input,output,session){
         output$cmd <- renderText({paste0("'",load_path,"' was loaded")})
       } else if (input$save_radio=="Genes: stored"){
         if (!is.null(v$sp_gene_list)){
-          load_list <- lapply(as.list(read.csv(load_path)), FUN = function(x) intersect(x, v$sp_gene_list))
+          load_list <- lapply(as.list(utils::read.csv(load_path)), FUN = function(x) intersect(x, v$sp_gene_list))
           if (!is.null(v$sc_gene_list)){load_list <- lapply(load_list, FUN = function(x) intersect(x, v$sc_gene_list))}
           output$cmd <- renderText({paste0("'",load_path,"' was loaded")})
         } else if (!is.null(v$sc_gene_list)){
-          load_list <- lapply(as.list(read.csv(load_path)), FUN = function(x) intersect(x, v$sc_gene_list))
+          load_list <- lapply(as.list(utils::read.csv(load_path)), FUN = function(x) intersect(x, v$sc_gene_list))
           output$cmd <- renderText({paste0("'",load_path,"' was loaded")})
         } else {
           load_list <- list()
@@ -3717,14 +3718,14 @@ server <- function(input,output,session){
                                     ifelse(input$radio_delim_type=="Space"," "," ")))
       v$skip_row <- input$row_num_to_skip
       if (input$file_load_shift_col_check) {
-        v$output_col <- as.character(fread(v$load_path, sep=v$delim_type,
-                                           header=FALSE,skip=v$skip_row,
-                                           nrows=1))
+        v$output_col <- as.character(data.table::fread(v$load_path, sep=v$delim_type,
+                                                       header=FALSE,skip=v$skip_row,
+                                                       nrows=1))
       }
-      read_file <- fread(v$load_path,
-                         header = input$file_load_header_check,
-                         skip = v$skip_row,
-                         sep = v$delim_type, data.table=FALSE, showProgress=TRUE)
+      read_file <- data.table::fread(v$load_path,
+                                     header = input$file_load_header_check,
+                                     skip = v$skip_row,
+                                     sep = v$delim_type, data.table=FALSE, showProgress=TRUE)
       if (input$file_load_shift_col_check){
         if (dim(read_file)[2]==(length(v$output_col)+1)){
           v$output_col <- c("X", v$output_col)
@@ -3738,7 +3739,6 @@ server <- function(input,output,session){
         read_file <- read_file %>% as.data.frame() %>%
           tibble::column_to_rownames(var = base::colnames(read_file)[input$col_num_to_rowname])
       }
-      print(as.data.frame(read_file))
       if (dim(read_file)[2]>3){read_file <- read_file[,c(1:3)]}
       output$table_check <- DT::renderDataTable({
         DT::datatable(as.data.frame(read_file),
@@ -3751,10 +3751,10 @@ server <- function(input,output,session){
   observeEvent(input$convert_file_ok, {
     show_modal_spinner()
     if (!is.null(v$load_path)){
-      read_total <- fread(v$load_path,
-                          header = input$file_load_header_check,
-                          skip = v$skip_row,
-                          sep = v$delim_type, data.table=FALSE, showProgress=TRUE)
+      read_total <- data.table::fread(v$load_path,
+                                      header = input$file_load_header_check,
+                                      skip = v$skip_row,
+                                      sep = v$delim_type, data.table=FALSE, showProgress=TRUE)
       if (!is.null(v$output_col)){colnames(read_total) <- v$output_col}
       if (input$file_load_transpose_check){
         read_total <- t(read_total %>% as.data.frame() %>%
@@ -3796,18 +3796,18 @@ server <- function(input,output,session){
   # Stop shiny after closing the page
   observeEvent(input$close, {
     js$closeWindow()
-    stopApp()
+    shiny::stopApp()
   })
 }
 
-#' Function to run STqunatools app
+#' Function to run STquantools app
 #' @description ST analysis tool to visualize and quantify multiple datasets
-#' @return starts shiny application for STquantools
-#' examples
+#' @return Starts shiny application for STquantools
+#' @examples
 #' STquantool::run_app()
 #' @export
 run_app <- function(){
-  shinyApp(ui = ui, server = server)
+  shiny::shinyApp(ui = ui, server = server)
 }
 
 # Run shiny app

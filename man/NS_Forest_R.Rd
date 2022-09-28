@@ -8,7 +8,6 @@ NS_Forest_R(
   object,
   assay = "RNA",
   slot = "data",
-  NSForest_dir = "./",
   outdir = "./",
   clusterLabelcolumnHeader = "louvain",
   rfTrees = 1000,
@@ -37,11 +36,16 @@ NS_Forest_R(
 
 \item{betaValue}{Set values for fbeta weighting. 1 is default f-measure.}
 
-\item{NSForest.dir}{R wrapper python file for the NSForest analysis}
-
-\item{conda.evn.name}{name of the conda environemt (already installed with Anaconda) to use for CellDART analysis (default: 'CellDART')}
+\item{conda.env.name}{name of the conda environemt (already installed with Anaconda) to use for CellDART analysis (default: 'CellDART')}
+}
+\value{
+dataframe containing optimal combination of marker genes in each cluster
 }
 \description{
 R wrapper for NSForest
 }
-\keyword{internal}
+\references{
+Aevermann B, Zhang Y, Novotny M, Keshk M, Bakken T, Miller J, Hodge R, Lelieveldt B, Lein E, Scheuermann RH. A machine learning method for the discovery of minimum marker gene combinations for cell type identification from single-cell RNA sequencing. Genome Res. 2021 Oct;31(10):1767-1780. doi: 10.1101/gr.275569.121.
+
+https://github.com/JCVenterInstitute/NSForest
+}

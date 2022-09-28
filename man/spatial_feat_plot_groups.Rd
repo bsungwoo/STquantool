@@ -74,4 +74,3 @@ Visualizing spatial gene expression
 \references{
 https://wilkelab.org/cowplot/articles/shared_legends.html
 }
-\keyword{internal}

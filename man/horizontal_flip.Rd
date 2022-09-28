@@ -6,7 +6,9 @@
 \usage{
 horizontal_flip(file_dir_vector)
 }
+\arguments{
+\item{file_dir_vector}{'spatial' directory for the 10X Visium-formatted file}
+}
 \description{
 Horizontally flip the image
 }
-\keyword{internal}

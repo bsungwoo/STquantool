@@ -43,17 +43,25 @@ frequency_boxplot(
 
 \item{cluster_colors}{the colors used to visualize each cluster}
 
-\item{x.axis.title}{x axis title, y.axis.title: y axis title}
+\item{x.axis.title}{x axis title}
+
+\item{y.axis.title}{y.axis.title}
 
 \item{legend.title}{title of the legend}
 
-\item{x.axis.title.size}{x axis title size, y.axis.title.size: y axis title size}
+\item{x.axis.title.size}{x axis title size}
 
-\item{x.axis.text.size}{x axis text size, y.axis.text.size: y axis text size}
+\item{y.axis.title.size}{y axis title size}
+
+\item{x.axis.text.size}{x axis text size}
+
+\item{y.axis.text.size}{y axis text size}
 
 \item{x.axis.text.angle}{x axis text angle (default: 0)}
 
-\item{legend.title.size}{legend title size, legend.text.size: legend text size}
+\item{legend.title.size}{legend title size}
+
+\item{legend.text.size}{legend text size}
 
 \item{vis.freq.text}{visualize frequency inside of the boxplot}
 
@@ -61,7 +69,9 @@ frequency_boxplot(
 
 \item{freq.stats}{whether to return frequency statistics}
 }
+\value{
+plot object and dataframe containing summarized statistics (when freq.stats=TRUE)
+}
 \description{
 Draw the frequency boxplot for spots
 }
-\keyword{internal}

@@ -6,10 +6,15 @@
 \alias{STquantool-package}
 \title{STquantool: ST analysis tool to visualize and quantify multiple datasets}
 \description{
-ST analysis tool based on R shiny platform to visualize and quantify multiple datasets. It first integrates and clusters multiple ST datasets based on reciprocal PCA. Then, it visualizes the results based on Seurat and clusterProfiler packages, finds differentially expressed genes, performs cell type decomposition, and quantify regional cell composition or gene expression
+ST analysis tool based on R shiny platform to visualize and quantify multiple datasets. It first integrates and clusters multiple ST datasets based on reciprocal PCA. Then, it visualizes the results based on Seurat and clusterProfiler packages, finds differentially expressed genes, performs cell type decomposition, and quantify regional cell composition or gene expression.
 }
 \author{
 \strong{Maintainer}: Sungwoo Bae \email{bsungwoo@snu.ac.kr} (\href{https://orcid.org/0000-0002-3484-3749}{ORCID})
+
+Authors:
+\itemize{
+  \item Hongyoon Choi \email{chy1000@snu.ac.kr} (\href{https://orcid.org/0000-0002-8895-2449}{ORCID})
+}
 
 }
 \keyword{internal}

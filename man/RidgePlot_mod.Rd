@@ -33,15 +33,20 @@ RidgePlot_mod(
 
 \item{title_size}{size of the title in each plot}
 
-\item{x.axis.title}{x axis title, y.axis.title: y axis title}
+\item{x.axis.title}{x axis title}
 
-\item{x.axis.title.size}{x axis title size, y.axis.title.size: y axis title size}
+\item{y.axis.title}{y.axis.title}
 
-\item{x.axis.text.size}{x axis text size, y.axis.text.size: y axis text size}
+\item{x.axis.title.size}{x axis title size}
+
+\item{y.axis.title.size}{y.axis.title.size}
+
+\item{x.axis.text.size}{x axis text size}
+
+\item{y.axis.text.size}{y.axis.text.size}
 
 \item{ncol}{column numbers for the plot (number of plots in the column)}
 }
 \description{
-Modified ridgeplot
+modified ridgeplot to fix min-max values
 }
-\keyword{internal}

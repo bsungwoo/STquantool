@@ -6,13 +6,20 @@ Authors@R:
              family = "Bae",
              role = c("aut", "cre"),
              email = "bsungwoo@snu.ac.kr",
-             comment = c(ORCID = "0000-0002-3484-3749")))
-Description: ST analysis tool based on R shiny platform to visualize and quantify multiple datasets. It first integrates and clusters multiple ST datasets based on reciprocal PCA. Then, it visualizes the results based on Seurat and clusterProfiler packages, finds differentially expressed genes, performs cell type decomposition, and quantify regional cell composition or gene expression
+             comment = c(ORCID = "0000-0002-3484-3749")),
+      person(given = "Hongyoon",
+             family = "Choi",
+             role = c("aut"),
+             email = "chy1000@snu.ac.kr",
+             comment = c(ORCID = "0000-0002-8895-2449")))
+Description: ST analysis tool based on R shiny platform to visualize and quantify multiple datasets. It first integrates and clusters multiple ST datasets based on reciprocal PCA. Then, it visualizes the results based on Seurat and clusterProfiler packages, finds differentially expressed genes, performs cell type decomposition, and quantify regional cell composition or gene expression.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
-Imports: 
+Depends:
+      R (>= 4.0.0)
+Imports:
       shiny (>= 1.7.2),
       shinyFiles,
       shinycssloaders,
@@ -20,21 +27,23 @@ Imports:
       shinymanager,
       shinyjs,
       shinythemes,
+      reticulate (>= 1.25),
       Seurat (>= 4.1.0),
       dplyr (>= 1.0.7),
-      rhdf5,
-      DT,
+      plyr,
+      DT (>= 0.24),
       data.table (>= 1.14.0),
-      BiocManager,
       EnhancedVolcano (>= 1.12.0),
       clusterProfiler (>= 4.2.2),
       org.Mm.eg.db,
       org.Hs.eg.db,
-      reticulate (>= 1.25),
-      colormap,
-      stringr,
-      moments,
+      colormap (>= 0.1.4),
+      moments (>= 0.14.1),
       magick (>= 2.7.3),
-      rjson,
-      ggpubr,
+      rjson (>= 0.2.21),
+      ggpubr (>= 0.4.0),
+      rstatix (>= 0.7.0),
       ggridges
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

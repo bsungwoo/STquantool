@@ -38,6 +38,8 @@ save_feat_plot_by_n(
 \arguments{
 \item{object}{the seurat object to visualize the clusters}
 
+\item{feats_of_interest}{feature to be visualized (genes, module scores...)}
+
 \item{grp}{assigned group name}
 
 \item{slide_title}{change the group title in each plot}
@@ -73,6 +75,10 @@ save_feat_plot_by_n(
 
 \item{slide.to.visualize}{vector representing number of slide to visualize: eg: c(1,3)}
 
+\item{cluster_name}{group name of a specific spot cluster to be visualized}
+
+\item{spot.cluster.highlight}{vector of spot cluster name to be highlighted}
+
 \item{height}{height of the printed image (by inch)}
 
 \item{width}{width of the printed image (by inch)}
@@ -83,9 +89,12 @@ save_feat_plot_by_n(
 
 \item{file_name}{header name of the image files to save}
 
-\item{feat_of_interest}{feature to be visualized (genes, module scores...)}
+\item{sort.by.expression}{sort the given feature according the the average expression in whole tissue}
+
+\item{assay}{assay of the data to use for calculation of average expression}
+
+\item{slot}{name of the slot to use in the given Seurat object}
 }
 \description{
 Automatically saving spatial feature plot by n
 }
-\keyword{internal}

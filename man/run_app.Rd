@@ -2,15 +2,16 @@
 % Please edit documentation in R/app.R
 \name{run_app}
 \alias{run_app}
-\title{Function to run STqunatools app}
+\title{Function to run STquantools app}
 \usage{
 run_app()
 }
 \value{
-starts shiny application for STquantools
-examples
-STquantool::run_app()
+Starts shiny application for STquantools
 }
 \description{
 ST analysis tool to visualize and quantify multiple datasets
+}
+\examples{
+STquantool::run_app()
 }

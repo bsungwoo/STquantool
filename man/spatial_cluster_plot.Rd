@@ -35,6 +35,10 @@ spatial_cluster_plot(
 
 \item{alpha}{transparency of the color spot on the tissue: default: c(0,1)}
 
+\item{image.alpha}{transparency of the tissue image (default 0.6)}
+
+\item{pt.size.factor}{size of the spot visualized on the tissue}
+
 \item{title_size}{size of the title for each spatial plot}
 
 \item{face}{the type of the text on the plot}
@@ -52,4 +56,3 @@ spatial_cluster_plot(
 \description{
 Visualizing the spot clusters: spatial mapping with labels
 }
-\keyword{internal}

@@ -17,7 +17,34 @@ preprocess_data(
   maximum_size = 6000 * 1024^2
 )
 }
+\arguments{
+\item{data_dir}{vector for the directories to load the single-cell data}
+
+\item{grp}{group name to assigned to each single-cell data}
+
+\item{data_type}{type of data to integrate (single-cell or spatial)}
+
+\item{filter_nfeature_RNA}{each element is the lower threshold for total number of detected genes in each single-cell data provided}
+
+\item{filter_percent_mt}{each element is the upper threshold for fraction of mitochondrial genes in each single-cell data provided}
+
+\item{reference_index}{vector for index number of the reference single-cell dataset in grp vector (default: NULL)
+\itemize{
+\item if input is c(1,5) it means that we will use first to fifth element of group as a reference
+\item if input is NULL it means that we will use all pairwise anchors for integration
+}}
+
+\item{n_var_features}{number of variable genes to be included in each single-cell dataset (default: 2000)}
+
+\item{cluster_dim}{PC dimension to be used for clustering of the spots (default: 30)}
+
+\item{cluster_resolution}{resolution during the clustering process (default: 0.5)}
+
+\item{maximum_size}{maximum size allowed for the analysis (default: 6GB)}
+}
+\value{
+Seurat object with a preprocessed dataset
+}
 \description{
 Simple preprocess data
 }
-\keyword{internal}

@@ -27,6 +27,5 @@ FeaturePlot_mod(
 \item{ncol}{column numbers for the plot (number of slides in the column)}
 }
 \description{
-Modified featureplot
+modified feature plot to fix the min-max values
 }
-\keyword{internal}

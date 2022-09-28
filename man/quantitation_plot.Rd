@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{quantitation_plot}
 \alias{quantitation_plot}
-\title{Quantitation of the data}
+\title{Quantitation of the regional values}
 \usage{
 quantitation_plot(
   object,
@@ -25,13 +25,69 @@ quantitation_plot(
   x.axis.text.angle = 90,
   legend.title.size = 12,
   legend.text.size = 12,
-  vis.cellf.text = FALSE,
-  cellf.text.size = 3.5,
-  cellf.stats = FALSE,
+  vis.value.text = FALSE,
+  value.text.size = 3.5,
+  return.stats = FALSE,
   spot.total.num.stats = FALSE
 )
 }
+\arguments{
+\item{object}{Seurat object to use during the analysis}
+
+\item{data.to.use}{values to use for the quantitation (it can be gene lists or metadata lists, however the two cannot be given together)}
+
+\item{group.to.compare}{group to compare between: x axis of the plot}
+
+\item{group.to.facet}{group to facet the plot}
+
+\item{agg.to.boxplot}{whether to aggregate all the data points included in each group.to.compare group and split and recode}
+
+\item{group.to.split}{group to split the aggregated plot with}
+
+\item{group.to.recode}{group to recode the 'group.to.split'
+\itemize{
+\item if the split group is orig.ident and is composed of "3mo_WT","7mo_WT","3mo_TG","7mo_TG", the recode group can be defined by reclassifying the each of element to "WT","WT","TG","TG"
+\item if the recode group is saved in object as 'cluster' then group.to.recode='cluster'
+}}
+
+\item{calculate_mode}{values to calculate in each group ('mean','sum', or 'boxplot')}
+
+\item{pairwise.comp.stats}{whether to calculate pairwise wilcoxon test and visualize p-value on top of each group}
+
+\item{cluster_colors}{the colors the use for the visualization}
+
+\item{plot_ncol}{the number of the facets in the column}
+
+\item{x.axis.title}{x axis title (default: '')}
+
+\item{y.axis.title}{y axis title (default: 'cell fraction')}
+
+\item{x.axis.title.size}{x axis title size (default: 20)}
+
+\item{y.axis.title.size}{y axis title size (default: 20)}
+
+\item{x.axis.text.size}{x axis text size (default: 10)}
+
+\item{y.axis.text.size}{y axis text size (default: 12)}
+
+\item{x.axis.text.angle}{x axis text angle (default: 90)}
+
+\item{vis.value.text}{whether to visualize the values on the barplot}
+
+\item{value.text.size}{size of the value text (y-axis)}
+
+\item{return.stats}{whether to return the statistics along with a plot}
+
+\item{spot.total.num.stats}{whether to calculate and return total number of spots in each group}
+
+\item{lengend.title.size}{size of the legend title (default: 12)}
+
+\item{legened.text.size}{size of the legend text(default: 12)}
+}
+\value{
+plot object and dataframe containing summarized statistics (when return.stats=TRUE)
+}
 \description{
-Quantitation of the data
+Quantitation of the regional values
 }
 \keyword{internal}

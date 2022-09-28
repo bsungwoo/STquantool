@@ -15,13 +15,23 @@ FindMarkers_mod(
   slot = "data",
   assay = NULL,
   min.pct = 0.1,
-  min.lognorm.count = 0,
   only.pos = FALSE,
   latent.vars = NULL,
   min.cells.group = 3
 )
 }
+\arguments{
+\item{object}{Seurat object to find markers}
+
+\item{purpose}{purpose of the function: marker discovery or differentially expressed genes finding}
+
+\item{group.to.find}{identity of the group to find markers within}
+
+\item{others}{refer to Seurat::FindMarkers}
+}
+\value{
+dataframe with average log fold change, percentage of cells detected in each group (ident.1 and ident.2), adjusted p-value and average feature value in each group
+}
 \description{
 Calculate markers for the cell type based on Seurat FindAllMarkers. Instead, the column containing average expression in each cluster was added
 }
-\keyword{internal}

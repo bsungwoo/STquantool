@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions.R
 \name{preprocess_data_integ_rpca}
 \alias{preprocess_data_integ_rpca}
-\title{Simple preprocess data}
+\title{Integrate datasets using reciprocal PCA in Seurat}
 \usage{
 preprocess_data_integ_rpca(
   data_dir,
@@ -48,7 +48,9 @@ preprocess_data_integ_rpca(
 
 \item{maximum_size}{maximum size allowed for the analysis (default: 6GB)}
 }
+\value{
+Seurat object with multiple integrated datasets
+}
 \description{
 Integrating single-cell or spatial datasets (Reciprocal PCA and Anchor finding)
 }
-\keyword{internal}
