@@ -1244,7 +1244,7 @@ quantitation_plot <- function(object,
   }
 
   for (j in 1:length(group_levels)){
-    eval(parse(text=paste0('sp_metadata_mod_group <- sp_metadata_mod %>% filter(',
+    eval(parse(text=paste0('sp_metadata_mod_group <- sp_metadata_mod %>% dplyr::filter(',
                            group.to.compare,'== group_levels[j]) %>%',
                            'dplyr::select(-c(',group.to.compare,'))')))
 
@@ -1254,7 +1254,7 @@ quantitation_plot <- function(object,
       # Calculate total number of spots per group
       eval(parse(text=paste0('total_number_facet_group <- sp_metadata_mod_group %>%',
                              'dplyr::group_by(',group.to.facet,') %>%',
-                             'dplyr::summarize(total=n()) %>%',
+                             'dplyr::summarize(total=dplyr::n()) %>%',
                              'dplyr::arrange(',group.to.facet,')')))
       if (agg.to.boxplot){
         total_number_facet_group$Recode <- group_levels_recode[total_number_facet_group[[group.to.facet]]]
@@ -1322,7 +1322,7 @@ quantitation_plot <- function(object,
 
   # Check if all the data is genes
   if (!identical(setdiff(data.to.use, colnames(sp_metadata)),character(0))){
-    df_total[["Values"]] <- log1p((df_total[["Values"]]))
+    df_total[["Values"]] <- log1p(df_total[["Values"]])
   }
 
   if (agg.to.boxplot){
@@ -1547,8 +1547,8 @@ FindMarkers_mod <- function(object, purpose="marker",
 
   df_append <- data.frame()
   if (purpose=="marker"){
-    total_exp_data <- log1p((Seurat::AverageExpression(object, assays=assay, slot=slot,
-                                                       group.by = group.to.find)[[1]]))
+    total_exp_data <- log1p(Seurat::AverageExpression(object, assays=assay, slot=slot,
+                                                      group.by = group.to.find)[[1]])
     for (i in levels(df[['cluster']])){
       df_tmp <- as.data.frame(total_exp_data[df[df['cluster']==i,][['gene']], i])
       df_append <- rbind(df_append, df_tmp)
@@ -1559,10 +1559,10 @@ FindMarkers_mod <- function(object, purpose="marker",
     total_exp_data <- Seurat::GetAssayData(object, assay=assay, slot=slot)
     exp_data1 <- Matrix::rowMeans(expm1(total_exp_data[df[['gene']],
                                                        Seurat::WhichCells(object, idents=ident.1)])) %>%
-      log1p() %>% as.data.frame()
+      log1p(.) %>% as.data.frame()
     exp_data2 <- Matrix::rowMeans(expm1(total_exp_data[df[['gene']],
                                                        Seurat::WhichCells(object, idents=ident.2)])) %>%
-      log1p() %>% as.data.frame()
+      log1p(.) %>% as.data.frame()
 
     df_append <- cbind(exp_data1, exp_data2)
     colnames(df_append) <- c("avg_exp_ident.1","avg_exp_ident.2")

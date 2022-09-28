@@ -1,9 +1,4 @@
 options(shiny.maxRequestSize = 50*1024*1024^2)
-
-#' Internal function to close browser
-#' @description Close app when closing browser
-#' @keywords internal
-#' @export
 jscode <- "shinyjs.closeWindow = function() { window.close(); }"
 
 #' Internal UI function
@@ -18,7 +13,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                           shiny::h4(style = "font-family:San-serif",
                              paste0("ST analysis tool to visualize and quantify multiple datasets")),
                           # Image insertion
-                          shiny::img(height=400,width=700,src="./www/Main.png"),
+                          shiny::img(height=400,width=700,src=system.file('www/Main.png', package = "STquantool")),
                           shinyjs::useShinyjs(),
                           shinyjs::extendShinyjs(text = jscode, functions = c("closeWindow")),
                           shiny::br(),
