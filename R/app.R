@@ -12,6 +12,8 @@ jscode <- "shinyjs.closeWindow = function() { window.close(); }"
 
 #' Internal UI function
 #' @description UI function for STquantool
+#' @importFrom dplyr "%>%"
+#' @importFrom DT "%>%"
 #' @keywords internal
 ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab"),
                  shiny::tabPanel(title = "Info",
@@ -1087,6 +1089,8 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
 #' Internal server function
 #' @description Server function for STquantool
 #' @keywords internal
+#' @importFrom dplyr "%>%"
+#' @importFrom DT "%>%"
 server <- function(input,output,session){
   # Directory setting
   shinyFiles::shinyDirChoose(

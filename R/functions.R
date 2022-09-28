@@ -17,6 +17,7 @@ flipModal <- function(text="vertically", input_name="ok_vertical") {
 #' Horizontally flip the image
 #' @description Horizontally flip the image
 #' @param file_dir_vector 'spatial' directory for the 10X Visium-formatted file
+#' @importFrom dplyr "%>%"
 #' @export
 horizontal_flip <- function(file_dir_vector){
 
@@ -49,6 +50,7 @@ horizontal_flip <- function(file_dir_vector){
 #' Vertically flip the image
 #' @description Vertically flip the image
 #' @param file_dir_vector 'spatial' directory for the 10X Visium-formatted file
+#' @importFrom dplyr "%>%"
 #' @export
 vertical_flip <- function(file_dir_vector){
 
@@ -701,6 +703,7 @@ spatial_cluster_plot <- function(object,grp=NULL,
 #' @param vis.freq.text visualize frequency inside of the boxplot
 #' @param freq.text.size size of the frequency text inside of the boxplot
 #' @param freq.stats whether to return frequency statistics
+#' @importFrom dplyr "%>%"
 #' @returns plot object and dataframe containing summarized statistics (when freq.stats=TRUE)
 #' @export
 frequency_boxplot <- function(object,grp=NULL,
@@ -1148,6 +1151,7 @@ RidgePlot_mod <- function(object,feat,groups='seurat_clusters',
 #' @param value.text.size size of the value text (y-axis)
 #' @param return.stats whether to return the statistics along with a plot
 #' @param spot.total.num.stats whether to calculate and return total number of spots in each group
+#' @importFrom dplyr "%>%"
 #' @returns plot object and dataframe containing summarized statistics (when return.stats=TRUE)
 #' @export
 quantitation_plot <- function(object,
@@ -1511,6 +1515,7 @@ NS_Forest_R <- function(object,assay="RNA",slot="data",
 #' @param group.to.find identity of the group to find markers within
 #' @param others refer to Seurat::FindMarkers
 #' @return dataframe with average log fold change, percentage of cells detected in each group (ident.1 and ident.2), adjusted p-value and average feature value in each group
+#' @importFrom dplyr "%>%"
 #' @export
 FindMarkers_mod <- function(object, purpose="marker",
                             group.to.find='seurat_clusters',
