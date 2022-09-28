@@ -1,11 +1,4 @@
 library(shiny)
-library(shinyFiles)
-library(shinycssloaders)
-library(shinybusy)
-library(shinymanager)
-library(shinyjs)
-library(shinythemes)
-
 library(DT)
 library(dplyr)
 
@@ -20,7 +13,21 @@ jscode <- "shinyjs.closeWindow = function() { window.close(); }"
 #' Internal UI function
 #' @description UI function for STquantool
 #' @keywords internal
-#' @export
+#' @importFrom shiny actionButton br checkboxInput column conditionalPanel
+#' @importFrom shiny dataTableOutput div downloadButton downloadHandler
+#' @importFrom shiny eventReactive fileInput flowLayout fluidPage fluidRow
+#' @importFrom shiny h1 h2 h3 h4 h5 h6 img isolate
+#' @importFrom shiny mainPanel modalButton modalDialog navbarMenu navbarPage
+#' @importFrom shiny observe observeEvent plotOutput radioButtons reactive
+#' @importFrom shiny reactiveVal reactiveValues removeModal renderDataTable
+#' @importFrom shiny renderImage renderPlot renderPrint renderTable
+#' @importFrom shiny renderText runApp
+#' @importFrom shiny selectInput selectizeInput
+#' @importFrom shiny shinyApp showModal
+#' @importFrom shiny sidebarLayout sidebarPanel sliderInput stopApp
+#' @importFrom shiny tableOutput tabPanel tabsetPanel textInput textOutput titlePanel
+#' @importFrom shiny updateCheckboxInput updateNumericInput updateRadioButtons updateSelectInput
+#' @importFrom shiny updateSelectizeInput updateSliderInput updateTextInput verbatimTextOutput wellPanel
 ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab"),
                  tabPanel(title = "Info",
                           h2(style = "font-family:San-serif", "STquantool"),
@@ -28,9 +35,9 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                           h4(style = "font-family:San-serif",
                              paste0("ST analysis tool to visualize and quantify multiple datasets")),
                           # Image insertion
-                          img(height=400,width=700,src="Main.png"),
-                          useShinyjs(),
-                          extendShinyjs(text = jscode, functions = c("closeWindow")),
+                          img(height=400,width=700,src=system.file("www", "Main.png", package="STquantool")),
+                          shinyjs::useShinyjs(),
+                          shinyjs::extendShinyjs(text = jscode, functions = c("closeWindow")),
                           br(),
                           actionButton("close", "End session")
                  ),
@@ -41,7 +48,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                               column(7,
                                      wellPanel(style = "height:350px;",
                                                h4("Set directory and make output folder"),
-                                               shinyDirButton("dir", "Find directory", "Search"),
+                                               shinyFiles::shinyDirButton("dir", "Find directory", "Search"),
                                                verbatimTextOutput("dir", placeholder = TRUE),
                                                actionButton(inputId = "set_wd", label = "Set working directory"),
                                                br(),
@@ -59,7 +66,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                                                             choices = list("Single-cell","Spatial", "Genes: stored", "Genes: abundance"),
                                                             selected = "Single-cell"),
                                                actionButton("data_save", "Data save"),
-                                               shinyFilesButton("data_load", "Data load", "Search", FALSE),
+                                               shinyFiles::shinyFilesButton("data_load", "Data load", "Search", FALSE),
                                                br(),br(),
                                                h4("Convert file to sparse matrix (.rds)"),
                                                actionButton("convert_file_to_sparse", "Convert")
@@ -82,7 +89,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                               tabsetPanel(id = "qc_tabset",
                                           tabPanel("Directory",
                                                    br(),
-                                                   shinyDirButton('qc_dir', 'Find directory for QC',
+                                                   shinyFiles::shinyDirButton('qc_dir', 'Find directory for QC',
                                                                   'Search'),
                                                    verbatimTextOutput("qc_dir", placeholder = TRUE),
                                                    radioButtons("qc_data_type","Data format",
@@ -177,7 +184,7 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
                           titlePanel("Preprocessing single or multiple datasets"),
                           mainPanel(
                             wellPanel(
-                              shinyDirButton('dir_integ', 'Integration directory',
+                              shinyFiles::shinyDirButton('dir_integ', 'Integration directory',
                                              'Search', multiple=TRUE),
                               verbatimTextOutput("dir_integ", placeholder = TRUE),
                               actionButton(inputId = "check_files", label = "Check Files"),
@@ -1092,10 +1099,27 @@ ui <- navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab
 )
 
 
-### Server function
+#' Internal server function
+#' @description Server function for STquantool
+#' @keywords internal
+#' @importFrom shiny actionButton br checkboxInput column conditionalPanel
+#' @importFrom shiny dataTableOutput div downloadButton downloadHandler
+#' @importFrom shiny eventReactive fileInput flowLayout fluidPage fluidRow
+#' @importFrom shiny h1 h2 h3 h4 h5 h6 img isolate
+#' @importFrom shiny mainPanel modalButton modalDialog navbarMenu navbarPage
+#' @importFrom shiny observe observeEvent plotOutput radioButtons reactive
+#' @importFrom shiny reactiveVal reactiveValues removeModal renderDataTable
+#' @importFrom shiny renderImage renderPlot renderPrint renderTable
+#' @importFrom shiny renderText runApp
+#' @importFrom shiny selectInput selectizeInput
+#' @importFrom shiny shinyApp showModal
+#' @importFrom shiny sidebarLayout sidebarPanel sliderInput stopApp
+#' @importFrom shiny tableOutput tabPanel tabsetPanel textInput textOutput titlePanel
+#' @importFrom shiny updateCheckboxInput updateNumericInput updateRadioButtons updateSelectInput
+#' @importFrom shiny updateSelectizeInput updateSliderInput updateTextInput verbatimTextOutput wellPanel
 server <- function(input,output,session){
   # Directory setting
-  shinyDirChoose(
+  shinyFiles::shinyDirChoose(
     input,
     'dir',
     roots = c(home = '/home/nmadmin/'),
@@ -1166,7 +1190,7 @@ server <- function(input,output,session){
 
 
   # Choose single-cell directory
-  shinyDirChoose(
+  shinyFiles::shinyDirChoose(
     input,
     'qc_dir',
     roots = c(home = '/home/nmadmin', wd ='.'),
@@ -1205,7 +1229,7 @@ server <- function(input,output,session){
   ## Load single-cell or spatial data for qc
   observeEvent(input$dir_qc, {
     if (!is.null(qc_path())){
-      show_modal_spinner()
+      shinybusy::show_modal_spinner()
       if (input$qc_data_type=='Single-cell'){
         if ("filtered_feature_bc_matrix" %in% list.files(qc_path())){
           data_path <- file.path(qc_path(), "filtered_feature_bc_matrix")
@@ -1234,7 +1258,7 @@ server <- function(input,output,session){
           v$sp_qc_data <- Seurat::PercentageFeatureSet(v$sp_qc_data, pattern = "^mt-", col.name = "percent.mt")
         }
       }
-      remove_modal_spinner()
+      shinybusy::remove_modal_spinner()
     }
   })
 
@@ -1374,7 +1398,7 @@ server <- function(input,output,session){
 
 
   ## Load single-cell or spatial data for integration
-  shinyDirChoose(
+  shinyFiles::shinyDirChoose(
     input,
     'dir_integ',
     roots = c(home = '/home/nmadmin', wd ='.'),
@@ -1466,7 +1490,7 @@ server <- function(input,output,session){
   observeEvent(input$integ_start, {
     if (length(input$dir_integ_sel)==1){
       if (input$preproc_radio=='Single-cell'){
-        show_modal_spinner()
+        shinybusy::show_modal_spinner()
         v$sc_data <- preprocess_data(data_dir=input$dir_integ_sel,
                                      grp=input$grp_name, data_type='Single-cell',
                                      filter_nfeature_RNA=input$nFeature_RNA_thres,
@@ -1474,15 +1498,15 @@ server <- function(input,output,session){
                                      n_var_features=input$n_var_features,
                                      cluster_dim=input$cluster_dim,
                                      cluster_resolution=input$cluster_resolution)
-        remove_modal_spinner()
+        shinybusy::remove_modal_spinner()
       } else if (input$preproc_radio=='Spatial'){
-        show_modal_spinner()
+        shinybusy::show_modal_spinner()
         v$sp_data <- preprocess_data(data_dir=input$dir_integ_sel,
                                      grp=input$grp_name, data_type='Spatial',
                                      n_var_features=input$n_var_features,
                                      cluster_dim=input$cluster_dim,
                                      cluster_resolution=input$cluster_resolution)
-        remove_modal_spinner()
+        shinybusy::remove_modal_spinner()
       }
     } else if (length(input$dir_integ_sel)>1) {
       grp <- sapply(strsplit(input$grp_name, ",")[[1]],
@@ -1499,7 +1523,7 @@ server <- function(input,output,session){
                                       function(x){as.numeric(x)})
         filter_percent_mt <- sapply(strsplit(input$percent_mt_thres, ",")[[1]],
                                     function(x){as.numeric(x)})
-        show_modal_spinner()
+        shinybusy::show_modal_spinner()
         v$sc_data <- preprocess_data_integ_rpca(data_dir=input$dir_integ_sel,
                                                 grp=grp, data_type='Single-cell',
                                                 filter_nfeature_RNA=filter_nfeature_RNA,
@@ -1510,9 +1534,9 @@ server <- function(input,output,session){
                                                 integ_dim=input$integ_dim,
                                                 cluster_dim=input$cluster_dim,
                                                 cluster_resolution=input$cluster_resolution)
-        remove_modal_spinner()
+        shinybusy::remove_modal_spinner()
       } else if (input$preproc_radio=='Spatial') {
-        show_modal_spinner()
+        shinybusy::show_modal_spinner()
         v$sp_data <- preprocess_data_integ_rpca(data_dir=input$dir_integ_sel,
                                                 grp=grp, data_type='Spatial',
                                                 reference_index=reference,
@@ -1521,7 +1545,7 @@ server <- function(input,output,session){
                                                 integ_dim=input$integ_dim,
                                                 cluster_dim=input$cluster_dim,
                                                 cluster_resolution=input$cluster_resolution)
-        remove_modal_spinner()
+        shinybusy::remove_modal_spinner()
       }
     }
 
@@ -1530,7 +1554,7 @@ server <- function(input,output,session){
 
   ## Update the metadata and genes of single-cell and spatial data
   observeEvent(v$sc_data, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     temp <- v$sc_data
     v$sc_gene_list <- c()
     v$sc_meta_list_factor <- c()
@@ -1555,11 +1579,11 @@ server <- function(input,output,session){
       v$sc_meta_list_factor <- sort(sel_list)
       v$sc_meta_list_value <- sort(sel_list_inv)
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
   observeEvent(v$sp_data, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     temp <- v$sp_data
     v$sp_gene_list <- c()
     v$sp_meta_list_factor <- c()
@@ -1586,7 +1610,7 @@ server <- function(input,output,session){
       v$sp_meta_list_value <- sort(sel_list_inv)
       v$sp_spot_num <- dim(temp)[2]
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
   ## Update the gene list
@@ -2050,13 +2074,13 @@ server <- function(input,output,session){
                                    action_button_name = "ok_sp_feat_upload"))
   })
   observeEvent(input$ok_sp_feat_upload, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$sp_csv_table)&!is.null(input$sp_column_select)){
       data_table <- v$sp_csv_table
       data_gene <- data_table[[input$sp_column_select]]
       v[['gene_upload']][[input$sp_feat_save_name]] <- intersect(v$sp_gene_list, data_gene)
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 
@@ -2088,7 +2112,7 @@ server <- function(input,output,session){
 
   # Start save feature by n
   observeEvent(input$sp_feat_save_by_n, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$sp_csv_table)&!is.null(input$sp_column_select)){
       data_tmp <- v$sp_csv_table
       eval(parse(text=paste0('sp_feat_list <- data_tmp$',input$sp_column_select)))
@@ -2125,7 +2149,7 @@ server <- function(input,output,session){
         }
       }
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 
@@ -2511,7 +2535,7 @@ server <- function(input,output,session){
                                    action_button_name = "ok_sc_marker_gene"))
   })
   observeEvent(input$ok_sc_marker_gene, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$sc_marker)){
       if (sc_marker_list()[[5]]=='Wilcoxon'){
         for (i in levels(factor(v$sc_marker[['cluster']]))){
@@ -2533,7 +2557,7 @@ server <- function(input,output,session){
         }
       }
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
   output$sc_deg_table <- DT::renderDataTable({
@@ -2591,11 +2615,11 @@ server <- function(input,output,session){
   })
 
   observeEvent(input$ok_sc_deg, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$DEG)){
       v[['gene_upload']][[input$deg_save_name]] <- v$DEG[['gene']]
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 
@@ -2679,11 +2703,11 @@ server <- function(input,output,session){
   })
 
   observeEvent(input$ok_sc_deg_volcano, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$deg_subset)){
       v[['gene_upload']][[input$deg_volcano_save_name]] <- v$deg_subset[['gene']]
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 
@@ -2795,7 +2819,7 @@ server <- function(input,output,session){
 
   # Perform annotation
   observeEvent(input$cluster_new_idents, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (input$annotation_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$annotation_radio=="Spatial"){
@@ -2838,7 +2862,7 @@ server <- function(input,output,session){
         }
       }
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 
@@ -2869,7 +2893,7 @@ server <- function(input,output,session){
   })
 
   observeEvent(input$module_score_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (input$module_score_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$module_score_radio=="Spatial"){
@@ -2893,7 +2917,7 @@ server <- function(input,output,session){
         }
       }
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 
@@ -2945,7 +2969,7 @@ server <- function(input,output,session){
                                    action_button_name = "ok_module_score_feat_upload"))
   })
   observeEvent(input$ok_module_score_feat_upload, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$module_table)&!is.null(input$module_table_select)){
       data_table <- v$module_table
       data_gene <- data_table[[input$module_table_select]]
@@ -2956,7 +2980,7 @@ server <- function(input,output,session){
       }
       v[['gene_upload']][[input$module_score_feat_save_name]] <- intersect(gene_list, data_gene)
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 
@@ -2987,7 +3011,7 @@ server <- function(input,output,session){
     }
   })
   observeEvent(input$subset_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (input$subset_radio=="Single-cell"){
       temp <- v$sc_data
     } else if (input$subset_radio=="Spatial"){
@@ -3033,7 +3057,7 @@ server <- function(input,output,session){
         v$sp_data <- temp
       }
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 
@@ -3126,7 +3150,7 @@ server <- function(input,output,session){
 
   ## Quantitation plot
   observeEvent(input$quantitation_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (((input$quantitation_agg_mode &
           input$quantitation_comp_group != input$quantitation_split_group)|
          (!input$quantitation_agg_mode &
@@ -3194,7 +3218,7 @@ server <- function(input,output,session){
         }
       }
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
   output$quantitation_plot <- renderPlot({
@@ -3229,7 +3253,7 @@ server <- function(input,output,session){
     }
   })
   observeEvent(input$celldart_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$sp_data)&!is.null(v$sc_data)){
       brain.tmp <- pred_cellf_celldart(sp_data=v$sp_data,sc_data=v$sc_data,
                                        outdir=file.path(global$datapath,input$output_folder_name),
@@ -3248,7 +3272,7 @@ server <- function(input,output,session){
                                        init_train_epoch=input$celldart_init_train_epoch)
       v$sp_data <- brain.tmp
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 
@@ -3263,7 +3287,7 @@ server <- function(input,output,session){
                                  action_button_name = "sc_clust_save_start"))
   })
   observeEvent(input$sc_clust_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     v$dimplot
     if (!is.null(input$sc_cell_high_cluster)&input$sc_cell_high){
       cell_highlight <- paste(input$sc_cell_high_cluster, collapse = '_')
@@ -3278,7 +3302,7 @@ server <- function(input,output,session){
                 width = input$sc_clust_width,
                 height = input$sc_clust_height, units = c("cm"),
                 dpi = input$sc_clust_save_dpi, bg = "white")})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3292,7 +3316,7 @@ server <- function(input,output,session){
   })
 
   observeEvent(input$sc_freq_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     v$freq_boxplot[[1]]
     try({ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
@@ -3301,7 +3325,7 @@ server <- function(input,output,session){
                                  input$sc_cluster_var_freq,'.png')),
                 width = input$sc_freq_width, height = input$sc_freq_height, units = c("cm"),
                 dpi = input$sc_freq_save_dpi, bg = "white")})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3315,7 +3339,7 @@ server <- function(input,output,session){
                                  action_button_name = "sc_feat_save_start"))
   })
   observeEvent(input$sc_feat_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     v$sc_featureplot
     try({ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
@@ -3325,7 +3349,7 @@ server <- function(input,output,session){
                 height = input$sc_feat_height,
                 units = c("cm"),
                 dpi = input$sc_feat_save_dpi, bg = "white")})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3339,7 +3363,7 @@ server <- function(input,output,session){
                                  action_button_name = "sp_cluster_save_start"))
   })
   observeEvent(input$sp_cluster_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     v$sc_clusterplot
     try({ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
@@ -3347,7 +3371,7 @@ server <- function(input,output,session){
                 width = input$sp_cluster_width,
                 height = input$sp_cluster_height, units = c("cm"),
                 dpi = input$sp_cluster_save_dpi, bg = "white")})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3361,7 +3385,7 @@ server <- function(input,output,session){
                                  action_button_name = "sp_feat_save_start"))
   })
   observeEvent(input$sp_feat_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     v$sp_featureplot
     try({ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
@@ -3370,7 +3394,7 @@ server <- function(input,output,session){
                 width = input$sp_feat_width,
                 height = input$sp_feat_height, units = c("cm"),
                 dpi = input$sp_feat_save_dpi, bg = "white")})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3384,7 +3408,7 @@ server <- function(input,output,session){
                                  action_button_name = "vln_save_start"))
   })
   observeEvent(input$vln_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$vlnplot)){
       patchwork::wrap_plots(v$vlnplot, ncol=input$vln_ncol)
     }
@@ -3395,7 +3419,7 @@ server <- function(input,output,session){
                 width = input$vln_width,
                 height = input$vln_height, units = c("cm"),
                 dpi = input$vln_save_dpi, bg = "white")})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3409,7 +3433,7 @@ server <- function(input,output,session){
                                  action_button_name = "ridge_save_start"))
   })
   observeEvent(input$ridge_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     v$ridgeplot
     try({ggsave(file.path(global$datapath,input$output_folder_name,
                           'data_files',
@@ -3418,7 +3442,7 @@ server <- function(input,output,session){
                 width = input$ridge_width,
                 height = input$ridge_height, units = c("cm"),
                 dpi = input$ridge_save_dpi, bg = "white")})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3432,7 +3456,7 @@ server <- function(input,output,session){
                                  action_button_name = "sc_deg_volcano_save_start"))
   })
   observeEvent(input$sc_deg_volcano_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     try({if (input$sc_check_deg_subset){
       grDevices::png(file.path(global$datapath,input$output_folder_name,
                                'data_files',
@@ -3454,7 +3478,7 @@ server <- function(input,output,session){
     }
       print(v$volcano)
       grDevices::dev.off()})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3467,7 +3491,7 @@ server <- function(input,output,session){
                                  action_button_name = "sc_deg_enrich_save_start"))
   })
   observeEvent(input$sc_deg_enrich_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     try({if (input$sc_check_deg_subset){
       grDevices::png(file.path(global$datapath,input$output_folder_name,
                                'data_files',
@@ -3491,7 +3515,7 @@ server <- function(input,output,session){
     }
       print(v$dotplot)
       grDevices:dev.off()})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3505,7 +3529,7 @@ server <- function(input,output,session){
                                  action_button_name = "quantitation_save_start"))
   })
   observeEvent(input$quantitation_save_start, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     v$quantitation_result[[1]]
 
     if (input$quantitation_cellf_mode=="metadata"){
@@ -3538,7 +3562,7 @@ server <- function(input,output,session){
              height = input$quantitation_height, units = c("cm"),
              dpi = input$quantitation_save_dpi, bg = "white")
     }})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
   })
 
@@ -3560,38 +3584,38 @@ server <- function(input,output,session){
     }
   })
   observeEvent(input$ok_sc, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     try({saveRDS(v$sc_data, file.path(global$datapath,input$output_folder_name,
                                       paste0(input$sc_save_file_name,'.rds')))})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
     output$cmd <- renderText({paste0('The single-cell data was saved as RDS in ',
                                      file.path(global$datapath,input$output_folder_name))})
   })
   observeEvent(input$ok_sp, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     try({saveRDS(v$sp_data, file.path(global$datapath,input$output_folder_name,
                                       paste0(input$sp_save_file_name,'.rds')))})
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
     output$cmd <- renderText({paste0('The spatial data was saved as RDS in ',
                                      file.path(global$datapath,input$output_folder_name))})
   })
   observeEvent(input$ok_stored_gene, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$gene_upload)){
       try({utils::write.table(t(plyr::ldply(v$gene_upload, rbind)),
                               file = file.path(global$datapath,input$output_folder_name,
                                                paste0(input$sp_save_stored_gene,'.csv')),
                               sep=',', col.names=FALSE)})
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
     output$cmd <- renderText({paste0('The gene lists were saved as csv in ',
                                      file.path(global$datapath,input$output_folder_name))})
   })
   observeEvent(input$ok_ab_gene, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$sc_gene_list)&!is.null(v$sp_gene_list)){
       try({utils::write.table(t(plyr::ldply(list("Single.cell.top3000"=v$sc_gene_list,
                                                  "Spatial.top3000"=v$sp_gene_list), rbind)),
@@ -3607,7 +3631,7 @@ server <- function(input,output,session){
                             file.path(global$datapath,input$output_folder_name,
                                       paste0(input$sp_save_ab_gene,'.csv')), col.names = T)})
     }
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
     removeModal()
     output$cmd <- renderText({paste0('The abundance list was saved as csv in ',
                                      file.path(global$datapath,input$output_folder_name))})
@@ -3615,7 +3639,7 @@ server <- function(input,output,session){
 
 
   # Load single-cell or spatial data in RDS format
-  shinyFileChoose(input, 'data_load',
+  shinyFiles::shinyFileChoose(input, 'data_load',
                   roots = c(home = '/home/nmadmin', wd ='.'),
                   filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad"))
 
@@ -3635,14 +3659,14 @@ server <- function(input,output,session){
 
     if (next_step){
       if (input$save_radio=="Single-cell"){
-        show_modal_spinner()
+        shinybusy::show_modal_spinner()
         v$sc_data <- readRDS(load_path)
-        remove_modal_spinner()
+        shinybusy::remove_modal_spinner()
         output$cmd <- renderText({paste0("'",load_path,"' was loaded")})
       } else if (input$save_radio=="Spatial"){
-        show_modal_spinner()
+        shinybusy::show_modal_spinner()
         v$sp_data <- readRDS(load_path)
-        remove_modal_spinner()
+        shinybusy::remove_modal_spinner()
         output$cmd <- renderText({paste0("'",load_path,"' was loaded")})
       } else if (input$save_radio=="Genes: stored"){
         if (!is.null(v$sp_gene_list)){
@@ -3690,7 +3714,7 @@ server <- function(input,output,session){
   })
 
   # Choose the files to convert
-  shinyFileChoose(input, 'choose_file_to_convert',
+  shinyFiles::shinyFileChoose(input, 'choose_file_to_convert',
                   roots = c(home = '/home/nmadmin', wd ='.'),
                   filetypes = c('',"txt","csv"))
 
@@ -3749,7 +3773,7 @@ server <- function(input,output,session){
 
   ## Convert to 10X format
   observeEvent(input$convert_file_ok, {
-    show_modal_spinner()
+    shinybusy::show_modal_spinner()
     if (!is.null(v$load_path)){
       read_total <- data.table::fread(v$load_path,
                                       header = input$file_load_header_check,
@@ -3789,7 +3813,7 @@ server <- function(input,output,session){
       }
     }
     removeModal()
-    remove_modal_spinner()
+    shinybusy::remove_modal_spinner()
   })
 
 

@@ -24,7 +24,6 @@ Imports:
       shinyFiles,
       shinycssloaders,
       shinybusy,
-      shinymanager,
       shinyjs,
       shinythemes,
       reticulate (>= 1.25),

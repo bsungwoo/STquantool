@@ -1,9 +1,4 @@
-library(Seurat)
-library(dplyr)
 library(shiny)
-library(shinycssloaders)
-library(shinyjs)
-
 library(ggpubr)
 library(dplyr)
 
@@ -11,9 +6,9 @@ library(dplyr)
 #' @description Flip the image
 #' @keywords internal
 flipModal <- function(text="vertically", input_name="ok_vertical") {
-  modalDialog(
-    div(tags$b(paste0("Will you ",text," flip the image?"), style = "color: black;")),
-    footer = tagList(
+  shiny::modalDialog(
+    shiny::div(tags$b(paste0("Will you ",text," flip the image?"), style = "color: black;")),
+    footer = shiny::tagList(
       modalButton("Cancel"),
       actionButton(input_name, "OK")
     )
@@ -88,16 +83,16 @@ vertical_flip <- function(file_dir_vector){
 #' @description Save the images
 #' @keywords internal
 save_plot_Modal <- function(slider_input_name="save_dpi", action_button_name = "save_start") {
-  modalDialog(
-    div(tags$b("Options for saving a plot"), style = "color: blue;"),
-    wellPanel(
-      sliderInput(inputId = slider_input_name,
-                  label = "dpi to save image",
-                  value = 100, min = 0, max=500, step=10)
+  shiny::modalDialog(
+    shiny::div(tags$b("Options for saving a plot"), style = "color: blue;"),
+    shiny::wellPanel(
+      shiny::sliderInput(inputId = slider_input_name,
+                         label = "dpi to save image",
+                         value = 100, min = 0, max=500, step=10)
     ),
     footer = tagList(
-      modalButton("Cancel"),
-      actionButton(action_button_name, "Save")
+      shiny::modalButton("Cancel"),
+      shiny::actionButton(action_button_name, "Save")
     )
   )
 }
@@ -108,22 +103,22 @@ save_plot_Modal <- function(slider_input_name="save_dpi", action_button_name = "
 save_plot_wh_Modal <- function(slider_input_name="save_dpi", width_name = "deg_width",
                                height_name = "deg_height", width_value=13, height_value=15,
                                action_button_name = "save_start") {
-  modalDialog(
-    div(tags$b("Options for saving a plot"), style = "color: blue;"),
-    wellPanel(
-      sliderInput(inputId = slider_input_name,
-                  label = "dpi to save image",
-                  value = 100, min = 0, max=500, step=10),
-      sliderInput(inputId = width_name,
-                  label = "Width in cm",
-                  value = width_value, min=0, max=50, step=1),
-      sliderInput(inputId = height_name,
-                  label = "Height in cm",
-                  value = height_value, min=0, max=50, step=1)
+  shiny::modalDialog(
+    shiny::div(tags$b("Options for saving a plot"), style = "color: blue;"),
+    shiny::wellPanel(
+      shiny::sliderInput(inputId = slider_input_name,
+                         label = "dpi to save image",
+                         value = 100, min = 0, max=500, step=10),
+      shiny::sliderInput(inputId = width_name,
+                         label = "Width in cm",
+                         value = width_value, min=0, max=50, step=1),
+      shiny::sliderInput(inputId = height_name,
+                         label = "Height in cm",
+                         value = height_value, min=0, max=50, step=1)
     ),
-    footer = tagList(
-      modalButton("Cancel"),
-      actionButton(action_button_name, "Save")
+    footer = shiny::tagList(
+      shiny::modalButton("Cancel"),
+      shiny::actionButton(action_button_name, "Save")
     )
   )
 }
@@ -140,21 +135,21 @@ save_files_Modal <- function(text="single-cell",
                              add_text_input_name="sc_save_name_add",
                              add_text_input_explain='Name of the file',
                              add_file_save_name="sc_data", action_button_name = "ok_sc") {
-  modalDialog(
-    div(tags$b(paste0(text_for_purpose,text,text_for_add), style = "color: black;")),
-    wellPanel(
-      textInput(inputId = text_input_name,
-                label = text_input_explain,
-                value = file_save_name),
+  shiny::modalDialog(
+    shiny::div(tags$b(paste0(text_for_purpose,text,text_for_add), style = "color: black;")),
+    shiny::wellPanel(
+      shiny::textInput(inputId = text_input_name,
+                       label = text_input_explain,
+                       value = file_save_name),
       if (add_text_input){
-        textInput(inputId = add_text_input_name,
-                  label = add_text_input_explain,
-                  value = add_file_save_name)
+        shiny::textInput(inputId = add_text_input_name,
+                         label = add_text_input_explain,
+                         value = add_file_save_name)
       }
     ),
-    footer = tagList(
-      modalButton("Cancel"),
-      actionButton(action_button_name, "OK")
+    footer = shiny::tagList(
+      shiny::modalButton("Cancel"),
+      shiny::actionButton(action_button_name, "OK")
     )
   )
 }
@@ -182,34 +177,34 @@ load_files_Modal <- function(input, output, session, text="csv or txt",
                              action_button_name1 = "check_load",
                              action_button_name2 = "ok_load",
                              result_table = "table_check") {
-  modalDialog(
-    div(tags$b(paste0(text_for_purpose,text,text_for_add), style = "color: black;")),
-    wellPanel(
-      textInput(inputId = text_input_name,
-                label = text_input_explain,
-                value = file_save_name),
-      radioButtons(radio_input_name, radio_input_explain,
-                   choices = list("Comma","Tab","Space"), selected = "Comma"),
-      numericInput(numeric_input_name1,
-                   label = numeric_input_explain1,
-                   value = 1, min = 1, max=5),
-      numericInput(numeric_input_name2,
-                   label = numeric_input_explain2,
-                   value = 0, min = 0, max=5),
-      checkboxInput(check_input_name1, "Header", TRUE),
-      checkboxInput(check_input_name2, "Transpose", FALSE),
-      checkboxInput(check_input_name3, "Shift one column", FALSE),
-      modalButton("Cancel"),
-      shinyFilesButton(files_button_name, files_button_explain,
-                       files_button_text, multiple=FALSE),
-      actionButton(action_button_name1, "Check"),
-      actionButton(action_button_name2, "Convert")
+  shiny::modalDialog(
+    shiny::div(tags$b(paste0(text_for_purpose,text,text_for_add), style = "color: black;")),
+    shiny::wellPanel(
+      shiny::textInput(inputId = text_input_name,
+                       label = text_input_explain,
+                       value = file_save_name),
+      shiny::radioButtons(radio_input_name, radio_input_explain,
+                          choices = list("Comma","Tab","Space"), selected = "Comma"),
+      shiny::numericInput(numeric_input_name1,
+                          label = numeric_input_explain1,
+                          value = 1, min = 1, max=5),
+      shiny::numericInput(numeric_input_name2,
+                          label = numeric_input_explain2,
+                          value = 0, min = 0, max=5),
+      shiny::checkboxInput(check_input_name1, "Header", TRUE),
+      shiny::checkboxInput(check_input_name2, "Transpose", FALSE),
+      shiny::checkboxInput(check_input_name3, "Shift one column", FALSE),
+      shiny::modalButton("Cancel"),
+      shinyFiles::shinyFilesButton(files_button_name, files_button_explain,
+                                   files_button_text, multiple=FALSE),
+      shiny::actionButton(action_button_name1, "Check"),
+      shiny::actionButton(action_button_name2, "Convert")
     ),
-    wellPanel(
-      h5("First 20 rows and 3 columns are shown"),
-      DT::dataTableOutput(session$ns(result_table)) %>% withSpinner(color="#0000FF")
+    shiny::wellPanel(
+      shiny::h5("First 20 rows and 3 columns are shown"),
+      DT::dataTableOutput(session$ns(result_table)) %>% shinycssloaders::withSpinner(color="#0000FF")
     ),
-    footer = tagList(
+    footer = shiny::tagList(
     ),
     size = "l"
   )
@@ -224,16 +219,16 @@ save_gene_list_Modal <- function(text_for_purpose='Will you save the given gene 
                                  text_input_explain = "Name of the gene list",
                                  file_save_name="Gene list",
                                  action_button_name = "ok_gene") {
-  modalDialog(
-    div(tags$b(paste0(text_for_purpose), style = "color: black;")),
-    wellPanel(
-      textInput(inputId = text_input_name,
-                label = text_input_explain,
-                value = file_save_name)
+  shiny::modalDialog(
+    shiny::div(tags$b(paste0(text_for_purpose), style = "color: black;")),
+    shiny::wellPanel(
+      shiny::textInput(inputId = text_input_name,
+                       label = text_input_explain,
+                       value = file_save_name)
     ),
-    footer = tagList(
-      modalButton("Cancel"),
-      actionButton(action_button_name, "OK")
+    footer = shiny::tagList(
+      shiny::modalButton("Cancel"),
+      shiny::actionButton(action_button_name, "OK")
     )
   )
 }
