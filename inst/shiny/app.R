@@ -13,7 +13,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                           shiny::h4(style = "font-family:San-serif",
                              paste0("ST analysis tool to visualize and quantify multiple datasets")),
                           # Image insertion
-                          shiny::img(height=400,width=700,src=system.file('www/Main.png', package = "STquantool")),
+                          shiny::img(height=400,width=700,src='Main.png'),
                           shinyjs::useShinyjs(),
                           shinyjs::extendShinyjs(text = jscode, functions = c("closeWindow")),
                           shiny::br(),
@@ -1269,15 +1269,15 @@ server <- function(input,output,session){
       temp <- qc_list_sc()[[7]]
       # Draw histogram for total count, nFeature_RNA, and percent mitochondrial genes
       if (qc_list_sc()[[6]] == "nCount_RNA"){
-        grahics::hist(temp@meta.data$nCount_RNA, breaks=qc_list_sc()[[4]],
+        graphics::hist(temp@meta.data$nCount_RNA, breaks=qc_list_sc()[[4]],
              xlim=c(0,qc_list_sc()[[5]]), main = "Histogram for nCount_RNA",
              xlab = "nCount_RNA")
       } else if (qc_list_sc()[[6]] == "nFeature_RNA"){
-        grahics::hist(temp@meta.data$nFeature_RNA, breaks=qc_list_sc()[[4]],
+        graphics::hist(temp@meta.data$nFeature_RNA, breaks=qc_list_sc()[[4]],
              xlim=c(0,qc_list_sc()[[5]]), main = "Histogram for nFeature_RNA",
              xlab = "nFeature_RNA")
       } else if (qc_list_sc()[[6]] == "percent.mt"){
-        grahics::hist(temp@meta.data$percent.mt, breaks=qc_list_sc()[[4]],
+        graphics::hist(temp@meta.data$percent.mt, breaks=qc_list_sc()[[4]],
              xlim=c(0,qc_list_sc()[[5]]), main = "Histogram for percent.mt",
              xlab = "percent.mt")
       }
@@ -1318,15 +1318,15 @@ server <- function(input,output,session){
       temp <- qc_list_sp()[[8]]
       # Draw histogram for total count, nFeature_RNA, and percent mitochondrial genes
       if (qc_list_sp()[[6]] == "nCount_Spatial"){
-        grahics::hist(temp@meta.data$nCount_Spatial, breaks=qc_list_sp()[[4]],
+        graphics::hist(temp@meta.data$nCount_Spatial, breaks=qc_list_sp()[[4]],
              xlim=c(0,qc_list_sp()[[5]]), main = "Histogram for nCount_Spatial",
              xlab = "nCount_Spatial")
       } else if (qc_list_sp()[[6]] == "nFeature_Spatial"){
-        grahics::hist(temp@meta.data$nFeature_Spatial, breaks=qc_list_sp()[[4]],
+        graphics::hist(temp@meta.data$nFeature_Spatial, breaks=qc_list_sp()[[4]],
              xlim=c(0,qc_list_sp()[[5]]), main = "Histogram for nFeature_Spatial",
              xlab = "nFeature_Spatial")
       } else if (qc_list_sp()[[6]] == "percent.mt"){
-        grahics::hist(temp@meta.data$percent.mt, breaks=qc_list_sp()[[4]],
+        graphics::hist(temp@meta.data$percent.mt, breaks=qc_list_sp()[[4]],
              xlim=c(0,qc_list_sp()[[5]]), main = "Histogram for percent.mt",
              xlab = "percent.mt")
       }
@@ -2681,11 +2681,15 @@ server <- function(input,output,session){
   sc_deg_enrich_plot <- shiny::eventReactive(input$sc_deg_enrich_start, {
     if(!is.null(v$DEG)){
       deg_subset <- v$DEG
-      if (as.numeric(input$sc_deg_enrich_logfc) < 0){logfc <- "-"+input$sc_deg_enrich_logfc}
-      else {logfc <-input$sc_deg_enrich_logfc}
-      eval(parse(text=paste0('v$deg_enrich_subset <- deg_subset[deg_subset$p_val_adj<',
-                             input$sc_deg_enrich_p,
-                             ' & deg_subset$avg_log2FC>',logfc,',]')))
+      if (as.numeric(input$sc_deg_enrich_logfc) < 0){
+        eval(parse(text=paste0('v$deg_enrich_subset <- deg_subset[deg_subset$p_val_adj<',
+                               input$sc_deg_enrich_p,
+                               ' & deg_subset$avg_log2FC< ',input$sc_deg_enrich_logfc,',]')))
+      } else {
+        eval(parse(text=paste0('v$deg_enrich_subset <- deg_subset[deg_subset$p_val_adj<',
+                               input$sc_deg_enrich_p,
+                               ' & deg_subset$avg_log2FC> ',input$sc_deg_enrich_logfc,',]')))
+      }
     }
 
     list(input$sc_deg_enrich_type, input$sc_deg_enrich_species,
@@ -2872,9 +2876,9 @@ server <- function(input,output,session){
         feature_list <- input$module_score_list
       }
       if (!is.null(feature_list)){
-        temp <- Seurat::AddModuleScore(temp,
-                                       features = list(feature_list),
-                                       name = input$module_score_name)
+        try({temp <- Seurat::AddModuleScore(temp,
+                                            features = list(feature_list),
+                                            name = input$module_score_name)})
         if (input$module_score_radio=="Single-cell"){
           v$sc_data <- temp
         } else if (input$module_score_radio=="Spatial"){

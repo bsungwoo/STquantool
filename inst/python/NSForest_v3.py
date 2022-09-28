@@ -1,4 +1,5 @@
 ## Modified NSForest function from https://github.com/JCVenterInstitute/NSForest
+## Aevermann BD, Zhang Y, Novotny M, Keshk M, Bakken TE, Miller JA, Hodge RD, Lelieveldt B, Lein ES, Scheuermann RH. A machine learning method for the discovery of minimum marker gene combinations for cell-type identification from single-cell RNA sequencing. Genome Res. 2021 Jun 4:gr.275569.121. doi: 10.1101/gr.275569.121.
 
 def NS_Forest(adata, outdir, clusterLabelcolumnHeader = "louvain", rfTrees = 1000, 
               Median_Expression_Level = 0, Genes_to_testing = 6, betaValue = 0.5):
