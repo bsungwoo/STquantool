@@ -1,6 +1,3 @@
-library(shiny)
-library(dplyr)
-
 #' Internal Modal function to flip the image
 #' @description Flip the image
 #' @keywords internal

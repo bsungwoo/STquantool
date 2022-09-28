@@ -1,7 +1,3 @@
-library(shiny)
-library(DT)
-library(dplyr)
-
 options(shiny.maxRequestSize = 50*1024*1024^2)
 
 #' Internal function to close browser
@@ -22,7 +18,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                           shiny::h4(style = "font-family:San-serif",
                              paste0("ST analysis tool to visualize and quantify multiple datasets")),
                           # Image insertion
-                          shiny::img(height=400,width=700,src="Main.png"),
+                          shiny::img(height=400,width=700,src="./www/Main.png"),
                           shinyjs::useShinyjs(),
                           shinyjs::extendShinyjs(text = jscode, functions = c("closeWindow")),
                           shiny::br(),
@@ -86,13 +82,13 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                           ),
                                           shiny::tabPanel("Single-cell",
                                                    shiny::wellPanel(
-                                                     sliderInput(inputId = "nCount_RNA",
+                                                     shiny::sliderInput(inputId = "nCount_RNA",
                                                                  label = "nCount_RNA: threshold",
                                                                  value = 100, min = 0, max = 1000, step=10),
-                                                     sliderInput(inputId = "percent.mt",
+                                                     shiny::sliderInput(inputId = "percent.mt",
                                                                  label = "percent.mt: threshold",
                                                                  value = 5, min = 0, max = 100, step=1),
-                                                     sliderInput(inputId = "nFeature_RNA",
+                                                     shiny::sliderInput(inputId = "nFeature_RNA",
                                                                  label = "nFeature_RNA: threshold",
                                                                  value = 300, min = 0, max = 1000, step=10)
                                                    ),
@@ -100,10 +96,10 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                      shiny::radioButtons("qc_radio","Histogram choices",
                                                                   choices = list("nCount_RNA", "nFeature_RNA", "percent.mt"),
                                                                   selected = "nCount_RNA"),
-                                                     sliderInput(inputId = "histo_breaks",
+                                                     shiny::sliderInput(inputId = "histo_breaks",
                                                                  label = "Histogram breaks",
                                                                  value = 5000, min = 0, max = 10000, step=100),
-                                                     sliderInput(inputId = "histo_xmax",
+                                                     shiny::sliderInput(inputId = "histo_xmax",
                                                                  label = "Histogram limits",
                                                                  value = 2000, min = 0, max = 3000, step=100)
                                                    ),
@@ -111,13 +107,13 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                           ),
                                           shiny::tabPanel(title = "Spatial",
                                                    shiny::wellPanel(
-                                                     sliderInput(inputId = "sp_nCount_Spatial",
+                                                     shiny::sliderInput(inputId = "sp_nCount_Spatial",
                                                                  label = "nCount_Spatial: threshold",
                                                                  value = 100, min = 0, max = 1000, step=10),
-                                                     sliderInput(inputId = "sp_percent.mt",
+                                                     shiny::sliderInput(inputId = "sp_percent.mt",
                                                                  label = "percent.mt: threshold",
                                                                  value = 5, min = 0, max = 100, step=1),
-                                                     sliderInput(inputId = "sp_nFeature_Spatial",
+                                                     shiny::sliderInput(inputId = "sp_nFeature_Spatial",
                                                                  label = "nFeature_RNA: threshold",
                                                                  value = 300, min = 0, max = 1000, step=10)
                                                    ),
@@ -125,13 +121,13 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                      shiny::radioButtons("qc_sp_radio","Histogram & Visualization choices",
                                                                   choices = list("nCount_Spatial", "nFeature_Spatial", "percent.mt"),
                                                                   selected = "nCount_Spatial"),
-                                                     sliderInput(inputId = "histo_sp_breaks",
+                                                     shiny::sliderInput(inputId = "histo_sp_breaks",
                                                                  label = "Histogram breaks",
                                                                  value = 5000, min = 0, max = 10000, step=100),
-                                                     sliderInput(inputId = "histo_sp_xmax",
+                                                     shiny::sliderInput(inputId = "histo_sp_xmax",
                                                                  label = "Histogram limits",
                                                                  value = 2000, min = 0, max = 3000, step=100),
-                                                     sliderInput(inputId = "tissue_qc_minmax",
+                                                     shiny::sliderInput(inputId = "tissue_qc_minmax",
                                                                  label = "Mapping on tissue: minmax",
                                                                  value = c(0,100), min = 0, max = 100, step=100)
                                                    ),
@@ -200,19 +196,19 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                               )
                             ),
                             shiny::wellPanel(
-                              sliderInput(inputId = "n_var_features",
+                              shiny::sliderInput(inputId = "n_var_features",
                                           label = "Number of HVGs",
                                           value = 2000, min = 1000, max = 5000, step=10),
-                              sliderInput(inputId = "n_integ_features",
+                              shiny::sliderInput(inputId = "n_integ_features",
                                           label = "Number of genes in integration",
                                           value = 2000, min = 1000, max = 5000, step=10),
-                              sliderInput(inputId = "integ_dim",
+                              shiny::sliderInput(inputId = "integ_dim",
                                           label = "Number of dimensions used in integration",
                                           value = 50, min = 0, max = 100, step=1),
-                              sliderInput(inputId = "cluster_dim",
+                              shiny::sliderInput(inputId = "cluster_dim",
                                           label = "Number of dimension in clustering",
                                           value = 30, min = 0, max = 50, step=1),
-                              sliderInput(inputId = "cluster_resolution",
+                              shiny::sliderInput(inputId = "cluster_resolution",
                                           label = "Clustering resolution",
                                           value = 0.3, min = 0, max = 1, step=0.05),
                               shiny::actionButton(inputId = "integ_start", label = "Integration start")
@@ -237,14 +233,14 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                                 shiny::textInput(inputId = "sc_vis_title",
                                                                           label = "Title of the plot",
                                                                           value="Cluster plot"),
-                                                                sliderInput(inputId = "sc_dot_size",
+                                                                shiny::sliderInput(inputId = "sc_dot_size",
                                                                             label = "Size of the dot",
                                                                             value = 0, min = 0, max = 2, step=0.05),
                                                                 shiny::checkboxInput("sc_vis_label","Label on", value = TRUE),
                                                                 shiny::conditionalPanel(
                                                                   condition = "input.sc_vis_label==true",
                                                                   shiny::wellPanel(
-                                                                    sliderInput(inputId = "sc_label_size",
+                                                                    shiny::sliderInput(inputId = "sc_label_size",
                                                                                 label = "Size of the label text",
                                                                                 value = 4, min = 0, max = 10, step=1)
                                                                   )
@@ -287,10 +283,10 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                                 shiny::checkboxInput("sc_check_x_axis_text", "x-axis text", value=FALSE),
                                                                 shiny::conditionalPanel(
                                                                   condition = "input.sc_check_x_axis_text==true",
-                                                                  sliderInput(inputId = "sc_freq_x_angle",
+                                                                  shiny::sliderInput(inputId = "sc_freq_x_angle",
                                                                               label = "Angle of x-axis text",
                                                                               value = 0, min=0, max=90, step=5),
-                                                                  sliderInput(inputId = "sc_freq_x_size",
+                                                                  shiny::sliderInput(inputId = "sc_freq_x_size",
                                                                               label = "Size of x-axis text",
                                                                               value = 12, min=0, max=30, step=1)
                                                                 ),
@@ -340,13 +336,13 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                           choices="", multiple = TRUE)
                                          ),
                                          shiny::checkboxInput("sc_check_metadata","Show metadata list", value = FALSE),
-                                         sliderInput(inputId = "sc_feat_minmax",
+                                         shiny::sliderInput(inputId = "sc_feat_minmax",
                                                      label = "Min max value",
                                                      value = c(0,3), min = 0, max = 10, step=0.1),
                                          shiny::textInput(inputId = "sc_feat_color",
                                                    label = "Color",
                                                    value= "blue"),
-                                         numericInput(inputId = "sc_feat_ncol",
+                                         shiny::numericInput(inputId = "sc_feat_ncol",
                                                       label = "Number of columns",
                                                       value = 2, min = 1, max=10),
                                          shiny::actionButton(inputId = "sc_vis_feat_start", label = "Plot"),
@@ -370,10 +366,10 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::conditionalPanel(
                                            condition = "input.sp_check_cluster_transparency==true",
                                            shiny::wellPanel(
-                                             sliderInput(inputId = "sp_cluster_alpha",
+                                             shiny::sliderInput(inputId = "sp_cluster_alpha",
                                                          label = "Transparency of spots",
                                                          value = c(1,1), min=0, max=1, step=0.1),
-                                             sliderInput(inputId = "sp_cluster_image.alpha",
+                                             shiny::sliderInput(inputId = "sp_cluster_image.alpha",
                                                          label = "Transparency of tissue",
                                                          value = 0.6, min=0, max=1, step=0.1)
                                            )
@@ -383,25 +379,25 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::conditionalPanel(
                                            condition = "input.sp_check_cluster_vis==true",
                                            shiny::wellPanel(
-                                             numericInput(inputId = "sp_cluster_ncol",
+                                             shiny::numericInput(inputId = "sp_cluster_ncol",
                                                           label = "Number of columns",
                                                           value = 4, min = 1, max=20),
                                              shiny::checkboxInput("sp_cluster_label","Label on", value=TRUE),
                                              shiny::conditionalPanel(
                                                condition = "input.sp_cluster_label==true",
                                                shiny::wellPanel(
-                                                 sliderInput(inputId = "sp_cluster_label_size",
+                                                 shiny::sliderInput(inputId = "sp_cluster_label_size",
                                                              label = "Size of the label",
                                                              value = 3, min=0, max=10, step = 1)
                                                )
                                              ),
-                                             sliderInput(inputId = "sp_cluster_pt.size.factor",
+                                             shiny::sliderInput(inputId = "sp_cluster_pt.size.factor",
                                                          label = "Size of the spot",
                                                          value = 1.6, min=0, max=3, step = 0.1),
-                                             sliderInput(inputId = "sp_cluster_img_width",
+                                             shiny::sliderInput(inputId = "sp_cluster_img_width",
                                                          label = "Width of image panel",
                                                          value = 1000, min=0, max=2000, step=10),
-                                             sliderInput(inputId = "sp_cluster_img_height",
+                                             shiny::sliderInput(inputId = "sp_cluster_img_height",
                                                          label = "Height of image panel",
                                                          value = 300, min=0, max=2000, step=10),
 
@@ -447,17 +443,17 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                           choices = "", multiple=TRUE)
                                          ),
                                          shiny::checkboxInput("sp_check_metadata","Show metadata list", value = FALSE),
-                                         sliderInput(inputId = "sp_feat_minmax",
+                                         shiny::sliderInput(inputId = "sp_feat_minmax",
                                                      label = "Min max value",
                                                      value = c(0,3), min = 0, max = 10, step=0.1),
                                          shiny::checkboxInput("sp_check_feat_transparency","Transparency", value = FALSE),
                                          shiny::conditionalPanel(
                                            condition = "input.sp_check_feat_transparency==true",
                                            shiny::wellPanel(
-                                             sliderInput(inputId = "sp_feat_alpha",
+                                             shiny::sliderInput(inputId = "sp_feat_alpha",
                                                          label = "Transparency of spots",
                                                          value = c(1,1), min=0, max=1, step=0.1),
-                                             sliderInput(inputId = "sp_feat_image.alpha",
+                                             shiny::sliderInput(inputId = "sp_feat_image.alpha",
                                                          label = "Transparency of tissue",
                                                          value = 0.6, min=0, max=1, step=0.1)
                                            )
@@ -483,17 +479,17 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::conditionalPanel(
                                            condition = "input.sp_check_feat_vis==true",
                                            shiny::wellPanel(
-                                             numericInput(inputId = "sp_feat_ncol",
+                                             shiny::numericInput(inputId = "sp_feat_ncol",
                                                           label = "Number of columns",
                                                           value = 4, min = 1, max=20),
-                                             numericInput("sp_title_size", "Size of the title", value=10, min=0),
-                                             sliderInput(inputId = "sp_feat_pt.size.factor",
+                                             shiny::numericInput("sp_title_size", "Size of the title", value=10, min=0),
+                                             shiny::sliderInput(inputId = "sp_feat_pt.size.factor",
                                                          label = "Size of the spot",
                                                          value = 1.8, min=0, max=3, step = 0.1),
-                                             sliderInput(inputId = "sp_feat_img_width",
+                                             shiny::sliderInput(inputId = "sp_feat_img_width",
                                                          label = "Width of image panel",
                                                          value = 900, min=0, max=2000, step=10),
-                                             sliderInput(inputId = "sp_feat_img_height",
+                                             shiny::sliderInput(inputId = "sp_feat_img_height",
                                                          label = "Height of image panel",
                                                          value = 550, min=0, max=2000, step=10),
                                              shiny::checkboxInput("sp_feat_crop","Crop the image", value=TRUE)
@@ -530,17 +526,17 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                         shiny::selectInput("sp_column_select","Select columns of gene list",
                                                                     "",multiple=FALSE)
                                                       ),
-                                                      numericInput(inputId = "sp_feat_by_n",
+                                                      shiny::numericInput(inputId = "sp_feat_by_n",
                                                                    label = "Number of features to save in each plot",
                                                                    value = 2, min = 0, max = 10),
                                                       shiny::textInput("sp_save_name", "Name of the file", value='feats'),
-                                                      sliderInput(inputId = "sp_save_by_n_width",
+                                                      shiny::sliderInput(inputId = "sp_save_by_n_width",
                                                                   label = "Width in cm",
                                                                   value = 18, min=0, max=50, step=1),
-                                                      sliderInput(inputId = "sp_save_by_n_height",
+                                                      shiny::sliderInput(inputId = "sp_save_by_n_height",
                                                                   label = "Height in cm",
                                                                   value = 11, min=0, max=50, step=1),
-                                                      sliderInput(inputId = "sp_upload_save_dpi",
+                                                      shiny::sliderInput(inputId = "sp_upload_save_dpi",
                                                                   label = "dpi to save image",
                                                                   value = 100, min = 0, max=500, step=10),
                                                       shiny::actionButton("sp_feat_save_by_n", "Save multiple plots by n"),
@@ -593,13 +589,13 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::conditionalPanel(
                                            condition = "input.vln_check_vis==true",
                                            shiny::wellPanel(
-                                             sliderInput(inputId = "vln_img_width",
+                                             shiny::sliderInput(inputId = "vln_img_width",
                                                          label = "Width of image panel",
                                                          value = 1000, min=0, max=2000, step=10),
-                                             sliderInput(inputId = "vln_img_height",
+                                             shiny::sliderInput(inputId = "vln_img_height",
                                                          label = "Height of image panel",
                                                          value = 800, min=0, max=2000, step=10),
-                                             numericInput(inputId = "vln_ncol",
+                                             shiny::numericInput(inputId = "vln_ncol",
                                                           label = "Number of columns",
                                                           value = 1, min = 1, max=10)
                                            )
@@ -640,23 +636,23 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                        "seurat_clusters" = "seurat_clusters",
                                                        "cluster" = "cluster"),
                                                      selected = "orig.ident"),
-                                         sliderInput(inputId = "ridge_feat_minmax",
+                                         shiny::sliderInput(inputId = "ridge_feat_minmax",
                                                      label = "Min max value",
                                                      value = c(-0.5,6), min = -1, max = 10, step=0.1),
-                                         sliderInput(inputId = "ridge_alpha",
+                                         shiny::sliderInput(inputId = "ridge_alpha",
                                                      label = "Transparency of filled color",
                                                      value = 0, min=0, max=1, step=0.1),
                                          shiny::checkboxInput("ridge_check_vis","Visualization", value = FALSE),
                                          shiny::conditionalPanel(
                                            condition = "input.ridge_check_vis==true",
                                            shiny::wellPanel(
-                                             sliderInput(inputId = "ridge_img_width",
+                                             shiny::sliderInput(inputId = "ridge_img_width",
                                                          label = "Width of image panel",
                                                          value = 1000, min=0, max=2000, step=10),
-                                             sliderInput(inputId = "ridge_img_height",
+                                             shiny::sliderInput(inputId = "ridge_img_height",
                                                          label = "Height of image panel",
                                                          value = 800, min=0, max=2000, step=10),
-                                             numericInput(inputId = "ridge_feat_ncol",
+                                             shiny::numericInput(inputId = "ridge_feat_ncol",
                                                           label = "Number of columns",
                                                           value = 2, min = 1, max=10)
                                            )
@@ -689,16 +685,16 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::conditionalPanel(
                                            condition = "input.check_marker_mode=='NSForest'",
                                            shiny::wellPanel(
-                                             sliderInput(inputId = "sc_marker_rfTrees",
+                                             shiny::sliderInput(inputId = "sc_marker_rfTrees",
                                                          label = "Number of trees",
                                                          value = 1000, min=0, max=5000, step=100),
-                                             sliderInput(inputId = "sc_median_exp_level",
+                                             shiny::sliderInput(inputId = "sc_median_exp_level",
                                                          label = "Median expression level for removing negative markers",
                                                          value = 0, min=-5, max=5, step=0.1),
-                                             sliderInput(inputId = "sc_genes_to_testing",
+                                             shiny::sliderInput(inputId = "sc_genes_to_testing",
                                                          label = "Number of binary genes to be tested by permutations",
                                                          value = 6, min=0, max=10, step=1),
-                                             sliderInput(inputId = "sc_beta_value",
+                                             shiny::sliderInput(inputId = "sc_beta_value",
                                                          label = "f-beta weight",
                                                          value = 0.5, min=0, max=1, step=0.01)
                                            )
@@ -813,7 +809,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                                    label = "Adjusted P-value", value= 0.05),
                                          shiny::textInput(inputId = "sc_deg_enrich_logfc",
                                                    label = "LogFC (pos: upper, neg: lower)", value= 0.3),
-                                         numericInput(inputId = "sc_deg_enrich_nshow",
+                                         shiny::numericInput(inputId = "sc_deg_enrich_nshow",
                                                       label = "Number of terms to show",
                                                       value = 10, min = 1, max=50),
                                          shiny::actionButton(inputId = "sc_deg_enrich_start", label = "Plot"),
@@ -917,19 +913,19 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::conditionalPanel(
                                            condition = "input.subset_recluster==true",
                                            shiny::wellPanel(
-                                             sliderInput(inputId = "recluster_n_var_features",
+                                             shiny::sliderInput(inputId = "recluster_n_var_features",
                                                          label = "Number of HVGs",
                                                          value = 2000, min = 1000, max = 5000, step=10),
-                                             sliderInput(inputId = "recluster_n_integ_features",
+                                             shiny::sliderInput(inputId = "recluster_n_integ_features",
                                                          label = "Number of genes in integration",
                                                          value = 2000, min = 1000, max = 5000, step=10),
-                                             sliderInput(inputId = "recluster_integ_dim",
+                                             shiny::sliderInput(inputId = "recluster_integ_dim",
                                                          label = "Number of dimensions used in integration",
                                                          value = 50, min = 0, max = 100, step=1),
-                                             sliderInput(inputId = "recluster_cluster_dim",
+                                             shiny::sliderInput(inputId = "recluster_cluster_dim",
                                                          label = "Number of dimension in clustering",
                                                          value = 30, min = 0, max = 50, step=1),
-                                             sliderInput(inputId = "recluster_cluster_resolution",
+                                             shiny::sliderInput(inputId = "recluster_cluster_resolution",
                                                          label = "Clustering resolution",
                                                          value = 0.3, min = 0, max = 1, step=0.05)
                                            )
@@ -1001,13 +997,13 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                          shiny::conditionalPanel(
                                            condition = "input.quantitation_check_vis==true",
                                            shiny::wellPanel(
-                                             sliderInput(inputId = "quantitation_img_width",
+                                             shiny::sliderInput(inputId = "quantitation_img_width",
                                                          label = "Width of image panel",
                                                          value = 1000, min=0, max=2000, step=10),
-                                             sliderInput(inputId = "quantitation_img_height",
+                                             shiny::sliderInput(inputId = "quantitation_img_height",
                                                          label = "Height of image panel",
                                                          value = 800, min=0, max=2000, step=10),
-                                             numericInput(inputId = "quantitation_feat_ncol",
+                                             shiny::numericInput(inputId = "quantitation_feat_ncol",
                                                           label = "Number of columns",
                                                           value = 4, min = 1, max=10)
                                            )
@@ -1045,13 +1041,13 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                                             "seurat_clusters" = "seurat_clusters"),
                                           selected = "seurat_clusters"),
                               shiny::wellPanel(
-                                sliderInput(inputId = "celldart_num_markers",
+                                shiny::sliderInput(inputId = "celldart_num_markers",
                                             label = "Number of markers for each celltype",
                                             value = 10, min=1, max=50, step=1),
-                                sliderInput(inputId = "celldart_nmix",
+                                shiny::sliderInput(inputId = "celldart_nmix",
                                             label = "Number of cells in a pseudospot",
                                             value = 8, min=1, max=20, step=1),
-                                sliderInput(inputId = "celldart_npseudo",
+                                shiny::sliderInput(inputId = "celldart_npseudo",
                                             label = "Number of pseudospots",
                                             value = 20000, min=10000, max=400000, step=1000),
                               ),
@@ -1059,22 +1055,22 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                               shiny::conditionalPanel(
                                 condition = "input.celldart_train_param==true",
                                 shiny::wellPanel(
-                                  sliderInput(inputId = "celldart_alpha",
+                                  shiny::sliderInput(inputId = "celldart_alpha",
                                               label = "Domain classifier loss weight",
                                               value = 0.6, min=0.1, max=10, step=0.1),
-                                  sliderInput(inputId = "celldart_alpha_lr",
+                                  shiny::sliderInput(inputId = "celldart_alpha_lr",
                                               label = "Domain classifier learning rate",
                                               value = 5, min=0.1, max=10, step=0.1),
-                                  sliderInput(inputId = "celldart_emb_dim",
+                                  shiny::sliderInput(inputId = "celldart_emb_dim",
                                               label = "Feature embedder dimension",
                                               value = 64, min=2, max=512, step=2),
-                                  sliderInput(inputId = "celldart_batch_size",
+                                  shiny::sliderInput(inputId = "celldart_batch_size",
                                               label = "Feature embedder dimension",
                                               value = 512, min=64, max=1024, step=2),
-                                  sliderInput(inputId = "celldart_n_iterations",
+                                  shiny::sliderInput(inputId = "celldart_n_iterations",
                                               label = "Number of iterations",
                                               value = 3000, min=1000, max=10000, step=100),
-                                  sliderInput(inputId = "celldart_init_train_epoch",
+                                  shiny::sliderInput(inputId = "celldart_init_train_epoch",
                                               label = "Initial training number",
                                               value = 10, min=1, max=30, step=1)
                                 )
