@@ -7,11 +7,11 @@ server <- function(input,output,session){
   shinyFiles::shinyDirChoose(
     input,
     'dir',
-    roots = c(home = '/home/nmadmin/'),
+    roots = c(home = '~'),
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
-  global <- shiny::reactiveValues(datapath = '/home/nmadmin/DATA1/Spatial')
+  global <- shiny::reactiveValues(datapath = '~')
 
   dir <- shiny::reactive(input$dir)
 
@@ -25,7 +25,7 @@ server <- function(input,output,session){
                       },
                       handlerExpr = {
                         if (!"path" %in% names(dir())) return()
-                        home <- normalizePath("/home/nmadmin")
+                        home <- normalizePath("~")
                         global$datapath <-
                           file.path(home, paste(unlist(dir()$path[-1]),
                                                 collapse = .Platform$file.sep))
@@ -78,7 +78,7 @@ server <- function(input,output,session){
   shinyFiles::shinyDirChoose(
     input,
     'qc_dir',
-    roots = c(home = '/home/nmadmin', wd ='.'),
+    roots = c(home = '~', wd ='.'),
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
@@ -91,7 +91,7 @@ server <- function(input,output,session){
       file.path(paste(c(getwd(),unlist(qc_dir()$path[-1])),
                       collapse=.Platform$file.sep))
     } else if (qc_dir()$root[[1]]=='home') {
-      home <- normalizePath("/home/nmadmin")
+      home <- normalizePath("~")
       file.path(paste(c(home,unlist(qc_dir()$path[-1])),
                       collapse=.Platform$file.sep))
     }
@@ -286,7 +286,7 @@ server <- function(input,output,session){
   shinyFiles::shinyDirChoose(
     input,
     'dir_integ',
-    roots = c(home = '/home/nmadmin', wd ='.'),
+    roots = c(home = '~', wd ='.'),
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
@@ -299,7 +299,7 @@ server <- function(input,output,session){
       file.path(paste(c(getwd(),unlist(dir_integ()$path[-1])),
                       collapse=.Platform$file.sep))
     } else if (dir_integ()$root[[1]]=='home') {
-      home <- normalizePath("/home/nmadmin")
+      home <- normalizePath("~")
       file.path(paste(c(home,unlist(dir_integ()$path[-1])),
                       collapse=.Platform$file.sep))
     }
@@ -2529,7 +2529,7 @@ server <- function(input,output,session){
 
   # Load single-cell or spatial data in RDS format
   shinyFiles::shinyFileChoose(input, 'data_load',
-                              roots = c(home = '/home/nmadmin', wd ='.'),
+                              roots = c(home = '~', wd ='.'),
                               filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad"))
 
   data_load <- shiny::reactive(input$data_load)
@@ -2541,7 +2541,7 @@ server <- function(input,output,session){
       load_path <- file.path(paste(c(getwd(),unlist(data_load()$files)), collapse=.Platform$file.sep))
       next_step <- TRUE
     } else if (data_load()$root[[1]]=='home') {
-      home <- normalizePath("/home/nmadmin")
+      home <- normalizePath("~")
       load_path <- file.path(paste(c(home,unlist(data_load()$files)), collapse=.Platform$file.sep))
       next_step <- TRUE
     }
@@ -2604,7 +2604,7 @@ server <- function(input,output,session){
 
   # Choose the files to convert
   shinyFiles::shinyFileChoose(input, 'choose_file_to_convert',
-                              roots = c(home = '/home/nmadmin', wd ='.'),
+                              roots = c(home = '~', wd ='.'),
                               filetypes = c('',"txt","csv"))
 
   choose_file_to_convert <- shiny::reactive(input$choose_file_to_convert)
@@ -2619,7 +2619,7 @@ server <- function(input,output,session){
                                      collapse=.Platform$file.sep))
       next_step <- T
     } else if (choose_file_to_convert()$root[[1]]=='home') {
-      home <- normalizePath("/home/nmadmin")
+      home <- normalizePath("~")
       path_tmp <- unlist(choose_file_to_convert()$files)
       v$load_path <- file.path(paste(c(home,path_tmp),
                                      collapse=.Platform$file.sep))
