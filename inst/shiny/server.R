@@ -1,7 +1,6 @@
 library(shiny)
 library(dplyr)
 library(DT)
-library(STquantool)
 
 server <- function(input,output,session){
   # Directory setting
@@ -264,20 +263,20 @@ server <- function(input,output,session){
 
   shiny::observeEvent(input$horizontal_flip_start, {
     if (!is.null(qc_path())){
-      shiny::showModal(flipModal(text="horizontally", input_name="ok_horizontal"))
+      shiny::showModal(STquantool::flipModal(text="horizontally", input_name="ok_horizontal"))
     }
   })
   shiny::observeEvent(input$ok_horizontal, {
-    horizontal_flip(qc_path())
+    STquantool::horizontal_flip(qc_path())
     shiny::removeModal()
   })
   shiny::observeEvent(input$vertical_flip_start, {
     if (!is.null(qc_path())){
-      shiny::showModal(flipModal(text="vertically", input_name="ok_vertical"))
+      shiny::showModal(STquantool::flipModal(text="vertically", input_name="ok_vertical"))
     }
   })
   shiny::observeEvent(input$ok_vertical, {
-    vertical_flip(qc_path())
+    STquantool::vertical_flip(qc_path())
     shiny::removeModal()
   })
 
@@ -377,21 +376,21 @@ server <- function(input,output,session){
     if (length(input$dir_integ_sel)==1){
       if (input$preproc_radio=='Single-cell'){
         shinybusy::show_modal_spinner()
-        v$sc_data <- preprocess_data(data_dir=input$dir_integ_sel,
-                                     grp=input$grp_name, data_type='Single-cell',
-                                     filter_nfeature_RNA=input$nFeature_RNA_thres,
-                                     filter_percent_mt=input$percent_mt_thres,
-                                     n_var_features=input$n_var_features,
-                                     cluster_dim=input$cluster_dim,
-                                     cluster_resolution=input$cluster_resolution)
+        v$sc_data <- STquantool::preprocess_data(data_dir=input$dir_integ_sel,
+                                                 grp=input$grp_name, data_type='Single-cell',
+                                                 filter_nfeature_RNA=input$nFeature_RNA_thres,
+                                                 filter_percent_mt=input$percent_mt_thres,
+                                                 n_var_features=input$n_var_features,
+                                                 cluster_dim=input$cluster_dim,
+                                                 cluster_resolution=input$cluster_resolution)
         shinybusy::remove_modal_spinner()
       } else if (input$preproc_radio=='Spatial'){
         shinybusy::show_modal_spinner()
-        v$sp_data <- preprocess_data(data_dir=input$dir_integ_sel,
-                                     grp=input$grp_name, data_type='Spatial',
-                                     n_var_features=input$n_var_features,
-                                     cluster_dim=input$cluster_dim,
-                                     cluster_resolution=input$cluster_resolution)
+        v$sp_data <- STquantool::preprocess_data(data_dir=input$dir_integ_sel,
+                                                 grp=input$grp_name, data_type='Spatial',
+                                                 n_var_features=input$n_var_features,
+                                                 cluster_dim=input$cluster_dim,
+                                                 cluster_resolution=input$cluster_resolution)
         shinybusy::remove_modal_spinner()
       }
     } else if (length(input$dir_integ_sel)>1) {
@@ -410,27 +409,27 @@ server <- function(input,output,session){
         filter_percent_mt <- sapply(strsplit(input$percent_mt_thres, ",")[[1]],
                                     function(x){as.numeric(x)})
         shinybusy::show_modal_spinner()
-        v$sc_data <- preprocess_data_integ_rpca(data_dir=input$dir_integ_sel,
-                                                grp=grp, data_type='Single-cell',
-                                                filter_nfeature_RNA=filter_nfeature_RNA,
-                                                filter_percent_mt=filter_percent_mt,
-                                                reference_index=reference,
-                                                n_var_features=input$n_var_features,
-                                                n_integ_features=input$n_integ_features,
-                                                integ_dim=input$integ_dim,
-                                                cluster_dim=input$cluster_dim,
-                                                cluster_resolution=input$cluster_resolution)
+        v$sc_data <- STquantool::preprocess_data_integ_rpca(data_dir=input$dir_integ_sel,
+                                                            grp=grp, data_type='Single-cell',
+                                                            filter_nfeature_RNA=filter_nfeature_RNA,
+                                                            filter_percent_mt=filter_percent_mt,
+                                                            reference_index=reference,
+                                                            n_var_features=input$n_var_features,
+                                                            n_integ_features=input$n_integ_features,
+                                                            integ_dim=input$integ_dim,
+                                                            cluster_dim=input$cluster_dim,
+                                                            cluster_resolution=input$cluster_resolution)
         shinybusy::remove_modal_spinner()
       } else if (input$preproc_radio=='Spatial') {
         shinybusy::show_modal_spinner()
-        v$sp_data <- preprocess_data_integ_rpca(data_dir=input$dir_integ_sel,
-                                                grp=grp, data_type='Spatial',
-                                                reference_index=reference,
-                                                n_var_features=input$n_var_features,
-                                                n_integ_features=input$n_integ_features,
-                                                integ_dim=input$integ_dim,
-                                                cluster_dim=input$cluster_dim,
-                                                cluster_resolution=input$cluster_resolution)
+        v$sp_data <- STquantool::preprocess_data_integ_rpca(data_dir=input$dir_integ_sel,
+                                                            grp=grp, data_type='Spatial',
+                                                            reference_index=reference,
+                                                            n_var_features=input$n_var_features,
+                                                            n_integ_features=input$n_integ_features,
+                                                            integ_dim=input$integ_dim,
+                                                            cluster_dim=input$cluster_dim,
+                                                            cluster_resolution=input$cluster_resolution)
         shinybusy::remove_modal_spinner()
       }
     }
@@ -629,14 +628,14 @@ server <- function(input,output,session){
       temp <- v$sp_data
     }
     if (!is.null(temp)){
-      v$freq_boxplot <- frequency_boxplot(temp,
-                                          group_of_interest=input$sc_group_var_freq,
-                                          cluster_name=input$sc_cluster_var_freq,
-                                          x.axis.title=input$sc_freq_x_title,
-                                          y.axis.title=input$sc_freq_y_title,
-                                          vis.freq.text=input$sc_freq_label, freq.stats=TRUE,
-                                          x.axis.text.angle=input$sc_freq_x_angle,
-                                          x.axis.text.size=input$sc_freq_x_size)
+      v$freq_boxplot <- STquantool::frequency_boxplot(temp,
+                                                      group_of_interest=input$sc_group_var_freq,
+                                                      cluster_name=input$sc_cluster_var_freq,
+                                                      x.axis.title=input$sc_freq_x_title,
+                                                      y.axis.title=input$sc_freq_y_title,
+                                                      vis.freq.text=input$sc_freq_label, freq.stats=TRUE,
+                                                      x.axis.text.angle=input$sc_freq_x_angle,
+                                                      x.axis.text.size=input$sc_freq_x_size)
       try({utils::write.csv(v$freq_boxplot[[2]], file.path(global$datapath,input$output_folder_name,
                                                            'data_files',
                                                            paste0(input$freqplot_radio,
@@ -740,12 +739,12 @@ server <- function(input,output,session){
     }
 
     if (!is.null(sc_featplot_list()[[7]])){
-      v$sc_featureplot <- FeaturePlot_mod(sc_featplot_list()[[7]],
-                                          v$sc_feat_list,
-                                          min=sc_featplot_list()[[4]][1],
-                                          max=sc_featplot_list()[[4]][2],
-                                          palette_color=sc_featplot_list()[[5]],
-                                          ncol = sc_featplot_list()[[6]])
+      v$sc_featureplot <- STquantool::FeaturePlot_mod(sc_featplot_list()[[7]],
+                                                      v$sc_feat_list,
+                                                      min=sc_featplot_list()[[4]][1],
+                                                      max=sc_featplot_list()[[4]][2],
+                                                      palette_color=sc_featplot_list()[[5]],
+                                                      ncol = sc_featplot_list()[[6]])
       v$sc_featureplot
     }
 
@@ -801,17 +800,17 @@ server <- function(input,output,session){
         slide_vis <- NULL
       }
 
-      v$sp_clusterplot <- spatial_cluster_plot(sp_clusterplot_list()[[13]],
-                                               cluster_name = sp_clusterplot_list()[[10]],
-                                               alpha=sp_clusterplot_list()[[1]],
-                                               image.alpha=sp_clusterplot_list()[[2]],
-                                               slide.to.visualize=slide_vis,
-                                               spot.cluster.highlight=sp_clusterplot_list()[[4]],
-                                               ncol=sp_clusterplot_list()[[5]],
-                                               pt.size.factor=sp_clusterplot_list()[[6]],
-                                               crop=sp_clusterplot_list()[[7]],
-                                               label=sp_clusterplot_list()[[11]],
-                                               label.size=sp_clusterplot_list()[[12]])
+      v$sp_clusterplot <- STquantool::spatial_cluster_plot(sp_clusterplot_list()[[13]],
+                                                           cluster_name = sp_clusterplot_list()[[10]],
+                                                           alpha=sp_clusterplot_list()[[1]],
+                                                           image.alpha=sp_clusterplot_list()[[2]],
+                                                           slide.to.visualize=slide_vis,
+                                                           spot.cluster.highlight=sp_clusterplot_list()[[4]],
+                                                           ncol=sp_clusterplot_list()[[5]],
+                                                           pt.size.factor=sp_clusterplot_list()[[6]],
+                                                           crop=sp_clusterplot_list()[[7]],
+                                                           label=sp_clusterplot_list()[[11]],
+                                                           label.size=sp_clusterplot_list()[[12]])
       v$sp_clusterplot
     }
   }, width = shiny::reactive({input$sp_cluster_img_width}),
@@ -930,21 +929,21 @@ server <- function(input,output,session){
       # Sys.setenv(DOWNLOAD_STATIC_LIBV8 = 1)
       # install.packages("V8")
 
-      v$sp_featureplot <- spatial_feat_plot_groups(sp_featplot_list()[[18]], v$sp_feat_list,
-                                                   min=sp_featplot_list()[[4]][1],
-                                                   max=sp_featplot_list()[[4]][2],
-                                                   alpha=sp_featplot_list()[[5]],
-                                                   image.alpha=sp_featplot_list()[[6]],
-                                                   palette_color=sp_featplot_list()[[7]],
-                                                   color_bar_mode=sp_featplot_list()[[8]],
-                                                   color_bar_loc=sp_featplot_list()[[9]],
-                                                   slide.to.visualize=slide_vis,
-                                                   cluster_name=sp_featplot_list()[[11]],
-                                                   spot.cluster.highlight=sp_featplot_list()[[12]],
-                                                   ncol=sp_featplot_list()[[13]],
-                                                   pt.size.factor=sp_featplot_list()[[14]],
-                                                   crop=sp_featplot_list()[[15]],
-                                                   title_size=sp_featplot_list()[[19]])
+      v$sp_featureplot <- STquantool::spatial_feat_plot_groups(sp_featplot_list()[[18]], v$sp_feat_list,
+                                                               min=sp_featplot_list()[[4]][1],
+                                                               max=sp_featplot_list()[[4]][2],
+                                                               alpha=sp_featplot_list()[[5]],
+                                                               image.alpha=sp_featplot_list()[[6]],
+                                                               palette_color=sp_featplot_list()[[7]],
+                                                               color_bar_mode=sp_featplot_list()[[8]],
+                                                               color_bar_loc=sp_featplot_list()[[9]],
+                                                               slide.to.visualize=slide_vis,
+                                                               cluster_name=sp_featplot_list()[[11]],
+                                                               spot.cluster.highlight=sp_featplot_list()[[12]],
+                                                               ncol=sp_featplot_list()[[13]],
+                                                               pt.size.factor=sp_featplot_list()[[14]],
+                                                               crop=sp_featplot_list()[[15]],
+                                                               title_size=sp_featplot_list()[[19]])
       v$sp_featureplot
     }
   }, width = shiny::reactive({input$sp_feat_img_width}),
@@ -953,11 +952,11 @@ server <- function(input,output,session){
 
   ## Upload gene list from feature plot multiple save
   shiny::observeEvent(input$sp_feat_upload, {
-    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
-                                          text_input_name="sp_feat_save_name",
-                                          text_input_explain = "Name of the gene list",
-                                          file_save_name="gene_list",
-                                          action_button_name = "ok_sp_feat_upload"))
+    shiny::showModal(STquantool::save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+                                                      text_input_name="sp_feat_save_name",
+                                                      text_input_explain = "Name of the gene list",
+                                                      file_save_name="gene_list",
+                                                      action_button_name = "ok_sp_feat_upload"))
   })
   shiny::observeEvent(input$ok_sp_feat_upload, {
     shinybusy::show_modal_spinner()
@@ -1011,27 +1010,27 @@ server <- function(input,output,session){
           } else {
             slide_vis <- NULL
           }
-          save_feat_plot_by_n(sp_featplot_multi_list()[[18]], sp_feat_list,
-                              by_n=input$sp_feat_by_n,
-                              min=sp_featplot_multi_list()[[4]][1],
-                              max=sp_featplot_multi_list()[[4]][2],
-                              alpha=sp_featplot_multi_list()[[5]],
-                              image.alpha=sp_featplot_multi_list()[[6]],
-                              palette_color=sp_featplot_multi_list()[[7]],
-                              color_bar_mode=sp_featplot_multi_list()[[8]],
-                              color_bar_loc=sp_featplot_multi_list()[[9]],
-                              slide.to.visualize=slide_vis,
-                              ncol=sp_featplot_multi_list()[[13]],
-                              pt.size.factor=sp_featplot_multi_list()[[14]],
-                              crop=sp_featplot_multi_list()[[15]],
-                              height = input$sp_save_by_n_height,
-                              width = input$sp_save_by_n_width,
-                              dpi = input$sp_upload_save_dpi,
-                              title_size=sp_featplot_multi_list()[[19]],
-                              save_path=file.path(global$datapath,
-                                                  input$output_folder_name,
-                                                  'data_files/'),
-                              file_name = input$sp_save_name)
+          STquantool::save_feat_plot_by_n(sp_featplot_multi_list()[[18]], sp_feat_list,
+                                          by_n=input$sp_feat_by_n,
+                                          min=sp_featplot_multi_list()[[4]][1],
+                                          max=sp_featplot_multi_list()[[4]][2],
+                                          alpha=sp_featplot_multi_list()[[5]],
+                                          image.alpha=sp_featplot_multi_list()[[6]],
+                                          palette_color=sp_featplot_multi_list()[[7]],
+                                          color_bar_mode=sp_featplot_multi_list()[[8]],
+                                          color_bar_loc=sp_featplot_multi_list()[[9]],
+                                          slide.to.visualize=slide_vis,
+                                          ncol=sp_featplot_multi_list()[[13]],
+                                          pt.size.factor=sp_featplot_multi_list()[[14]],
+                                          crop=sp_featplot_multi_list()[[15]],
+                                          height = input$sp_save_by_n_height,
+                                          width = input$sp_save_by_n_width,
+                                          dpi = input$sp_upload_save_dpi,
+                                          title_size=sp_featplot_multi_list()[[19]],
+                                          save_path=file.path(global$datapath,
+                                                              input$output_folder_name,
+                                                              'data_files/'),
+                                          file_name = input$sp_save_name)
         }
       }
     }
@@ -1243,12 +1242,12 @@ server <- function(input,output,session){
     }
 
     if (!is.null(ridgeplot_list()[[8]])){
-      v$ridgeplot <- RidgePlot_mod(ridgeplot_list()[[8]],
-                                   v$ridge_feat_list,
-                                   groups = ridgeplot_list()[[5]],
-                                   lim=ridgeplot_list()[[4]],
-                                   alpha = ridgeplot_list()[[6]],
-                                   ncol = ridgeplot_list()[[7]])
+      v$ridgeplot <- STquantool::RidgePlot_mod(ridgeplot_list()[[8]],
+                                               v$ridge_feat_list,
+                                               groups = ridgeplot_list()[[5]],
+                                               lim=ridgeplot_list()[[4]],
+                                               alpha = ridgeplot_list()[[6]],
+                                               ncol = ridgeplot_list()[[7]])
       v$ridgeplot
     }
 
@@ -1376,11 +1375,11 @@ server <- function(input,output,session){
   ## DEG process start
   output$sc_marker_table <- DT::renderDataTable({
     if (sc_marker_list()[[5]]=='Wilcoxon'){
-      temp <- FindMarkers_mod(sc_marker_list()[[4]], purpose="marker",
-                              group.to.find=sc_marker_list()[[1]],
-                              logfc.threshold=as.numeric(sc_marker_list()[[2]]),
-                              only.pos=sc_marker_list()[[3]],
-                              test.use='wilcox')
+      temp <- STquantool::FindMarkers_mod(sc_marker_list()[[4]], purpose="marker",
+                                          group.to.find=sc_marker_list()[[1]],
+                                          logfc.threshold=as.numeric(sc_marker_list()[[2]]),
+                                          only.pos=sc_marker_list()[[3]],
+                                          test.use='wilcox')
 
       v$sc_marker <- temp %>% dplyr::filter(avg_exp_clust > as.numeric(sc_marker_list()[[10]])) %>%
         dplyr::group_by(cluster) %>% dplyr::arrange(dplyr::desc(avg_exp_clust), .by_group = TRUE)
@@ -1398,14 +1397,14 @@ server <- function(input,output,session){
         dir.create(outdir_ns)
       }
 
-      v$sc_marker <- NS_Forest_R(object=sc_marker_list()[[4]], assay=assay_type, slot="data",
-                                 outdir=outdir_ns,
-                                 clusterLabelcolumnHeader=sc_marker_list()[[1]],
-                                 rfTrees=sc_marker_list()[[6]],
-                                 Median_Expression_Level=sc_marker_list()[[7]],
-                                 Genes_to_testing=sc_marker_list()[[8]],
-                                 betaValue=sc_marker_list()[[9]],
-                                 conda.env.name='STquantool')
+      v$sc_marker <- STquantool::NS_Forest_R(object=sc_marker_list()[[4]], assay=assay_type, slot="data",
+                                             outdir=outdir_ns,
+                                             clusterLabelcolumnHeader=sc_marker_list()[[1]],
+                                             rfTrees=sc_marker_list()[[6]],
+                                             Median_Expression_Level=sc_marker_list()[[7]],
+                                             Genes_to_testing=sc_marker_list()[[8]],
+                                             betaValue=sc_marker_list()[[9]],
+                                             conda.env.name='STquantool')
     }
 
     DT::datatable(v$sc_marker,
@@ -1414,11 +1413,11 @@ server <- function(input,output,session){
 
   ## Upload gene list
   shiny::observeEvent(input$sc_marker_upload,{
-    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
-                                          text_input_name="marker_save_name",
-                                          text_input_explain = "Name of the gene list",
-                                          file_save_name="gene_list",
-                                          action_button_name = "ok_sc_marker_gene"))
+    shiny::showModal(STquantool::save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+                                                      text_input_name="marker_save_name",
+                                                      text_input_explain = "Name of the gene list",
+                                                      file_save_name="gene_list",
+                                                      action_button_name = "ok_sc_marker_gene"))
   })
   shiny::observeEvent(input$ok_sc_marker_gene, {
     shinybusy::show_modal_spinner()
@@ -1448,12 +1447,12 @@ server <- function(input,output,session){
 
   output$sc_deg_table <- DT::renderDataTable({
     if (sc_deg_list()[[2]]){
-      temp <- FindMarkers_mod(sc_deg_list()[[9]], purpose="DEG",
-                              group.to.find = sc_deg_list()[[6]],
-                              ident.1 = sc_deg_list()[[7]],
-                              ident.2 = sc_deg_list()[[8]],
-                              test.use='MAST',
-                              logfc.threshold = as.numeric(sc_deg_list()[[10]]))
+      temp <- STquantool::FindMarkers_mod(sc_deg_list()[[9]], purpose="DEG",
+                                          group.to.find = sc_deg_list()[[6]],
+                                          ident.1 = sc_deg_list()[[7]],
+                                          ident.2 = sc_deg_list()[[8]],
+                                          test.use='MAST',
+                                          logfc.threshold = as.numeric(sc_deg_list()[[10]]))
       v$DEG <- temp %>% dplyr::filter(avg_exp_ident.1 > as.numeric(sc_deg_list()[[11]])) %>%
         dplyr::mutate(sign = ifelse(avg_log2FC > 0, "pos", "neg")) %>%
         dplyr::arrange(dplyr::desc(avg_exp_ident.1)) %>% dplyr::arrange(dplyr::desc(sign)) %>%
@@ -1468,12 +1467,12 @@ server <- function(input,output,session){
       DT::datatable(v$DEG,
                     options=list(lengthMenu=c(5,10,20,40,80), pageLength=5))
     } else {
-      temp <- FindMarkers_mod(sc_deg_list()[[9]], purpose="DEG",
-                              group.to.find = sc_deg_list()[[1]],
-                              ident.1 = sc_deg_list()[[3]],
-                              ident.2 = sc_deg_list()[[4]],
-                              test.use='MAST',
-                              logfc.threshold = as.numeric(sc_deg_list()[[10]]))
+      temp <- STquantool::FindMarkers_mod(sc_deg_list()[[9]], purpose="DEG",
+                                          group.to.find = sc_deg_list()[[1]],
+                                          ident.1 = sc_deg_list()[[3]],
+                                          ident.2 = sc_deg_list()[[4]],
+                                          test.use='MAST',
+                                          logfc.threshold = as.numeric(sc_deg_list()[[10]]))
       v$DEG <- temp %>% dplyr::filter(avg_exp_ident.1 > as.numeric(sc_deg_list()[[11]])) %>%
         dplyr::mutate(sign = ifelse(avg_log2FC > 0, "pos", "neg")) %>%
         dplyr::arrange(dplyr::desc(avg_exp_ident.1)) %>% dplyr::arrange(dplyr::desc(sign)) %>%
@@ -1493,11 +1492,11 @@ server <- function(input,output,session){
 
   ## Upload gene list
   shiny::observeEvent(input$sc_deg_upload,{
-    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
-                                          text_input_name="deg_save_name",
-                                          text_input_explain = "Name of the gene list",
-                                          file_save_name="gene_list",
-                                          action_button_name = "ok_sc_deg"))
+    shiny::showModal(STquantool::save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+                                                      text_input_name="deg_save_name",
+                                                      text_input_explain = "Name of the gene list",
+                                                      file_save_name="gene_list",
+                                                      action_button_name = "ok_sc_deg"))
   })
 
   shiny::observeEvent(input$ok_sc_deg, {
@@ -1581,11 +1580,11 @@ server <- function(input,output,session){
 
   # Upload gene list
   shiny::observeEvent(input$sc_deg_volcano_upload,{
-    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
-                                          text_input_name="deg_volcano_save_name",
-                                          text_input_explain = "Name of the gene list",
-                                          file_save_name="gene_list",
-                                          action_button_name = "ok_sc_deg_volcano"))
+    shiny::showModal(STquantool::save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+                                                      text_input_name="deg_volcano_save_name",
+                                                      text_input_explain = "Name of the gene list",
+                                                      file_save_name="gene_list",
+                                                      action_button_name = "ok_sc_deg_volcano"))
   })
 
   shiny::observeEvent(input$ok_sc_deg_volcano, {
@@ -1852,11 +1851,11 @@ server <- function(input,output,session){
 
   ## Upload gene list from feature plot multiple save
   shiny::observeEvent(input$module_score_gene_upload, {
-    shiny::showModal(save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
-                                          text_input_name="module_score_feat_save_name",
-                                          text_input_explain = "Name of the gene list",
-                                          file_save_name="gene_list",
-                                          action_button_name = "ok_module_score_feat_upload"))
+    shiny::showModal(STquantool::save_gene_list_Modal(text_for_purpose='Will you save the given gene list?',
+                                                      text_input_name="module_score_feat_save_name",
+                                                      text_input_explain = "Name of the gene list",
+                                                      file_save_name="gene_list",
+                                                      action_button_name = "ok_module_score_feat_upload"))
   })
   shiny::observeEvent(input$ok_module_score_feat_upload, {
     shinybusy::show_modal_spinner()
@@ -1914,13 +1913,13 @@ server <- function(input,output,session){
 
       if (input$subset_radio=="Single-cell"){
         if (input$subset_recluster){
-          temp <- recluster_dataset_rpca(temp, split.by='orig.ident',
-                                         data_type='Single-cell',
-                                         n_var_features=input$recluster_n_var_features,
-                                         n_integ_features=input$recluster_n_integ_features,
-                                         integ_dim=input$recluster_integ_dim,
-                                         cluster_dim=input$recluster_cluster_dim,
-                                         cluster_resolution=input$recluster_cluster_resolution)
+          temp <- STquantool::recluster_dataset_rpca(temp, split.by='orig.ident',
+                                                     data_type='Single-cell',
+                                                     n_var_features=input$recluster_n_var_features,
+                                                     n_integ_features=input$recluster_n_integ_features,
+                                                     integ_dim=input$recluster_integ_dim,
+                                                     cluster_dim=input$recluster_cluster_dim,
+                                                     cluster_resolution=input$recluster_cluster_resolution)
         }
         v$sc_data <- temp
       } else if (input$subset_radio=="Spatial"){
@@ -1936,13 +1935,13 @@ server <- function(input,output,session){
           }
         }
         if (input$subset_recluster){
-          temp <- recluster_dataset_rpca(temp, split.by='orig.ident',
-                                         data_type='Spatial',
-                                         n_var_features=input$recluster_n_var_features,
-                                         n_integ_features=input$recluster_n_integ_features,
-                                         integ_dim=input$recluster_integ_dim,
-                                         cluster_dim=input$recluster_cluster_dim,
-                                         cluster_resolution=input$recluster_cluster_resolution)
+          temp <- STquantool::recluster_dataset_rpca(temp, split.by='orig.ident',
+                                                     data_type='Spatial',
+                                                     n_var_features=input$recluster_n_var_features,
+                                                     n_integ_features=input$recluster_n_integ_features,
+                                                     integ_dim=input$recluster_integ_dim,
+                                                     cluster_dim=input$recluster_cluster_dim,
+                                                     cluster_resolution=input$recluster_cluster_resolution)
         }
         v$sp_data <- temp
       }
@@ -2067,25 +2066,25 @@ server <- function(input,output,session){
       if ((input$quantitation_agg_mode & input$quantitation_recode_group=="")|
           (is.null(quantitation_cellf))){
       } else {
-        v$quantitation_result <- quantitation_plot(temp,
-                                                   data.to.use=quantitation_cellf,
-                                                   group.to.compare=input$quantitation_comp_group,
-                                                   group.to.facet=input$quantitation_facet_group,
-                                                   agg.to.boxplot=input$quantitation_agg_mode,
-                                                   group.to.split=input$quantitation_split_group,
-                                                   group.to.recode=input$quantitation_recode_group,
-                                                   calculate_mode=input$quantitation_mode,
-                                                   pairwise.comp.stats=quantitation_pairwise_stats,
-                                                   x.axis.title='', y.axis.title=input$quantitation_name,
-                                                   x.axis.title.size=20,y.axis.title.size=20,
-                                                   x.axis.text.size=10,y.axis.text.size=12,
-                                                   x.axis.text.angle=90,
-                                                   legend.title.size=12,legend.text.size=12,
-                                                   vis.value.text=input$quantitation_vis_cellf,
-                                                   value.text.size=3.5,
-                                                   return.stats=TRUE,
-                                                   plot_ncol = input$quantitation_feat_ncol,
-                                                   spot.total.num.stats = input$spot_total_number)
+        v$quantitation_result <- STquantool::quantitation_plot(temp,
+                                                               data.to.use=quantitation_cellf,
+                                                               group.to.compare=input$quantitation_comp_group,
+                                                               group.to.facet=input$quantitation_facet_group,
+                                                               agg.to.boxplot=input$quantitation_agg_mode,
+                                                               group.to.split=input$quantitation_split_group,
+                                                               group.to.recode=input$quantitation_recode_group,
+                                                               calculate_mode=input$quantitation_mode,
+                                                               pairwise.comp.stats=quantitation_pairwise_stats,
+                                                               x.axis.title='', y.axis.title=input$quantitation_name,
+                                                               x.axis.title.size=20,y.axis.title.size=20,
+                                                               x.axis.text.size=10,y.axis.text.size=12,
+                                                               x.axis.text.angle=90,
+                                                               legend.title.size=12,legend.text.size=12,
+                                                               vis.value.text=input$quantitation_vis_cellf,
+                                                               value.text.size=3.5,
+                                                               return.stats=TRUE,
+                                                               plot_ncol = input$quantitation_feat_ncol,
+                                                               spot.total.num.stats = input$spot_total_number)
         quantitation_name_list <- quantitation_cellf[1:min(5, length(quantitation_cellf))]
         if (input$quantitation_agg_mode){
           try({utils::write.csv(v$quantitation_result[[2]], file.path(global$datapath,input$output_folder_name,
@@ -2145,21 +2144,21 @@ server <- function(input,output,session){
   shiny::observeEvent(input$celldart_start, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$sp_data)&!is.null(v$sc_data)){
-      brain.tmp <- pred_cellf_celldart(sp_data=v$sp_data,sc_data=v$sc_data,
-                                       outdir=file.path(global$datapath,input$output_folder_name),
-                                       sp_subset=input$celldart_check_subset,
-                                       spot.cluster.name=input$celldart_group,
-                                       spot.cluster.of.interest=input$celldart_group_sel,
-                                       metadata_celltype=input$celldart_metadata_celltype,
-                                       conda.env.name='STquantool',gpu=TRUE,
-                                       num_markers=input$celldart_num_markers,
-                                       seed_num=0,
-                                       nmix=input$celldart_nmix, npseudo=input$celldart_npseudo,
-                                       alpha=input$celldart_alpha, alpha_lr=input$celldart_alpha_lr,
-                                       emb_dim=input$celldart_emb_dim,
-                                       batch_size=input$celldart_batch_size,
-                                       n_iterations=input$celldart_n_iterations,
-                                       init_train_epoch=input$celldart_init_train_epoch)
+      brain.tmp <- STquantool::pred_cellf_celldart(sp_data=v$sp_data,sc_data=v$sc_data,
+                                                   outdir=file.path(global$datapath,input$output_folder_name),
+                                                   sp_subset=input$celldart_check_subset,
+                                                   spot.cluster.name=input$celldart_group,
+                                                   spot.cluster.of.interest=input$celldart_group_sel,
+                                                   metadata_celltype=input$celldart_metadata_celltype,
+                                                   conda.env.name='STquantool',gpu=TRUE,
+                                                   num_markers=input$celldart_num_markers,
+                                                   seed_num=0,
+                                                   nmix=input$celldart_nmix, npseudo=input$celldart_npseudo,
+                                                   alpha=input$celldart_alpha, alpha_lr=input$celldart_alpha_lr,
+                                                   emb_dim=input$celldart_emb_dim,
+                                                   batch_size=input$celldart_batch_size,
+                                                   n_iterations=input$celldart_n_iterations,
+                                                   init_train_epoch=input$celldart_init_train_epoch)
       v$sp_data <- brain.tmp
     }
     shinybusy::remove_modal_spinner()
@@ -2170,11 +2169,11 @@ server <- function(input,output,session){
   ## Save image files
   # Dimplot
   shiny::observeEvent(input$sc_clust_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_clust_save_dpi",
-                                        width_name = "sc_clust_width",
-                                        height_name = "sc_clust_height",
-                                        width_value=15, height_value=15,
-                                        action_button_name = "sc_clust_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "sc_clust_save_dpi",
+                                                    width_name = "sc_clust_width",
+                                                    height_name = "sc_clust_height",
+                                                    width_value=15, height_value=15,
+                                                    action_button_name = "sc_clust_save_start"))
   })
   shiny::observeEvent(input$sc_clust_save_start, {
     shinybusy::show_modal_spinner()
@@ -2198,11 +2197,11 @@ server <- function(input,output,session){
 
   # Frequency plot
   shiny::observeEvent(input$sc_freq_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_freq_save_dpi",
-                                        width_name = "sc_freq_width",
-                                        height_name = "sc_freq_height",
-                                        width_value=15, height_value=20,
-                                        action_button_name = "sc_freq_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "sc_freq_save_dpi",
+                                                    width_name = "sc_freq_width",
+                                                    height_name = "sc_freq_height",
+                                                    width_value=15, height_value=20,
+                                                    action_button_name = "sc_freq_save_start"))
   })
 
   shiny::observeEvent(input$sc_freq_save_start, {
@@ -2221,12 +2220,12 @@ server <- function(input,output,session){
 
   # Feature plot
   shiny::observeEvent(input$sc_feat_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_feat_save_dpi",
-                                        width_name = "sc_feat_width",
-                                        height_name = "sc_feat_height",
-                                        width_value=15*input$sc_feat_ncol,
-                                        height_value=15*(((length(v$sc_feat_list)-1)%/%input$sc_feat_ncol)+1),
-                                        action_button_name = "sc_feat_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "sc_feat_save_dpi",
+                                                    width_name = "sc_feat_width",
+                                                    height_name = "sc_feat_height",
+                                                    width_value=15*input$sc_feat_ncol,
+                                                    height_value=15*(((length(v$sc_feat_list)-1)%/%input$sc_feat_ncol)+1),
+                                                    action_button_name = "sc_feat_save_start"))
   })
   shiny::observeEvent(input$sc_feat_save_start, {
     shinybusy::show_modal_spinner()
@@ -2245,12 +2244,12 @@ server <- function(input,output,session){
 
   # Spatial cluster plot
   shiny::observeEvent(input$sp_cluster_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sp_cluster_save_dpi",
-                                        width_name = "sp_cluster_width",
-                                        height_name = "sp_cluster_height",
-                                        width_value=input$sp_cluster_img_width/28.35,
-                                        height_value=input$sp_cluster_img_height/28.35,
-                                        action_button_name = "sp_cluster_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "sp_cluster_save_dpi",
+                                                    width_name = "sp_cluster_width",
+                                                    height_name = "sp_cluster_height",
+                                                    width_value=input$sp_cluster_img_width/28.35,
+                                                    height_value=input$sp_cluster_img_height/28.35,
+                                                    action_button_name = "sp_cluster_save_start"))
   })
   shiny::observeEvent(input$sp_cluster_save_start, {
     shinybusy::show_modal_spinner()
@@ -2267,12 +2266,12 @@ server <- function(input,output,session){
 
   # Spatial feature plot
   shiny::observeEvent(input$sp_feat_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sp_feat_save_dpi",
-                                        width_name = "sp_feat_width",
-                                        height_name = "sp_feat_height",
-                                        width_value=input$sp_feat_img_width/28.35,
-                                        height_value=input$sp_feat_img_height/28.35,
-                                        action_button_name = "sp_feat_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "sp_feat_save_dpi",
+                                                    width_name = "sp_feat_width",
+                                                    height_name = "sp_feat_height",
+                                                    width_value=input$sp_feat_img_width/28.35,
+                                                    height_value=input$sp_feat_img_height/28.35,
+                                                    action_button_name = "sp_feat_save_start"))
   })
   shiny::observeEvent(input$sp_feat_save_start, {
     shinybusy::show_modal_spinner()
@@ -2290,12 +2289,12 @@ server <- function(input,output,session){
 
   # Violin plot
   shiny::observeEvent(input$vln_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "vln_save_dpi",
-                                        width_name = "vln_width",
-                                        height_name = "vln_height",
-                                        width_value=input$vln_img_width/28.35,
-                                        height_value=input$vln_img_height/28.35,
-                                        action_button_name = "vln_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "vln_save_dpi",
+                                                    width_name = "vln_width",
+                                                    height_name = "vln_height",
+                                                    width_value=input$vln_img_width/28.35,
+                                                    height_value=input$vln_img_height/28.35,
+                                                    action_button_name = "vln_save_start"))
   })
   shiny::observeEvent(input$vln_save_start, {
     shinybusy::show_modal_spinner()
@@ -2315,12 +2314,12 @@ server <- function(input,output,session){
 
   # Ridge plot
   shiny::observeEvent(input$ridge_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "ridge_save_dpi",
-                                        width_name = "ridge_width",
-                                        height_name = "ridge_height",
-                                        width_value=input$ridge_img_width/28.35,
-                                        height_value=input$ridge_img_height/28.35,
-                                        action_button_name = "ridge_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "ridge_save_dpi",
+                                                    width_name = "ridge_width",
+                                                    height_name = "ridge_height",
+                                                    width_value=input$ridge_img_width/28.35,
+                                                    height_value=input$ridge_img_height/28.35,
+                                                    action_button_name = "ridge_save_start"))
   })
   shiny::observeEvent(input$ridge_save_start, {
     shinybusy::show_modal_spinner()
@@ -2339,11 +2338,11 @@ server <- function(input,output,session){
 
   # Volcano plot
   shiny::observeEvent(input$sc_deg_volcano_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_deg_volcano_save_dpi",
-                                        width_name = "deg_volcano_width",
-                                        height_name = "deg_volcano_height",
-                                        width_value=13, height_value=15,
-                                        action_button_name = "sc_deg_volcano_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "sc_deg_volcano_save_dpi",
+                                                    width_name = "deg_volcano_width",
+                                                    height_name = "deg_volcano_height",
+                                                    width_value=13, height_value=15,
+                                                    action_button_name = "sc_deg_volcano_save_start"))
   })
   shiny::observeEvent(input$sc_deg_volcano_save_start, {
     shinybusy::show_modal_spinner()
@@ -2374,11 +2373,11 @@ server <- function(input,output,session){
 
   # Enrich plot
   shiny::observeEvent(input$sc_deg_enrich_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "sc_deg_enrich_save_dpi",
-                                        width_name = "deg_enrich_width",
-                                        height_name = "deg_enrich_height",
-                                        width_value=38, height_value=11,
-                                        action_button_name = "sc_deg_enrich_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "sc_deg_enrich_save_dpi",
+                                                    width_name = "deg_enrich_width",
+                                                    height_name = "deg_enrich_height",
+                                                    width_value=38, height_value=11,
+                                                    action_button_name = "sc_deg_enrich_save_start"))
   })
   shiny::observeEvent(input$sc_deg_enrich_save_start, {
     shinybusy::show_modal_spinner()
@@ -2411,12 +2410,12 @@ server <- function(input,output,session){
 
   # Quantitation
   shiny::observeEvent(input$quantitation_save, {
-    shiny::showModal(save_plot_wh_Modal(slider_input_name = "quantitation_save_dpi",
-                                        width_name = "quantitation_width",
-                                        height_name = "quantitation_height",
-                                        width_value=input$quantitation_img_width/28.35,
-                                        height_value=input$quantitation_img_height/28.35,
-                                        action_button_name = "quantitation_save_start"))
+    shiny::showModal(STquantool::save_plot_wh_Modal(slider_input_name = "quantitation_save_dpi",
+                                                    width_name = "quantitation_width",
+                                                    height_name = "quantitation_height",
+                                                    width_value=input$quantitation_img_width/28.35,
+                                                    height_value=input$quantitation_img_height/28.35,
+                                                    action_button_name = "quantitation_save_start"))
   })
   shiny::observeEvent(input$quantitation_save_start, {
     shinybusy::show_modal_spinner()
@@ -2460,17 +2459,17 @@ server <- function(input,output,session){
   # Saving processed single-cell or spatial dataset
   shiny::observeEvent(input$data_save, {
     if (input$save_radio=="Single-cell"){
-      shiny::showModal(save_files_Modal(text="single-cell", text_input_name="sc_save_file_name",
-                                        file_save_name="sc_data", action_button_name = "ok_sc"))
+      shiny::showModal(STquantool::save_files_Modal(text="single-cell", text_input_name="sc_save_file_name",
+                                                    file_save_name="sc_data", action_button_name = "ok_sc"))
     } else if (input$save_radio=="Spatial"){
-      shiny::showModal(save_files_Modal(text="spatial", text_input_name="sp_save_file_name",
-                                        file_save_name="sp_data", action_button_name = "ok_sp"))
+      shiny::showModal(STquantool::save_files_Modal(text="spatial", text_input_name="sp_save_file_name",
+                                                    file_save_name="sp_data", action_button_name = "ok_sp"))
     } else if (input$save_radio=="Genes: stored"){
-      shiny::showModal(save_files_Modal(text="stored gene list", text_input_name="sp_save_stored_gene",
-                                        file_save_name="stored_gene_list", action_button_name = "ok_stored_gene"))
+      shiny::showModal(STquantool::save_files_Modal(text="stored gene list", text_input_name="sp_save_stored_gene",
+                                                    file_save_name="stored_gene_list", action_button_name = "ok_stored_gene"))
     } else if (input$save_radio=="Genes: abundance"){
-      shiny::showModal(save_files_Modal(text="abundance gene list", text_input_name="sp_save_ab_gene",
-                                        file_save_name="ab_gene_list", action_button_name = "ok_ab_gene"))
+      shiny::showModal(STquantool::save_files_Modal(text="abundance gene list", text_input_name="sp_save_ab_gene",
+                                                    file_save_name="ab_gene_list", action_button_name = "ok_ab_gene"))
     }
   })
   shiny::observeEvent(input$ok_sc, {
@@ -2580,27 +2579,27 @@ server <- function(input,output,session){
 
   ## Convert file to 10Xformat
   shiny::observeEvent(input$convert_file_to_sparse, {
-    shiny::showModal(load_files_Modal(input=input, output=output, session=session,
-                                      text="csv or txt",
-                                      text_for_purpose="Will you convert the ",text_for_add=" file?",
-                                      text_input_name="file_load_name",
-                                      text_input_explain = "Name of the folder",
-                                      file_save_name = "Data_1",
-                                      radio_input_name = "radio_delim_type",
-                                      radio_input_explain = "Delimiter",
-                                      numeric_input_name1 = "col_num_to_rowname",
-                                      numeric_input_explain1 = "Select column number to transfer to rownames",
-                                      numeric_input_name2 = "row_num_to_skip",
-                                      numeric_input_explain2 = "Select row numbers to skip",
-                                      check_input_name1="file_load_header_check",
-                                      check_input_name2="file_load_transpose_check",
-                                      check_input_name3="file_load_shift_col_check",
-                                      files_button_name="choose_file_to_convert",
-                                      files_button_explain="Choose",
-                                      files_button_text="Select files to convert to 10X format (*.txt/*.csv)",
-                                      action_button_name1 = "check_load_file",
-                                      action_button_name2 = "convert_file_ok",
-                                      result_table = "table_check"))
+    shiny::showModal(STquantool::load_files_Modal(input=input, output=output, session=session,
+                                                  text="csv or txt",
+                                                  text_for_purpose="Will you convert the ",text_for_add=" file?",
+                                                  text_input_name="file_load_name",
+                                                  text_input_explain = "Name of the folder",
+                                                  file_save_name = "Data_1",
+                                                  radio_input_name = "radio_delim_type",
+                                                  radio_input_explain = "Delimiter",
+                                                  numeric_input_name1 = "col_num_to_rowname",
+                                                  numeric_input_explain1 = "Select column number to transfer to rownames",
+                                                  numeric_input_name2 = "row_num_to_skip",
+                                                  numeric_input_explain2 = "Select row numbers to skip",
+                                                  check_input_name1="file_load_header_check",
+                                                  check_input_name2="file_load_transpose_check",
+                                                  check_input_name3="file_load_shift_col_check",
+                                                  files_button_name="choose_file_to_convert",
+                                                  files_button_explain="Choose",
+                                                  files_button_text="Select files to convert to 10X format (*.txt/*.csv)",
+                                                  action_button_name1 = "check_load_file",
+                                                  action_button_name2 = "convert_file_ok",
+                                                  result_table = "table_check"))
   })
 
   # Choose the files to convert

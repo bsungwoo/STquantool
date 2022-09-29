@@ -1,7 +1,6 @@
 library(shiny)
 library(dplyr)
 library(DT)
-library(STquantool)
 
 options(shiny.maxRequestSize = 50*1024*1024^2)
 jscode <- "shinyjs.closeWindow = function() { window.close(); }"

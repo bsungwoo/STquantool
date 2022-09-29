@@ -1,6 +1,7 @@
 #' Internal Modal function to flip the image
 #' @description Flip the image
 #' @keywords internal
+#' @export
 flipModal <- function(text="vertically", input_name="ok_vertical") {
   shiny::modalDialog(
     shiny::div(shiny::tags$b(paste0("Will you ",text," flip the image?"), style = "color: black;")),
@@ -77,27 +78,10 @@ vertical_flip <- function(file_dir_vector){
   }
 }
 
-#' Save the images
-#' @description Save the images
-#' @keywords internal
-save_plot_Modal <- function(slider_input_name="save_dpi", action_button_name = "save_start") {
-  shiny::modalDialog(
-    shiny::div(shiny::tags$b("Options for saving a plot"), style = "color: blue;"),
-    shiny::wellPanel(
-      shiny::sliderInput(inputId = slider_input_name,
-                         label = "dpi to save image",
-                         value = 100, min = 0, max=500, step=10)
-    ),
-    footer = shiny::tagList(
-      shiny::modalButton("Cancel"),
-      shiny::actionButton(action_button_name, "Save")
-    )
-  )
-}
-
 #' Modal to save the deg output plot files
 #' @description Save the deg output plot files
 #' @keywords internal
+#' @export
 save_plot_wh_Modal <- function(slider_input_name="save_dpi", width_name = "deg_width",
                                height_name = "deg_height", width_value=13, height_value=15,
                                action_button_name = "save_start") {
@@ -124,6 +108,7 @@ save_plot_wh_Modal <- function(slider_input_name="save_dpi", width_name = "deg_w
 #' Modal to save the rds files
 #' @description Modal to save the rds files
 #' @keywords internal
+#' @export
 save_files_Modal <- function(text="single-cell",
                              text_for_purpose="Will you save the ",text_for_add=" data?",
                              text_input_name="sc_save_name",
@@ -155,6 +140,7 @@ save_files_Modal <- function(text="single-cell",
 #' Modal to load csv or txt files
 #' @description Modal to load csv or txt files
 #' @keywords internal
+#' @export
 load_files_Modal <- function(input, output, session, text="csv or txt",
                              text_for_purpose="Will you load the ",text_for_add=" file?",
                              text_input_name="file_load_name",
@@ -212,6 +198,7 @@ load_files_Modal <- function(input, output, session, text="csv or txt",
 #' Modal to save gene list
 #' @description Modal to load csv or txt files
 #' @keywords internal
+#' @export
 save_gene_list_Modal <- function(text_for_purpose='Will you save the given gene list?',
                                  text_input_name="gene_save_name",
                                  text_input_explain = "Name of the gene list",
