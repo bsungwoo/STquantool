@@ -7,7 +7,7 @@ server <- function(input,output,session){
   shinyFiles::shinyDirChoose(
     input,
     'dir',
-    roots = c(home = '~'),
+    roots = c(home = '~', wd = '.'),
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
@@ -16,9 +16,11 @@ server <- function(input,output,session){
   dir_path_wd <- shiny::eventReactive(input$dir, {
     if (is.null(names(dir()))){
 
+    } else if (dir()$root[[1]]=='wd'){
+      file.path(paste(c(getwd(),unlist(dir()$path[-1])),
+                      collapse=.Platform$file.sep))
     } else if (dir()$root[[1]]=='home') {
-      home <- normalizePath("~")
-      file.path(paste(c(home,unlist(dir()$path[-1])),
+      file.path(paste(c(fs::path_home(), unlist(dir()$path[-1])),
                       collapse=.Platform$file.sep))
     }
   }
@@ -83,8 +85,7 @@ server <- function(input,output,session){
       file.path(paste(c(getwd(),unlist(qc_dir()$path[-1])),
                       collapse=.Platform$file.sep))
     } else if (qc_dir()$root[[1]]=='home') {
-      home <- normalizePath("~")
-      file.path(paste(c(home,unlist(qc_dir()$path[-1])),
+      file.path(paste(c(fs::path_home(),unlist(qc_dir()$path[-1])),
                       collapse=.Platform$file.sep))
     }
   }
@@ -291,8 +292,7 @@ server <- function(input,output,session){
       file.path(paste(c(getwd(),unlist(dir_integ()$path[-1])),
                       collapse=.Platform$file.sep))
     } else if (dir_integ()$root[[1]]=='home') {
-      home <- normalizePath("~")
-      file.path(paste(c(home,unlist(dir_integ()$path[-1])),
+      file.path(paste(c(fs::path_home(),unlist(dir_integ()$path[-1])),
                       collapse=.Platform$file.sep))
     }
   }
@@ -2533,8 +2533,7 @@ server <- function(input,output,session){
       load_path <- file.path(paste(c(getwd(),unlist(data_load()$files)), collapse=.Platform$file.sep))
       next_step <- TRUE
     } else if (data_load()$root[[1]]=='home') {
-      home <- normalizePath("~")
-      load_path <- file.path(paste(c(home,unlist(data_load()$files)), collapse=.Platform$file.sep))
+      load_path <- file.path(paste(c(fs::path_home(),unlist(data_load()$files)), collapse=.Platform$file.sep))
       next_step <- TRUE
     }
 
@@ -2611,9 +2610,8 @@ server <- function(input,output,session){
                                      collapse=.Platform$file.sep))
       next_step <- T
     } else if (choose_file_to_convert()$root[[1]]=='home') {
-      home <- normalizePath("~")
       path_tmp <- unlist(choose_file_to_convert()$files)
-      v$load_path <- file.path(paste(c(home,path_tmp),
+      v$load_path <- file.path(paste(c(fs::path_home(),path_tmp),
                                      collapse=.Platform$file.sep))
       next_step <- T
     }
