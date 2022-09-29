@@ -11,25 +11,19 @@ server <- function(input,output,session){
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
-  global <- shiny::reactiveValues(datapath = '~')
-
   dir <- shiny::reactive(input$dir)
 
-  output$dir <- shiny::renderText({
-    global$datapath
-  })
+  dir_path_wd <- shiny::eventReactive(input$dir, {
+    if (is.null(names(dir()))){
 
-  shiny::observeEvent(ignoreNULL = TRUE,
-                      eventExpr = {
-                        input$dir
-                      },
-                      handlerExpr = {
-                        if (!"path" %in% names(dir())) return()
-                        home <- normalizePath("~")
-                        global$datapath <-
-                          file.path(home, paste(unlist(dir()$path[-1]),
-                                                collapse = .Platform$file.sep))
-                      })
+    } else if (dir()$root[[1]]=='home') {
+      home <- normalizePath("~")
+      file.path(paste(c(home,unlist(dir()$path[-1])),
+                      collapse=.Platform$file.sep))
+    }
+  }
+  )
+  output$dir <- shiny::renderText({dir_path_wd()})
 
   # Set working directory
   shiny::observeEvent(input$set_wd, {
@@ -38,11 +32,9 @@ server <- function(input,output,session){
       # save the original working directory for the first click
       v$orig_wd <- getwd()
     }
-    setwd(global$datapath)
+    setwd(dir_path_wd())
 
-    output$cmd <- shiny::renderText({
-      "Working directory was set"
-    })
+    output$cmd <- shiny::renderText({"Working directory was set"})
   })
 
   # Make output folder
@@ -50,8 +42,8 @@ server <- function(input,output,session){
                       {
                         # Assign the name of directories for saving figures
                         if (!file.exists(input$output_folder_name)){
-                          dir.create(file.path(global$datapath,input$output_folder_name))
-                          fig_dir <- file.path(global$datapath,input$output_folder_name,'data_files')
+                          dir.create(file.path(dir_path_wd(),input$output_folder_name))
+                          fig_dir <- file.path(dir_path_wd(),input$output_folder_name,'data_files')
 
                           if (!file.exists(fig_dir)){
                             dir.create(fig_dir)
@@ -60,7 +52,7 @@ server <- function(input,output,session){
                             })}
 
                         } else {
-                          fig_dir <- file.path(global$datapath,input$output_folder_name,'data_files')
+                          fig_dir <- file.path(dir_path_wd(),input$output_folder_name,'data_files')
                           if (!file.exists(fig_dir)){
                             dir.create(fig_dir)
                             output$cmd <- shiny::renderText({
@@ -636,7 +628,7 @@ server <- function(input,output,session){
                                                       vis.freq.text=input$sc_freq_label, freq.stats=TRUE,
                                                       x.axis.text.angle=input$sc_freq_x_angle,
                                                       x.axis.text.size=input$sc_freq_x_size)
-      try({utils::write.csv(v$freq_boxplot[[2]], file.path(global$datapath,input$output_folder_name,
+      try({utils::write.csv(v$freq_boxplot[[2]], file.path(dir_path_wd(),input$output_folder_name,
                                                            'data_files',
                                                            paste0(input$freqplot_radio,
                                                                   '_freq_plot_',
@@ -1027,7 +1019,7 @@ server <- function(input,output,session){
                                           width = input$sp_save_by_n_width,
                                           dpi = input$sp_upload_save_dpi,
                                           title_size=sp_featplot_multi_list()[[19]],
-                                          save_path=file.path(global$datapath,
+                                          save_path=file.path(dir_path_wd(),
                                                               input$output_folder_name,
                                                               'data_files/'),
                                           file_name = input$sp_save_name)
@@ -1383,14 +1375,14 @@ server <- function(input,output,session){
 
       v$sc_marker <- temp %>% dplyr::filter(avg_exp_clust > as.numeric(sc_marker_list()[[10]])) %>%
         dplyr::group_by(cluster) %>% dplyr::arrange(dplyr::desc(avg_exp_clust), .by_group = TRUE)
-      try({utils::write.csv(v$sc_marker, file.path(global$datapath,input$output_folder_name,
+      try({utils::write.csv(v$sc_marker, file.path(dir_path_wd(),input$output_folder_name,
                                                    'data_files',paste0(input$marker_radio,'_marker_',
                                                                        sc_marker_list()[[1]],'.csv')))})
     } else if (sc_marker_list()[[5]]=='NSForest') {
       assay_type <- ifelse(input$marker_radio=='Single-cell', 'RNA',
                            ifelse(input$marker_radio=='Spatial','Spatial', NULL))
 
-      outdir_ns <- file.path(global$datapath,input$output_folder_name,
+      outdir_ns <- file.path(dir_path_wd(),input$output_folder_name,
                              'data_files',paste0(input$marker_radio,'_NSForest_marker'))
       # Make output directory
       if (!file.exists(outdir_ns)){
@@ -1458,7 +1450,7 @@ server <- function(input,output,session){
         dplyr::arrange(dplyr::desc(avg_exp_ident.1)) %>% dplyr::arrange(dplyr::desc(sign)) %>%
         dplyr::select(-sign)
 
-      try({utils::write.csv(v$DEG, file.path(global$datapath,input$output_folder_name,
+      try({utils::write.csv(v$DEG, file.path(dir_path_wd(),input$output_folder_name,
                                              'data_files',
                                              paste0(input$DEG_radio,'_DEG_subset_',
                                                     paste(sc_deg_list()[[5]],collapse="_"),'_btw_',
@@ -1478,7 +1470,7 @@ server <- function(input,output,session){
         dplyr::arrange(dplyr::desc(avg_exp_ident.1)) %>% dplyr::arrange(dplyr::desc(sign)) %>%
         dplyr::select(-sign)
 
-      try({utils::write.csv(v$DEG, file.path(global$datapath,input$output_folder_name,
+      try({utils::write.csv(v$DEG, file.path(dir_path_wd(),input$output_folder_name,
                                              'data_files',
                                              paste0(input$DEG_radio,'_DEG_',
                                                     paste(sc_deg_list()[[3]],collapse="."),
@@ -2087,7 +2079,7 @@ server <- function(input,output,session){
                                                                spot.total.num.stats = input$spot_total_number)
         quantitation_name_list <- quantitation_cellf[1:min(5, length(quantitation_cellf))]
         if (input$quantitation_agg_mode){
-          try({utils::write.csv(v$quantitation_result[[2]], file.path(global$datapath,input$output_folder_name,
+          try({utils::write.csv(v$quantitation_result[[2]], file.path(dir_path_wd(),input$output_folder_name,
                                                                       'data_files',
                                                                       paste0('Regional_quant_table_',
                                                                              input$quantitation_mode,'_of_',
@@ -2096,7 +2088,7 @@ server <- function(input,output,session){
                                                                              input$quantitation_comp_group,'_with_spot_number_',
                                                                              input$spot_total_number,'.csv')))})
         } else {
-          try({utils::write.csv(v$quantitation_result[[2]], file.path(global$datapath,input$output_folder_name,
+          try({utils::write.csv(v$quantitation_result[[2]], file.path(dir_path_wd(),input$output_folder_name,
                                                                       'data_files',
                                                                       paste0('Regional_quant_table_',
                                                                              input$quantitation_mode,'_of_',
@@ -2145,7 +2137,7 @@ server <- function(input,output,session){
     shinybusy::show_modal_spinner()
     if (!is.null(v$sp_data)&!is.null(v$sc_data)){
       brain.tmp <- STquantool::pred_cellf_celldart(sp_data=v$sp_data,sc_data=v$sc_data,
-                                                   outdir=file.path(global$datapath,input$output_folder_name),
+                                                   outdir=file.path(dir_path_wd(),input$output_folder_name),
                                                    sp_subset=input$celldart_check_subset,
                                                    spot.cluster.name=input$celldart_group,
                                                    spot.cluster.of.interest=input$celldart_group_sel,
@@ -2183,7 +2175,7 @@ server <- function(input,output,session){
     } else {
       cell_highlight <- ""
     }
-    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(dir_path_wd(),input$output_folder_name,
                                    'data_files',
                                    paste0(input$dimplot_radio,'_dimplot_',
                                           input$sc_group_var,'_',cell_highlight,
@@ -2207,7 +2199,7 @@ server <- function(input,output,session){
   shiny::observeEvent(input$sc_freq_save_start, {
     shinybusy::show_modal_spinner()
     v$freq_boxplot[[1]]
-    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(dir_path_wd(),input$output_folder_name,
                                    'data_files',
                                    paste0(input$freqplot_radio,'_freqplot_',
                                           input$sc_group_var_freq,'_',
@@ -2230,7 +2222,7 @@ server <- function(input,output,session){
   shiny::observeEvent(input$sc_feat_save_start, {
     shinybusy::show_modal_spinner()
     v$sc_featureplot
-    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(dir_path_wd(),input$output_folder_name,
                                    'data_files',
                                    paste0(input$featureplot_radio,'_featplot_',
                                           paste(v$sc_feat_list,collapse='_'),'.png')),
@@ -2254,7 +2246,7 @@ server <- function(input,output,session){
   shiny::observeEvent(input$sp_cluster_save_start, {
     shinybusy::show_modal_spinner()
     v$sc_clusterplot
-    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(dir_path_wd(),input$output_folder_name,
                                    'data_files',
                                    paste0('spclustplot_seurat_clusters.png')),
                          width = input$sp_cluster_width,
@@ -2276,7 +2268,7 @@ server <- function(input,output,session){
   shiny::observeEvent(input$sp_feat_save_start, {
     shinybusy::show_modal_spinner()
     v$sp_featureplot
-    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(dir_path_wd(),input$output_folder_name,
                                    'data_files',
                                    paste0('spfeatplot_',
                                           paste(v$sp_feat_list,collapse='_'),'.png')),
@@ -2301,7 +2293,7 @@ server <- function(input,output,session){
     if (!is.null(v$vlnplot)){
       patchwork::wrap_plots(v$vlnplot, ncol=input$vln_ncol)
     }
-    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(dir_path_wd(),input$output_folder_name,
                                    'data_files',
                                    paste0(input$vlnplot_radio,'_vlnplot_',
                                           paste(v$vlnplot_feat_list,collapse='_'),'.png')),
@@ -2324,7 +2316,7 @@ server <- function(input,output,session){
   shiny::observeEvent(input$ridge_save_start, {
     shinybusy::show_modal_spinner()
     v$ridgeplot
-    try({ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
+    try({ggplot2::ggsave(file.path(dir_path_wd(),input$output_folder_name,
                                    'data_files',
                                    paste0(input$ridgeplot_radio,'_ridgeplot_',
                                           paste(v$ridge_feat_list,collapse='_'),'.png')),
@@ -2347,7 +2339,7 @@ server <- function(input,output,session){
   shiny::observeEvent(input$sc_deg_volcano_save_start, {
     shinybusy::show_modal_spinner()
     try({if (input$sc_check_deg_subset){
-      grDevices::png(file.path(global$datapath,input$output_folder_name,
+      grDevices::png(file.path(dir_path_wd(),input$output_folder_name,
                                'data_files',
                                paste0(input$DEG_radio,'_volcanoplot_subset_',
                                       paste(input$sc_deg_subset_sel,collapse="_"),'_btw_',
@@ -2356,7 +2348,7 @@ server <- function(input,output,session){
                      units = 'cm', res = input$sc_deg_volcano_save_dpi,
                      bg = "white")
     } else {
-      grDevices::png(file.path(global$datapath,input$output_folder_name,
+      grDevices::png(file.path(dir_path_wd(),input$output_folder_name,
                                'data_files',
                                paste0(input$DEG_radio,'_volcanoplot_',
                                       paste0(input$sc_deg_int,'_',
@@ -2382,7 +2374,7 @@ server <- function(input,output,session){
   shiny::observeEvent(input$sc_deg_enrich_save_start, {
     shinybusy::show_modal_spinner()
     try({if (input$sc_check_deg_subset){
-      grDevices::png(file.path(global$datapath,input$output_folder_name,
+      grDevices::png(file.path(dir_path_wd(),input$output_folder_name,
                                'data_files',
                                paste0(input$DEG_radio,'_',input$sc_deg_enrich_type,'_',
                                       input$sc_deg_enrich_species,'_enrichplot_subset_',
@@ -2392,7 +2384,7 @@ server <- function(input,output,session){
                      res = input$sc_deg_enrich_save_dpi,
                      bg = "white")
     } else {
-      grDevices::png(file.path(global$datapath,input$output_folder_name,
+      grDevices::png(file.path(dir_path_wd(),input$output_folder_name,
                                'data_files',
                                paste0(input$DEG_radio,'_',input$sc_deg_enrich_type,'_',
                                       input$sc_deg_enrich_species,'_enrichplot_',
@@ -2427,7 +2419,7 @@ server <- function(input,output,session){
       quantitation_cellf <- input$quantitation_cellf2
     }
     try({if (input$quantitation_agg_mode){
-      ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
+      ggplot2::ggsave(file.path(dir_path_wd(),input$output_folder_name,
                                 'data_files',
                                 paste0('Regional_quantplot_',
                                        input$quantitation_mode,'_of_',
@@ -2439,7 +2431,7 @@ server <- function(input,output,session){
                       height = input$quantitation_height, units = c("cm"),
                       dpi = input$quantitation_save_dpi, bg = "white")
     } else {
-      ggplot2::ggsave(file.path(global$datapath,input$output_folder_name,
+      ggplot2::ggsave(file.path(dir_path_wd(),input$output_folder_name,
                                 'data_files',
                                 paste0('Regional_quantplot_',
                                        input$quantitation_mode,'_of_',
@@ -2474,56 +2466,56 @@ server <- function(input,output,session){
   })
   shiny::observeEvent(input$ok_sc, {
     shinybusy::show_modal_spinner()
-    try({saveRDS(v$sc_data, file.path(global$datapath,input$output_folder_name,
+    try({saveRDS(v$sc_data, file.path(dir_path_wd(),input$output_folder_name,
                                       paste0(input$sc_save_file_name,'.rds')))})
     shinybusy::remove_modal_spinner()
     shiny::removeModal()
     output$cmd <- shiny::renderText({paste0('The single-cell data was saved as RDS in ',
-                                            file.path(global$datapath,input$output_folder_name))})
+                                            file.path(dir_path_wd(),input$output_folder_name))})
   })
   shiny::observeEvent(input$ok_sp, {
     shinybusy::show_modal_spinner()
-    try({saveRDS(v$sp_data, file.path(global$datapath,input$output_folder_name,
+    try({saveRDS(v$sp_data, file.path(dir_path_wd(),input$output_folder_name,
                                       paste0(input$sp_save_file_name,'.rds')))})
     shinybusy::remove_modal_spinner()
     shiny::removeModal()
     output$cmd <- shiny::renderText({paste0('The spatial data was saved as RDS in ',
-                                            file.path(global$datapath,input$output_folder_name))})
+                                            file.path(dir_path_wd(),input$output_folder_name))})
   })
   shiny::observeEvent(input$ok_stored_gene, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$gene_upload)){
       try({utils::write.table(t(plyr::ldply(v$gene_upload, rbind)),
-                              file = file.path(global$datapath,input$output_folder_name,
+                              file = file.path(dir_path_wd(),input$output_folder_name,
                                                paste0(input$sp_save_stored_gene,'.csv')),
                               sep=',', col.names=FALSE)})
     }
     shinybusy::remove_modal_spinner()
     shiny::removeModal()
     output$cmd <- shiny::renderText({paste0('The gene lists were saved as csv in ',
-                                            file.path(global$datapath,input$output_folder_name))})
+                                            file.path(dir_path_wd(),input$output_folder_name))})
   })
   shiny::observeEvent(input$ok_ab_gene, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$sc_gene_list)&!is.null(v$sp_gene_list)){
       try({utils::write.table(t(plyr::ldply(list("Single.cell.top3000"=v$sc_gene_list,
                                                  "Spatial.top3000"=v$sp_gene_list), rbind)),
-                              file.path(global$datapath,input$output_folder_name,
+                              file.path(dir_path_wd(),input$output_folder_name,
                                         paste0(input$sp_save_ab_gene,'.csv')), sep=',',
                               col.names=FALSE)})
     } else if (!is.null(v$sc_gene_list)&is.null(v$sp_gene_list)){
       try({utils::write.csv(data.frame("Single.cell.top3000"=v$sc_gene_list),
-                            file.path(global$datapath,input$output_folder_name,
+                            file.path(dir_path_wd(),input$output_folder_name,
                                       paste0(input$sp_save_ab_gene,'.csv')), col.names = T)})
     } else if (is.null(v$sc_gene_list)&!is.null(v$sp_gene_list)){
       try({utils::write.csv(data.frame("Spatial.top3000"=v$sp_gene_list),
-                            file.path(global$datapath,input$output_folder_name,
+                            file.path(dir_path_wd(),input$output_folder_name,
                                       paste0(input$sp_save_ab_gene,'.csv')), col.names = T)})
     }
     shinybusy::remove_modal_spinner()
     shiny::removeModal()
     output$cmd <- shiny::renderText({paste0('The abundance list was saved as csv in ',
-                                            file.path(global$datapath,input$output_folder_name))})
+                                            file.path(dir_path_wd(),input$output_folder_name))})
   })
 
 
@@ -2685,7 +2677,7 @@ server <- function(input,output,session){
           read_total <- Matrix::Matrix(read_total, sparse=TRUE)
           dimnames(read_total) = list(read_row, read_col)
 
-          save_path <- file.path(global$datapath,input$output_folder_name,input$file_load_name)
+          save_path <- file.path(dir_path_wd(),input$output_folder_name,input$file_load_name)
           dir.create(save_path)
           # Create HDF5 File
           if (!file.exists(file.path(save_path,

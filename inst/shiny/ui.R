@@ -1037,7 +1037,7 @@ ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("s
                               shiny::wellPanel(
                                 shiny::sliderInput(inputId = "celldart_num_markers",
                                             label = "Number of markers for each celltype",
-                                            value = 10, min=1, max=50, step=1),
+                                            value = 20, min=1, max=50, step=1),
                                 shiny::sliderInput(inputId = "celldart_nmix",
                                             label = "Number of cells in a pseudospot",
                                             value = 8, min=1, max=20, step=1),
