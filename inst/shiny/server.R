@@ -689,9 +689,9 @@ server <- function(input,output,session){
           val = eval(parse(text=paste0('temp$',input$sc_vis_metadata)))
           sc.min = min(val); sc.max = max(val)
           if (sc.min > 0){sc.min = 0}
-          if (grepl('_cellf',input$sc_vis_metadata)){
+          if (grepl('_cellf',input$sc_vis_metadata[1])){
             sc.min=0; sc.max=1
-          } else if (grepl('_module|[0-9]$',input$sc_vis_metadata)) {
+          } else if (grepl('_module|[0-9]$',input$sc_vis_metadata[1])) {
             sc.min=-4; sc.max=4
           } else {
             sc.min = sc.min; sc.max=sc.max
@@ -857,9 +857,9 @@ server <- function(input,output,session){
           val = eval(parse(text=paste0('temp$',input$sp_vis_metadata)))
           sp.min = min(val); sp.max = max(val)
           if (sp.min > 0){sp.min = 0}
-          if (grepl('_cellf',input$sp_vis_metadata)){
+          if (grepl('_cellf',input$sp_vis_metadata[1])){
             sp.min=0; sp.max=1
-          } else if (grepl('_module|[0-9]$',input$sp_vis_metadata)) {
+          } else if (grepl('_module|[0-9]$',input$sp_vis_metadata[1])) {
             sp.min=-4; sp.max=4
           } else {
             sp.min=sp.min; sp.max=sp.max
@@ -1190,9 +1190,9 @@ server <- function(input,output,session){
           val = eval(parse(text=paste0('temp$',input$ridge_vis_metadata)))
           sc.min = min(val); sc.max = max(val)
           if (sc.min > 0){sc.min = -0.5}
-          if (grepl('_cellf',input$ridge_vis_metadata)){
+          if (grepl('_cellf',input$ridge_vis_metadata[1])){
             sc.min=-0.5; sc.max=1
-          } else if (grepl('_module|[0-9]$',input$ridge_vis_metadata)) {
+          } else if (grepl('_module|[0-9]$',input$ridge_vis_metadata[1])) {
             sc.min=-4; sc.max=4
           } else {
             sc.min = sc.min; sc.max=sc.max
@@ -2012,9 +2012,9 @@ server <- function(input,output,session){
     y_axis_name <- "values"
     if (input$quantitation_cellf_mode=="metadata" &
         !is.null(input$quantitation_cellf1)){
-      if (grepl('_cellf',input$quantitation_cellf1)){
+      if (grepl('_cellf',input$quantitation_cellf1[1])){
         y_axis_name <- "cell fraction"
-      } else if (grepl('[0-9]$',input$quantitation_cellf1)){
+      } else if (grepl('[0-9]$',input$quantitation_cellf1[1])){
         y_axis_name <- "module score"
       } else {
         y_axis_name <- "values"
