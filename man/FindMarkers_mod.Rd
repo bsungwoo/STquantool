@@ -27,7 +27,25 @@ FindMarkers_mod(
 
 \item{group.to.find}{identity of the group to find markers within}
 
-\item{others}{refer to Seurat::FindMarkers}
+\item{logfc.threshold}{refer to Seurat::FindMarkers}
+
+\item{test.use}{refer to Seurat::FindMarkers}
+
+\item{ident.1}{refer to Seurat::FindMarkers}
+
+\item{ident.2}{refer to Seurat::FindMarkers}
+
+\item{slot}{refer to Seurat::FindMarkers}
+
+\item{assay}{refer to Seurat::FindMarkers}
+
+\item{min.pct}{refer to Seurat::FindMarkers}
+
+\item{only.pos}{refer to Seurat::FindMarkers}
+
+\item{latent.vars}{refer to Seurat::FindMarkers}
+
+\item{min.cells.group}{refer to Seurat::FindMarkers}
 }
 \value{
 dataframe with average log fold change, percentage of cells detected in each group (ident.1 and ident.2), adjusted p-value and average feature value in each group

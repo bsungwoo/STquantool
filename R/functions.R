@@ -1103,7 +1103,7 @@ RidgePlot_mod <- function(object,feat,groups='seurat_clusters',
       ggridges::geom_density_ridges(scale = 4, size = 1, alpha = alpha) +
       ggplot2::scale_x_continuous(expand = c(0, 0)) +
       ggplot2::scale_y_discrete(expand = c(0, 0)) +
-      coord_cartesian(clip = "off") +
+      ggplot2::coord_cartesian(clip = "off") +
       ggplot2::theme_minimal(base_size = 14) +
       ggplot2::xlim(lim) + ggplot2::ggtitle(feat[i]) +
       ggplot2::xlab(x.axis.title) + ggplot2::ylab(y.axis.title) +
@@ -1510,7 +1510,16 @@ NS_Forest_R <- function(object,assay="RNA",slot="data",
 #' @param object Seurat object to find markers
 #' @param purpose purpose of the function: marker discovery or differentially expressed genes finding
 #' @param group.to.find identity of the group to find markers within
-#' @param others refer to Seurat::FindMarkers
+#' @param logfc.threshold refer to Seurat::FindMarkers
+#' @param test.use refer to Seurat::FindMarkers
+#' @param ident.1 refer to Seurat::FindMarkers
+#' @param ident.2 refer to Seurat::FindMarkers
+#' @param slot refer to Seurat::FindMarkers
+#' @param assay refer to Seurat::FindMarkers
+#' @param min.pct refer to Seurat::FindMarkers
+#' @param only.pos refer to Seurat::FindMarkers
+#' @param latent.vars refer to Seurat::FindMarkers
+#' @param min.cells.group refer to Seurat::FindMarkers
 #' @return dataframe with average log fold change, percentage of cells detected in each group (ident.1 and ident.2), adjusted p-value and average feature value in each group
 #' @importFrom dplyr "%>%"
 #' @export
