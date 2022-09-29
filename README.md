@@ -89,6 +89,12 @@ Preprocessing single or multiple datasets.
 (3) Training parameters may be changed, but it is recommended to run the CellDART with default parameters.  
 (4) Click the 'Start' button to start the analysis. Explore the results using 'Visualization' and 'Utility-Quantitation' tabs.  
 
+## Key reference articles  
+1. Aevermann B, Zhang Y, Novotny M, Keshk M, Bakken T, Miller J, Hodge R, Lelieveldt B, Lein E, Scheuermann RH. A machine learning method for the discovery of minimum marker gene combinations for cell type identification from single-cell RNA sequencing. Genome Res. 2021 Oct;31(10):1767-1780.    
+2. Hao, Yuhan, et al. "Integrated analysis of multimodal single-cell data." Cell 184.13 (2021): 3573-3587.  
+3. Sungwoo Bae, Kwon Joong Na, Jaemoon Koh, Dong Soo Lee, Hongyoon Choi, Young Tae Kim, CellDART: cell type inference by domain adaptation of single-cell and spatial transcriptomic data, Nucleic Acids Research, Volume 50, Issue 10, 10 June 2022, Page e57.  
+4. Wu T, Hu E, Xu S, Chen M, Guo P, Dai Z, Feng T, Zhou L, Tang W, Zhan L, Fu x, Liu S, Bo X, Yu G (2021). “clusterProfiler 4.0: A universal enrichment tool for interpreting omics data.” The Innovation, 2(3), 100141.  
+
 ## Potential error and solutions (in Windows 11)  
 CondaSSLError: OpenSSL appears to be unavailable on this machine.  
 (1) If the error persists even after installation of OpenSSL, then, please run the following command (change according to the miniconda path) first and start app in the same cmd window.  
