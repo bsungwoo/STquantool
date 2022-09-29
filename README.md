@@ -6,18 +6,23 @@ ST analysis tool to visualize and quantify multiple datasets
 devtools::install_github('bsungwoo/STquantool', force = T)
 ```
 
+## Run app
+```Plain Text
+STquantool::run_app()
+```
+
 ## Manual  
 The R shiny application panel consists of main, upload, visualization, and analysis sections.  
 
 ### 1. Load or Save files:  
-### A. Set woring directory and assign output folder  
+#### A. Set working directory and assign output folder  
 (1) Click 'Find directory' to browse & select directory and click 'Set working directory' to fix the working directory.  
 (2) Put name for the output folder and click 'Assign output folder'. All the results will be saved in '<name of output folder>/data_files'.  
 
-### B. To upload Seurat object saved as spatial .rds format or Gene lists saved in csv format. (<500 MB)  
+#### B. To upload Seurat object saved as spatial .rds format or Gene lists saved in csv format. (<500 MB)  
 To upload Seurat object saved in rds format, browse the rds file by selecting the data type and clicking 'Data load'.  
 
-### C. To convert tsv/csv/txt format file to count matrix  
+#### C. To convert tsv/csv/txt format file to count matrix  
 (1) Click 'Convert' button in 'Convert to sparse matrix (.rds)'. A window will appear.  
 (2) Click 'Choose' to search for the file to upload.  
 (3) For the single-cell or spatial count matrix, rownames should be gene names and column names should be barcode names.  
@@ -27,7 +32,7 @@ To upload Seurat object saved in rds format, browse the rds file by selecting th
 (7) If the name of the first column is not empty or wrongly assigned (normally, it should be empty or non-meaningful character such as .X) and the column should be shifted.  
 (8) If you finished checking, then click 'Convert' button to generate sparse matrix in .rds format.  
 
-### D. Save processed data  
+#### D. Save processed data  
 'Data save' button in 'Upload & Save' will automatically extract and save the single-cell/spatial rds files, stored gene lists, and abundance gene lists.  
 
 ### 2. QC process  
@@ -56,22 +61,22 @@ Preprocessing single or multiple datasets.
 (4) Draw enrichment plot for the GO/KEGG terms with the extracted DEGs in (2).  
 
 ### 5. Utility  
-### A. Annotation of cell or spot clusters  
+#### A. Annotation of cell or spot clusters  
 (1) Click the data format and group to annotate.  
 (2) check the elements in the group and assing the new group name and the new element name.  
 (3) To recode the existing group to larger group, then check 'Recode the group and save'.  
 
-### B. Module score  
+#### B. Module score  
 (1) Click the data format and assign the name of the module score.  
 (2) Import csv file with the feature list or choose among the saved gene list to select the genes for module scores.  
 (3) Click 'Generate' to make module scores. After generating the score, the score can be visualized in the 3. Visualization tab.  
 
-### C. Subest the dataset  
+#### C. Subest the dataset  
 (1) Click the data format and select group for the subsetting.  
 (2) Choose clusters to subset and click 'recluster' if reclustering is needed.  
 (3) Click 'Subset' to proceed with the subsetting procedure.  
 
-### D. Quantify the dataset  
+#### D. Quantify the dataset  
 (1) Select calculation method, comparison group (x-axis), and data values.  
 (2) To aggregate the dataset into the recoded group generated in A, then check the box (aggregate to boxplot).  
 (3) Select facet group or split/recode group pairs.  
@@ -83,3 +88,20 @@ Preprocessing single or multiple datasets.
 (2) Select the number of marker genes per cell type (default: 20), number of cells in a pseudospot (default: 8), and number of pseudospots (generally optimal in the range of 5~10 times the number of real spots).  
 (3) Training parameters may be changed, but it is recommended to run the CellDART with default parameters.  
 (4) Click the 'Start' button to start the analysis. Explore the results using 'Visualization' and 'Utility-Quantitation' tabs.  
+
+## Potential error and solutions (in Windows 11)  
+CondaSSLError: OpenSSL appears to be unavailable on this machine.  
+(1) If the error persists even after installation of OpenSSL, then, please run the following command (change according to the miniconda path) first and start app in the same cmd window.  
+```Plain Text
+https://github.com/conda/conda/issues/11795
+shell('setx PATH "C:/Users/<User Name>/AppData/Local/r-miniconda/Library/bin;C:/Users/<User Name>/AppData/Local/r-miniconda/condabin"')
+STquantool::run_app()
+```
+(2) If the above solution does not work, then manually install conda environment with the below command.  
+```Plain Text
+conda create -n STquantool -c conda-forge python=3.8.12
+conda activate STquantool
+pip install git+https://github.com/mexchy1000/CellDART.git
+pip install graphviz numexpr
+```
+Then run the application again.  

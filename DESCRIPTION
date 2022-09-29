@@ -28,6 +28,7 @@ Imports:
       shinythemes,
       reticulate (>= 1.25),
       Seurat (>= 4.1.0),
+      hdf5r,
       dplyr (>= 1.0.7),
       plyr,
       DT (>= 0.24),

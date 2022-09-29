@@ -2136,22 +2136,22 @@ server <- function(input,output,session){
   shiny::observeEvent(input$celldart_start, {
     shinybusy::show_modal_spinner()
     if (!is.null(v$sp_data)&!is.null(v$sc_data)){
-      brain.tmp <- STquantool::pred_cellf_celldart(sp_data=v$sp_data,sc_data=v$sc_data,
-                                                   outdir=file.path('.',input$output_folder_name),
-                                                   sp_subset=input$celldart_check_subset,
-                                                   spot.cluster.name=input$celldart_group,
-                                                   spot.cluster.of.interest=input$celldart_group_sel,
-                                                   metadata_celltype=input$celldart_metadata_celltype,
-                                                   conda.env.name='STquantool',gpu=TRUE,
-                                                   num_markers=input$celldart_num_markers,
-                                                   seed_num=0,
-                                                   nmix=input$celldart_nmix, npseudo=input$celldart_npseudo,
-                                                   alpha=input$celldart_alpha, alpha_lr=input$celldart_alpha_lr,
-                                                   emb_dim=input$celldart_emb_dim,
-                                                   batch_size=input$celldart_batch_size,
-                                                   n_iterations=input$celldart_n_iterations,
-                                                   init_train_epoch=input$celldart_init_train_epoch)
-      v$sp_data <- brain.tmp
+      try({brain.tmp <- STquantool::pred_cellf_celldart(sp_data=v$sp_data,sc_data=v$sc_data,
+                                                        outdir=file.path('.',input$output_folder_name),
+                                                        sp_subset=input$celldart_check_subset,
+                                                        spot.cluster.name=input$celldart_group,
+                                                        spot.cluster.of.interest=input$celldart_group_sel,
+                                                        metadata_celltype=input$celldart_metadata_celltype,
+                                                        conda.env.name='STquantool',gpu=TRUE,
+                                                        num_markers=input$celldart_num_markers,
+                                                        seed_num=0,
+                                                        nmix=input$celldart_nmix, npseudo=input$celldart_npseudo,
+                                                        alpha=input$celldart_alpha, alpha_lr=input$celldart_alpha_lr,
+                                                        emb_dim=input$celldart_emb_dim,
+                                                        batch_size=input$celldart_batch_size,
+                                                        n_iterations=input$celldart_n_iterations,
+                                                        init_train_epoch=input$celldart_init_train_epoch)
+      v$sp_data <- brain.tmp})
     }
     shinybusy::remove_modal_spinner()
   })
