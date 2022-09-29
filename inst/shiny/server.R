@@ -1,8 +1,8 @@
-#' Internal server function
-#' @description Server function for STquantool
-#' @keywords internal
-#' @importFrom dplyr "%>%"
-#' @importFrom DT "%>%"
+library(shiny)
+library(dplyr)
+library(DT)
+library(STquantool)
+
 server <- function(input,output,session){
   # Directory setting
   shinyFiles::shinyDirChoose(

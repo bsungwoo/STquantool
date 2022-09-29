@@ -1,11 +1,11 @@
+library(shiny)
+library(dplyr)
+library(DT)
+library(STquantool)
+
 options(shiny.maxRequestSize = 50*1024*1024^2)
 jscode <- "shinyjs.closeWindow = function() { window.close(); }"
 
-#' Internal UI function
-#' @description UI function for STquantool
-#' @importFrom dplyr "%>%"
-#' @importFrom DT "%>%"
-#' @keywords internal
 ui <- shiny::navbarPage(title = "STquantool", theme = shinythemes::shinytheme("spacelab"),
                  shiny::tabPanel(title = "Info",
                           shiny::h2(style = "font-family:San-serif", "STquantool"),
