@@ -7,7 +7,7 @@ server <- function(input,output,session){
   shinyFiles::shinyDirChoose(
     input,
     'dir',
-    roots = c(home = '~', wd = '.'),
+    roots = c(home = fs::path_home(), wd = '.'),
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
@@ -72,7 +72,7 @@ server <- function(input,output,session){
   shinyFiles::shinyDirChoose(
     input,
     'qc_dir',
-    roots = c(home = '~', wd ='.'),
+    roots = c(home = fs::path_home(), wd ='.'),
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
@@ -279,7 +279,7 @@ server <- function(input,output,session){
   shinyFiles::shinyDirChoose(
     input,
     'dir_integ',
-    roots = c(home = '~', wd ='.'),
+    roots = c(home = fs::path_home(), wd ='.'),
     filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad")
   )
 
@@ -2521,7 +2521,7 @@ server <- function(input,output,session){
 
   # Load single-cell or spatial data in RDS format
   shinyFiles::shinyFileChoose(input, 'data_load',
-                              roots = c(home = '~', wd ='.'),
+                              roots = c(home = fs::path_home(), wd ='.'),
                               filetypes = c('',"txt","tsv","csv","rds","png","h5","h5ad"))
 
   data_load <- shiny::reactive(input$data_load)
@@ -2595,7 +2595,7 @@ server <- function(input,output,session){
 
   # Choose the files to convert
   shinyFiles::shinyFileChoose(input, 'choose_file_to_convert',
-                              roots = c(home = '~', wd ='.'),
+                              roots = c(home = fs::path_home(), wd ='.'),
                               filetypes = c('',"txt","csv"))
 
   choose_file_to_convert <- shiny::reactive(input$choose_file_to_convert)
