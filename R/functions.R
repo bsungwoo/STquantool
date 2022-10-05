@@ -26,8 +26,8 @@ horizontal_flip <- function(file_dir_vector){
     for (x in orig_file_name[1:2]){
       img_orig <- magick::image_read(paste0(file_dir,'/spatial/',x))
       file.rename(paste0(file_dir,'/spatial/',x),
-                  paste0(file_dir,'/spatial/',
-                         strsplit(x,'[.]')[[1]][1],'_orig.png'))
+                  paste0(file_dir,'/spatial/','orig_',
+                         strsplit(x,'[.]')[[1]][1],'.png'))
       img_mod <- magick::image_flop(img_orig)
       if (x == orig_file_name[1]){width_hires <- magick::image_info(img_mod)[[2]]}
       magick::image_write(img_mod, paste0(file_dir,'/spatial/',x))
@@ -36,8 +36,8 @@ horizontal_flip <- function(file_dir_vector){
     coord <- utils::read.csv(paste0(file_dir,'/spatial/',orig_file_name[3]),
                              header=FALSE)
     file.rename(paste0(file_dir,'/spatial/',orig_file_name[3]),
-                paste0(file_dir,'/spatial/',
-                       strsplit(orig_file_name[3],'[.]')[[1]][1],'_orig.csv'))
+                paste0(file_dir,'/spatial/','orig_',
+                       strsplit(orig_file_name[3],'[.]')[[1]][1],'.csv'))
     scale_factor <- rjson::fromJSON(file = paste0(file_dir,'/spatial/',orig_file_name[4]))
     coord_mod <- coord %>% dplyr::mutate(V4=127-V4, V6=width_hires/(scale_factor[[2]])-V6)
     utils::write.table(coord_mod, paste0(file_dir,'/spatial/',orig_file_name[3]),
@@ -59,8 +59,8 @@ vertical_flip <- function(file_dir_vector){
     for (x in orig_file_name[1:2]){
       img_orig <- magick::image_read(paste0(file_dir,'/spatial/',x))
       file.rename(paste0(file_dir,'/spatial/',x),
-                  paste0(file_dir,'/spatial/',
-                         strsplit(x,'[.]')[[1]][1],'_orig.png'))
+                  paste0(file_dir,'/spatial/','orig_',
+                         strsplit(x,'[.]')[[1]][1],'.png'))
       img_mod <- magick::image_flip(img_orig)
       if (x == orig_file_name[1]){height_hires <- magick::image_info(img_mod)[[3]]}
       magick::image_write(img_mod, paste0(file_dir,'/spatial/',x))
@@ -69,8 +69,8 @@ vertical_flip <- function(file_dir_vector){
     coord <- utils::read.csv(paste0(file_dir,'/spatial/',orig_file_name[3]),
                              header=FALSE)
     file.rename(paste0(file_dir,'/spatial/',orig_file_name[3]),
-                paste0(file_dir,'/spatial/',
-                       strsplit(orig_file_name[3],'[.]')[[1]][1],'_orig.csv'))
+                paste0(file_dir,'/spatial/','orig_',
+                       strsplit(orig_file_name[3],'[.]')[[1]][1],'.csv'))
     scale_factor <- rjson::fromJSON(file = paste0(file_dir,'/spatial/',orig_file_name[4]))
     coord_mod <- coord %>% dplyr::mutate(V3=77-V3, V5=height_hires/(scale_factor[[2]])-V5)
     utils::write.table(coord_mod, paste0(file_dir,'/spatial/',orig_file_name[3]),
