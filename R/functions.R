@@ -968,7 +968,7 @@ save_feat_plot_by_n <- function(object,feats_of_interest,grp=NULL,
                                 height = 8, width = 8, dpi = 200,
                                 save_path='./figures/integ',
                                 file_name = 'feats',
-                                sort.by.expression=TRUE, assay=NULL, slot='data'){
+                                sort.by.expression=FALSE, assay=NULL, slot='data'){
   # Sort by the expression level
   if (sort.by.expression){
     if (!is.null(spot.cluster.highlight)){
