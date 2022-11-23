@@ -955,7 +955,8 @@ server <- function(input,output,session){
     if (!is.null(v$sp_csv_table)&!is.null(input$sp_column_select)){
       data_table <- v$sp_csv_table
       data_gene <- data_table[[input$sp_column_select]]
-      v[['gene_upload']][[input$sp_feat_save_name]] <- intersect(v$sp_gene_list, data_gene)
+      v[['gene_upload']][[input$sp_feat_save_name]] <- c(intersect(v$sp_gene_list, data_gene),
+                                                         intersect(v$sp_meta_list_value, data_gene))
     }
     shinybusy::remove_modal_spinner()
   })
@@ -995,7 +996,9 @@ server <- function(input,output,session){
       eval(parse(text=paste0('sp_feat_list <- data_tmp$',input$sp_column_select)))
 
       if (!is.null(sp_featplot_multi_list()[[18]])){
-        sp_feat_list <- intersect(rownames(sp_featplot_multi_list()[[18]]), sp_feat_list)
+        sp_feat_list1 <- intersect(rownames(sp_featplot_multi_list()[[18]]), sp_feat_list)
+        sp_feat_list2 <- intersect(colnames(sp_featplot_multi_list()[[18]]@meta.data), sp_feat_list)
+        sp_feat_list <- c(sp_feat_list1, sp_feat_list2)
         if (!identical(sp_feat_list, character(0))){
           if (!is.null(sp_featplot_multi_list()[[10]])){
             slide_vis <- sp_featplot_multi_list()[[10]]
