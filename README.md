@@ -1,7 +1,7 @@
 # STquantool
 ST analysis tool to visualize and quantify multiple datasets  
--> Cite as: Lee EJ, Bae S, Suh M, Choi H, Choi Y, Hwang DW, Lee DS. Spatial transcriptomic brain imaging reveals the effects of immunomodulation therapy upon specific regional brain cells in mouse dementia model. bioRxiv. 2023.  
--> https://doi.org/10.1101/2023.01.20.524845  
+* Cite as: Lee EJ, Bae S, Suh M, Choi H, Choi Y, Hwang DW, Lee DS. Spatial transcriptomic brain imaging reveals the effects of immunomodulation therapy upon specific regional brain cells in mouse dementia model. bioRxiv. 2023.  
+* https://doi.org/10.1101/2023.01.20.524845  
 
 ## Installation and running
 ### 1. Using in R
@@ -10,17 +10,13 @@ devtools::install_github('bsungwoo/STquantool', force = T)
 STquantool::run_app()
 ```
 ### 2. Standalone app
-Please download file: [STquantool_v1_windows.exe]()  
+Please download file: [STquantool_v1_windows.exe](https://github.com/bsungwoo/STquantool/releases/download/v1.0.1/STquantool_v1_windows.7z)  
 
 ## Key packages
 ** Python  
-```Plain Text
-NSForest 3.0
--> Copied the code to ./inst/python/NSForest_v3.py
-```
+NSForest 3.0: Copied the code to ./inst/python/NSForest_v3.py  
 ** R  
-For details, please refer to DESCRIPTION file.  
-[R package requirements](https://github.com/bsungwoo/STquantool/blob/main/DESCRIPTION)  
+For details, please refer to DESCRIPTION file: [R package requirements](https://github.com/bsungwoo/STquantool/blob/main/DESCRIPTION)  
 
 ## Usage
 The R shiny application panel consists of main, upload, visualization, and analysis sections.  
