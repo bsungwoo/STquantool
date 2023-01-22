@@ -9,7 +9,7 @@ ST analysis tool to visualize and quantify multiple datasets
 devtools::install_github('bsungwoo/STquantool', force = T)
 STquantool::run_app()
 ```
-### 2. Standalone app
+### 2. Standalone app (packaged with [electron-packager](https://github.com/electron/electron-packager))
 Please download file: [STquantool_v1_windows.exe](https://github.com/bsungwoo/STquantool/releases/download/v1.0.1/STquantool_v1_windows.7z)  
 
 ## Key packages
