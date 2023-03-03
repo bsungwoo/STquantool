@@ -6,6 +6,13 @@ ST analysis tool to visualize and quantify multiple datasets
 ## Installation and running
 ### 1. Using in R
 ```Plain Text
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("clusterProfiler")
+BiocManager::install("org.Mm.eg.db")
+BiocManager::install("org.Hs.eg.db")
+BiocManager::install("EnhancedVolcano")
+
 devtools::install_github('bsungwoo/STquantool', force = T)
 STquantool::run_app()
 ```
